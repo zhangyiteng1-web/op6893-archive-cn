@@ -25,8 +25,8 @@
     .step h3 { color: #00ffa3; font-size: 0.85rem; margin-bottom: 10px; letter-spacing: 0.1em; }
     .step p { color: #9fb2c5; font-size: 0.92rem; line-height: 1.7; }
     .code {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(98, 247, 255, 0.2);
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(98,247,255,0.2);
       border-radius: 10px;
       padding: 14px;
       margin: 10px 0;
@@ -34,26 +34,23 @@
       font-size: 0.8rem;
       color: #62f7ff;
       word-break: break-all;
-      user-select: all;
-      -webkit-user-select: all;
     }
     .btn {
       display: inline-block;
-      padding: 12px 24px;
-      border: 1px solid rgba(0, 255, 163, 0.5);
+      padding: 14px 28px;
+      border: 1px solid rgba(0,255,163,0.5);
       border-radius: 12px;
-      background: rgba(0, 255, 163, 0.12);
+      background: rgba(0,255,163,0.12);
       color: #00ffa3;
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 1rem;
       text-decoration: none;
       cursor: pointer;
       margin-top: 8px;
     }
-    .btn:hover { background: rgba(0, 255, 163, 0.2); }
     .result {
-      background: rgba(0, 255, 163, 0.08);
-      border: 1px solid rgba(0, 255, 163, 0.3);
+      background: rgba(0,255,163,0.08);
+      border: 1px solid rgba(0,255,163,0.3);
       border-radius: 16px;
       padding: 16px;
       margin-top: 10px;
@@ -61,80 +58,52 @@
     }
     .result .label { color: #00ffa3; font-size: 0.8rem; font-weight: 900; margin-bottom: 6px; }
     .result .token { font-family: monospace; font-size: 0.75rem; color: #fff; }
-    .error { color: #ff5a78; font-size: 0.9rem; margin-top: 8px; }
-    hr { border: none; border-top: 1px solid rgba(126, 239, 255, 0.1); margin: 16px 0; }
+    .error { color: #ff5a78; }
+    input { width: 100%; padding: 14px; border: 1px solid rgba(98,247,255,0.3); border-radius: 10px; background: rgba(0,0,0,0.4); color: #fff; font: inherit; margin: 10px 0; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>获取123云盘Token</h1>
-    <p style="color:#7e97ad;margin-bottom:20px;">用于 GitHub Actions 镜像脚本自动登录</p>
+    <p style="color:#7e97ad;margin-bottom:20px;">用于 GitHub Actions 镜像脚本</p>
 
     <div class="step">
-      <h3>方式一（推荐）· 浏览器控制台</h3>
-      <p>用手机浏览器打开 123pan.com 并登录，然后复制下面这段代码：</p>
-      <div class="code" id="code1">javascript:var t=localStorage.getItem("token")||localStorage.getItem("authorization")||JSON.parse(localStorage.getItem("user")||"{}").token;if(t){prompt("复制下面这行Token:",t)}else{alert("未找到Token，请先登录123pan.com")}</div>
-      <p style="font-size:0.85rem;color:#8ea4ba;">长按上方代码 → 全选 → 复制。然后在浏览器地址栏粘贴并回车。</p>
-      <p style="font-size:0.8rem;color:#5a7a90;margin-top:8px;">如果浏览器阻止了 javascript: 协议，请用方式二</p>
+      <h3>方式一 · 书签法（手机可用）</h3>
+      <p>1. 添加一个书签，名称随意，网址填下面这段：</p>
+      <div class="code" id="bm">javascript:(function(){var t=JSON.parse(localStorage.user||'{}').token;if(t){var e=document.createElement('textarea');e.value=t;e.style.position='fixed';e.style.top='0';e.style.left='0';e.style.width='100%';e.style.height='200px';e.style.zIndex='99999';e.style.background='#111';e.style.color='#0f0';e.style.fontSize='12px';e.style.padding='10px';document.body.appendChild(e);e.select();e.setSelectionRange(0,99999);navigator.clipboard.writeText(t);alert('Token已复制: '+t.substring(0,30)+'...')}else{alert('未找到，请先登录123pan.com')}})();</div>
+      <p>2. 打开 <a href="https://www.123pan.com" target="_blank" style="color:#62f7ff;">123pan.com</a> 并登录</p>
+      <p>3. 点击那个书签，Token 会自动复制并弹出</p>
     </div>
 
     <div class="step">
-      <h3>方式二 · 此页面直接提取</h3>
-      <p>前提：你已经在同一浏览器中登录过 <a href="https://www.123pan.com/" target="_blank" style="color:#62f7ff;">123pan.com</a></p>
-      <p>点击下方按钮，通过 iframe 尝试读取 token（部分浏览器可能阻止）：</p>
-      <button class="btn" onclick="tryExtract()">尝试提取Token</button>
-      <div id="result" style="margin-top:10px;"></div>
+      <h3>方式二 · 电脑浏览器（最简单）</h3>
+      <p>在电脑上登录 123pan.com，按 F12 → Console，粘贴下面代码回车：</p>
+      <div class="code">JSON.parse(localStorage.user).token</div>
+      <p>输出的那串文字就是 Token，复制即可。</p>
     </div>
 
     <div class="step">
-      <h3>方式三 · 手动查找</h3>
-      <p>1. 用手机浏览器打开 <a href="https://www.123pan.com/" target="_blank" style="color:#62f7ff;">www.123pan.com</a> 并登录</p>
-      <p>2. 在地址栏输入（先复制好）：</p>
-      <div class="code">javascript:alert(JSON.parse(localStorage.user).token)</div>
-      <p>3. 如果弹出了很长一串文字，复制下来就是 Token</p>
+      <h3>方式三 · 手动输入</h3>
+      <p>如果你能通过其他方式获取 Token，直接粘贴到下方：</p>
+      <input id="tokenInput" placeholder="粘贴 Bearer Token...">
+      <button class="btn" onclick="showToken()">确认</button>
+      <div id="result"></div>
     </div>
-
-    <hr>
 
     <div class="step">
       <h3>拿到Token后</h3>
-      <p>去 GitHub 仓库 → <strong>Settings → Secrets and variables → Actions → Secrets</strong></p>
-      <p>新建一个 secret：<strong>Name</strong> = <code>PAN123_TOKEN</code>，<strong>Value</strong> = 粘贴Token</p>
-      <p style="margin-top:10px;color:#8ea4ba;">然后手动触发 "Mirror to 123pan" workflow 即可（不需要填手机号密码了）</p>
+      <p>去 GitHub 仓库 → <strong>Settings → Secrets → Actions → Secrets</strong></p>
+      <p>新建 <code>PAN123_TOKEN</code>，粘贴 Token</p>
+      <p style="margin-top:10px;color:#8ea4ba;">然后触发 "Mirror to 123pan" workflow</p>
     </div>
   </div>
 
   <script>
-    async function tryExtract() {
-      const result = document.getElementById('result');
-      result.innerHTML = '<p style="color:#ffd166;">正在尝试...</p>';
-
-      // Try to read from this page's localStorage (won't work unless same origin)
-      // This is a fallback - most browsers block cross-origin access
-      const keys = ['token', 'authorization', 'user', 'auth', 'access_token'];
-      let found = false;
-
-      for (const key of keys) {
-        try {
-          const val = localStorage.getItem(key);
-          if (val) {
-            let token = val;
-            try {
-              const parsed = JSON.parse(val);
-              token = parsed.token || parsed.authorization || parsed.access_token || val;
-            } catch {}
-            if (token && token.length > 20) {
-              result.innerHTML = `<div class="result"><div class="label">✓ 找到Token</div><div class="token">${token}</div></div>
-                <p style="color:#00ffa3;margin-top:10px;">长按上方Token复制，添加到GitHub Secret → PAN123_TOKEN</p>`;
-              found = true;
-              break;
-            }
-          }
-        } catch {}
-      }
-
-      if (!found) {
-        result.innerHTML = `<p class="error">未能从此页面提取Token。<br>请用方式一（复制地址栏代码）或方式三（手动）</p>`;
+    function showToken() {
+      var t = document.getElementById('tokenInput').value.trim();
+      if (t) {
+        document.getElementById('result').innerHTML = '<div class="result"><div class="label">Token已就绪（已复制到剪贴板）</div><div class="token">'+t+'</div></div>';
+        navigator.clipboard.writeText(t).catch(()=>{});
       }
     }
   </script>

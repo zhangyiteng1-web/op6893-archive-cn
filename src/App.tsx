@@ -43,6 +43,7 @@ type ArchiveFile = {
   size?: string;
   url?: string;
   changelog?: string;
+  changelog_zh?: string;
 };
 
 type ArchiveData = {
@@ -137,6 +138,10 @@ function formatChangelog(text: string): string {
     .map((s) => s.trim())
     .filter(Boolean)
     .join(" || ");
+}
+
+function getBestChangelog(file: ArchiveFile): string {
+  return file.changelog_zh ?? file.changelog ?? "";
 }
 
 function renderChangelogHtml(text: string): string {
@@ -258,7 +263,7 @@ export default function App() {
     const keyword = query.trim().toLowerCase();
     const matched = files.filter((file) => {
       const matchesCategory = category === "all" || file.category === category;
-      const target = `${file.name ?? ""} ${file.version ?? ""} ${file.android ?? ""} ${file.changelog ?? ""}`.toLowerCase();
+      const target = `${file.name ?? ""} ${file.version ?? ""} ${file.android ?? ""} ${file.changelog ?? ""} ${file.changelog_zh ?? ""}`.toLowerCase();
       return matchesCategory && (!keyword || target.includes(keyword));
     });
     return sortFiles(matched, sortBy, sortAsc);
@@ -490,24 +495,25 @@ export default function App() {
                 <tbody>
                   {filteredFiles.map((file) => {
                     const isExpanded = expandedRows.has(file.id);
+                    const bestChangelog = getBestChangelog(file);
                     return (
                       <tr
                         key={file.id}
-                        className={`${isExpanded ? "expanded" : ""} ${file.changelog ? "clickable" : ""}`}
-                        onClick={() => file.changelog && toggleRow(file.id)}
+                        className={`${isExpanded ? "expanded" : ""} ${bestChangelog ? "clickable" : ""}`}
+                        onClick={() => bestChangelog && toggleRow(file.id)}
                       >
                         <td>
                           <span className="tag">{file.categoryLabel}</span>
                         </td>
                         <td>
                           <strong>{file.name ?? "未命名文件"}</strong>
-                          {file.changelog && !isExpanded && (
-                            <small>{formatChangelog(file.changelog)}</small>
+                          {bestChangelog && !isExpanded && (
+                            <small>{formatChangelog(bestChangelog)}</small>
                           )}
-                          {file.changelog && isExpanded && (
+                          {bestChangelog && isExpanded && (
                             <div
                               className="changelogFull"
-                              dangerouslySetInnerHTML={{ __html: renderChangelogHtml(file.changelog) }}
+                              dangerouslySetInnerHTML={{ __html: renderChangelogHtml(bestChangelog) }}
                             />
                           )}
                         </td>
@@ -551,11 +557,12 @@ export default function App() {
             <div className="mobileCards">
               {filteredFiles.map((file) => {
                 const isExpanded = expandedRows.has(file.id);
+                const bestChangelog = getBestChangelog(file);
                 return (
                   <article
                     className="mobileCard"
                     key={file.id}
-                    onClick={() => file.changelog && toggleRow(file.id)}
+                    onClick={() => bestChangelog && toggleRow(file.id)}
                   >
                     <div className="mobileCardHeader">
                       <span className="tag">{file.categoryLabel}</span>
@@ -567,13 +574,13 @@ export default function App() {
                       <span>{file.version ? `v${file.version}` : "—"}</span>
                       <span>{file.size ?? "—"}</span>
                     </div>
-                    {file.changelog && isExpanded && (
+                    {bestChangelog && isExpanded && (
                       <div
                         className="changelogFull"
-                        dangerouslySetInnerHTML={{ __html: renderChangelogHtml(file.changelog) }}
+                        dangerouslySetInnerHTML={{ __html: renderChangelogHtml(bestChangelog) }}
                       />
                     )}
-                    {file.changelog && !isExpanded && (
+                    {bestChangelog && !isExpanded && (
                       <small className="mobileCardHint">点击查看更新日志</small>
                     )}
                     {file.url && (

@@ -1,11 +1,14 @@
 /**
  * 123pan mirror script
- * - Logs into 123pan with phone + password to get Bearer token
+ * - Authenticates via pre-obtained Bearer token (PAN123_TOKEN) or phone+password login
  * - Reads public/index.json and compares with public/.mirrored.json
  * - Downloads new files from archive.org → uploads to 123pan → creates share link
  * - Replaces download URLs in index.json with 123pan share links
  *
- * Required env vars:
+ * Required env vars (one of):
+ *   PAN123_TOKEN    - 123pan Bearer token (preferred, avoids verification code)
+ *
+ * Fallback env vars (if no token):
  *   PAN123_PHONE    - 123pan account phone number
  *   PAN123_PASSWORD - 123pan account password
  *
@@ -107,12 +110,47 @@ async function apiGet(url, params = {}) {
 
 // ── Login ───────────────────────────────────────────────────────────────────
 
+/**
+ * Validate that the current token is still usable.
+ */
+async function validateToken() {
+  try {
+    const res = await fetch(`${BASE_URL}/b/api/file/list/new`, {
+      headers: headers(),
+    });
+    const json = await res.json();
+    return json.code === 0 || json.code === 200;
+  } catch {
+    return false;
+  }
+}
+
 async function login() {
+  // 1. Try pre-obtained token first (avoids verification code)
+  const token = process.env.PAN123_TOKEN;
+
+  if (token) {
+    authToken = token;
+    log("Using pre-obtained PAN123_TOKEN...");
+
+    const valid = await validateToken();
+    if (valid) {
+      log("Token is valid, skipping login");
+      return;
+    }
+
+    warn("Token expired or invalid, falling back to phone+password login...");
+  }
+
+  // 2. Fallback: phone + password login
   const phone = process.env.PAN123_PHONE;
   const password = process.env.PAN123_PASSWORD;
 
   if (!phone || !password) {
-    throw new Error("Missing PAN123_PHONE or PAN123_PASSWORD env vars");
+    throw new Error(
+      "Missing PAN123_TOKEN (preferred) or PAN123_PHONE+PAN123_PASSWORD for authentication. " +
+      "Run `node scripts/get-123pan-token.js` locally to obtain a token and store it as PAN123_TOKEN secret in GitHub Actions."
+    );
   }
 
   log(`Logging into 123pan as ${phone}...`);
@@ -141,6 +179,7 @@ async function login() {
 
   authToken = json.data.token;
   log("Login successful");
+  log(`Token (save as PAN123_TOKEN secret): ${authToken}`);
 }
 
 // ── Upload ───────────────────────────────────────────────────────────────────

@@ -126,12 +126,54 @@ async function validateToken() {
 }
 
 async function login() {
-  // 1. Try pre-obtained token first (avoids verification code)
+  // 1. Try phone + password (primary, device will be remembered after first login)
+  const phone = process.env.PAN123_PHONE;
+  const password = process.env.PAN123_PASSWORD;
+
+  if (phone && password) {
+    log(`Logging into 123pan as ${phone}...`);
+
+    const res = await fetch(`${USER_API}/api/user/sign_in`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://yun.123pan.cn",
+        Referer: "https://yun.123pan.cn/",
+        Platform: "web",
+        "App-Version": "3",
+      },
+      body: JSON.stringify({
+        remember: true,
+        passport: phone,
+        password: password,
+      }),
+    });
+
+    const json = await res.json();
+
+    if (json.code === 200) {
+      authToken = json.data.token;
+      log("Login successful");
+      return;
+    }
+
+    if (json.code === 401 || json.message?.includes("verify") || json.message?.includes("验证")) {
+      warn(`Login requires verification: ${json.message}`);
+      warn("Please check your email for the verification code and enter it at https://yun.123pan.cn/");
+      warn("Or wait a few minutes and try again — 123pan may trust this IP after the first attempt.");
+      throw new Error(`Login blocked: ${json.message || JSON.stringify(json)}`);
+    }
+
+    // If phone login failed but not due to verification, try token
+    warn(`Phone login failed (code=${json.code}), trying token...`);
+  }
+
+  // 2. Try token fallback
   const token = process.env.PAN123_TOKEN;
 
   if (token) {
     authToken = token;
-    log("Using pre-obtained PAN123_TOKEN...");
+    log("Using PAN123_TOKEN...");
 
     const valid = await validateToken();
     if (valid) {
@@ -139,47 +181,12 @@ async function login() {
       return;
     }
 
-    warn("Token expired or invalid, falling back to phone+password login...");
+    warn("Token expired or invalid");
   }
 
-  // 2. Fallback: phone + password login
-  const phone = process.env.PAN123_PHONE;
-  const password = process.env.PAN123_PASSWORD;
-
-  if (!phone || !password) {
-    throw new Error(
-      "Missing PAN123_TOKEN (preferred) or PAN123_PHONE+PAN123_PASSWORD for authentication. " +
-      "Run `node scripts/get-123pan-token.js` locally to obtain a token and store it as PAN123_TOKEN secret in GitHub Actions."
-    );
-  }
-
-  log(`Logging into 123pan as ${phone}...`);
-
-  const res = await fetch(`${USER_API}/api/user/sign_in`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Origin: "https://yun.123pan.cn",
-      Referer: "https://yun.123pan.cn/",
-      Platform: "web",
-      "App-Version": "3",
-    },
-    body: JSON.stringify({
-      remember: true,
-      passport: phone,
-      password: password,
-    }),
-  });
-
-  const json = await res.json();
-
-  if (json.code !== 200) {
-    throw new Error(`123pan login failed: code=${json.code} message=${json.message || JSON.stringify(json)}`);
-  }
-
-  authToken = json.data.token;
-  log("Login successful");
-  log(`Token (save as PAN123_TOKEN secret): ${authToken}`);
+  throw new Error(
+    "Authentication failed. Provide PAN123_PHONE + PAN123_PASSWORD (or PAN123_TOKEN) in GitHub Secrets."
+  );
 }
 
 // ── Upload ───────────────────────────────────────────────────────────────────

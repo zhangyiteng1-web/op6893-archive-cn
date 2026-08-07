@@ -33,7 +33,7 @@ jobs:
   mirror:
     needs: sync
     runs-on: ubuntu-latest
-    if: ${{ secrets.PAN123_TOKEN != '' }}
+    if: ${{ secrets.PAN123_PHONE != '' }}
 
     steps:
       - name: Checkout
@@ -47,6 +47,8 @@ jobs:
       - name: Mirror new files to 123pan
         run: node scripts/mirror-to-123pan.js
         env:
+          PAN123_PHONE: ${{ secrets.PAN123_PHONE }}
+          PAN123_PASSWORD: ${{ secrets.PAN123_PASSWORD }}
           PAN123_TOKEN: ${{ secrets.PAN123_TOKEN }}
 
       - name: Commit mirrored index

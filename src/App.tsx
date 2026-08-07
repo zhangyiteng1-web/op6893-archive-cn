@@ -321,6 +321,9 @@ export default function App() {
               <a className="button" href="https://rmx3031-archive.pages.dev/" target="_blank">
                 访问原站
               </a>
+              <a className="button" href="#sponsor">
+                赞助支持
+              </a>
             </div>
           </div>
 
@@ -608,7 +611,7 @@ export default function App() {
         </button>
       )}
 
-      <section className="section sponsorSection">
+      <section className="section sponsorSection" id="sponsor">
         <div className="sponsorCard">
           <div className="sponsorCopy">
             <p className="eyebrow">SUPPORT THE PROJECT</p>

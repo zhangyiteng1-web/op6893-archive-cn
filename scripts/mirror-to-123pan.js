@@ -114,23 +114,26 @@ async function apiGet(url, params = {}) {
  * Validate that the current token is still usable.
  */
 async function validateToken() {
-  // Try multiple endpoints to validate the token
+  // Try multiple endpoints to validate the token, simplest first
   const endpoints = [
-    `${BASE_URL}/b/api/file/list/new`,
-    `${BASE_URL}/a/api/user/info`,
-    `https://www.123pan.cn/a/api/user/info`,
+    { url: `${BASE_URL}/a/api/user/info`, method: "GET" },
+    { url: `https://www.123pan.cn/a/api/user/info`, method: "GET" },
+    { url: `${BASE_URL}/b/api/file/list/new?driveId=0&parentFileId=0&limit=1`, method: "GET" },
   ];
 
-  for (const url of endpoints) {
+  log(`Validating token (${endpoints.length} endpoints)...`);
+
+  for (const { url, method } of endpoints) {
     try {
-      const res = await fetch(url, { headers: headers() });
+      const res = await fetch(url, { method, headers: headers() });
       const json = await res.json();
-      log(`Token validation (${url}): code=${json.code} message=${json.message || ""}`);
       if (json.code === 0 || json.code === 200) {
+        log(`Token is valid (${url.split("?")[0]})`);
         return true;
       }
+      log(`  ${url.split("?")[0]}: code=${json.code} ${json.message || ""}`);
     } catch (err) {
-      log(`Token validation error (${url}): ${err.message}`);
+      log(`  ${url.split("?")[0]}: ${err.message}`);
     }
   }
 

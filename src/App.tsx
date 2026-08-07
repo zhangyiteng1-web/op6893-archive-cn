@@ -500,15 +500,21 @@ export default function App() {
                       <tr
                         key={file.id}
                         className={`${isExpanded ? "expanded" : ""} ${bestChangelog ? "clickable" : ""}`}
-                        onClick={() => bestChangelog && toggleRow(file.id)}
                       >
                         <td>
                           <span className="tag">{file.categoryLabel}</span>
                         </td>
                         <td>
-                          <strong>{file.name ?? "未命名文件"}</strong>
+                          <strong
+                            className={bestChangelog ? "expandToggle" : ""}
+                            onClick={() => bestChangelog && toggleRow(file.id)}
+                            title={bestChangelog ? (isExpanded ? "点击收起" : "点击展开日志") : ""}
+                          >
+                            {file.name ?? "未命名文件"}
+                            {bestChangelog && <span className="expandIcon">{isExpanded ? " ▾" : " ▸"}</span>}
+                          </strong>
                           {bestChangelog && !isExpanded && (
-                            <small>{formatChangelog(bestChangelog)}</small>
+                            <small className="changelogPreview">{formatChangelog(bestChangelog)}</small>
                           )}
                           {bestChangelog && isExpanded && (
                             <div
@@ -562,13 +568,18 @@ export default function App() {
                   <article
                     className="mobileCard"
                     key={file.id}
-                    onClick={() => bestChangelog && toggleRow(file.id)}
                   >
                     <div className="mobileCardHeader">
                       <span className="tag">{file.categoryLabel}</span>
                       <span className="mobileCardDate">{file.date ?? "—"}</span>
                     </div>
-                    <h4>{file.name ?? "未命名文件"}</h4>
+                    <h4
+                      className={bestChangelog ? "expandToggle" : ""}
+                      onClick={() => bestChangelog && toggleRow(file.id)}
+                    >
+                      {file.name ?? "未命名文件"}
+                      {bestChangelog && <span className="expandIcon">{isExpanded ? " ▾" : " ▸"}</span>}
+                    </h4>
                     <div className="mobileCardMeta">
                       <span>Android {file.android ?? "—"}</span>
                       <span>{file.version ? `v${file.version}` : "—"}</span>
@@ -580,9 +591,7 @@ export default function App() {
                         dangerouslySetInnerHTML={{ __html: renderChangelogHtml(bestChangelog) }}
                       />
                     )}
-                    {bestChangelog && !isExpanded && (
-                      <small className="mobileCardHint">点击查看更新日志</small>
-                    )}
+                    {bestChangelog && !isExpanded && null}
                     {file.url && (
                       <div className="mobileCardActions">
                         <a href={file.url} target="_blank" onClick={(e) => e.stopPropagation()}>

@@ -30,7 +30,6 @@ const BASE_URL = "https://www.123pan.cn";
 const USER_API = "https://user.123pan.cn";
 const MAX_SIZE_MB = parseInt(process.env.PAN123_MAX_SIZE_MB || "0", 10); // 0 = no limit
 const DRY_RUN = process.env.PAN123_DRY_RUN === "1";
-const FORCE_ALL = process.env.PAN123_FORCE_ALL === "1";
 const MIRRORED_FILE = "public/.mirrored.json";
 const INDEX_FILE = "public/index.json";
 const CHUNK_SIZE = 8 * 1024 * 1024; // 8MB chunks for multipart upload
@@ -777,21 +776,15 @@ async function main() {
   log(`Loaded index: ${allFiles.length} files across ${Object.keys(indexData).filter(isCategoryKey).length} categories`);
   log(`Previously mirrored: ${Object.keys(mirrored).length} files`);
 
-  if (FORCE_ALL) {
-    log("FORCE_ALL mode: ignoring mirrored state, will process all files");
-  }
-
-  // 4. Find new files (or all files in FORCE_ALL mode)
-  const newFiles = FORCE_ALL
-    ? allFiles
-    : allFiles.filter((f) => !mirrored[f.file.url]);
+  // 4. Find new files
+  const newFiles = allFiles.filter((f) => !mirrored[f.file.url]);
 
   if (newFiles.length === 0) {
-    log("No files to mirror. Done.");
+    log("No new files to mirror. Done.");
     return;
   }
 
-  log(`Found ${newFiles.length} files to mirror${FORCE_ALL ? " (FORCE_ALL)" : ""}`);
+  log(`Found ${newFiles.length} new files to mirror`);
 
   // 5. Size check
   let skipped = 0;
@@ -850,15 +843,7 @@ async function main() {
           const actualSize = await fileSize(tmpPath);
           log(`  File size on disk: ${(actualSize / 1024 / 1024).toFixed(1)}MB`);
           if (actualSize === 0) {
-            warn(`  File is 0 bytes, skipping upload`);
-            mirroredEntry = {
-              shareUrl: null,
-              fileId: 0,
-              mirroredAt: new Date().toISOString(),
-              skipped: "empty_file",
-            };
-            skipped++;
-            break;
+            throw new Error("Downloaded file is 0 bytes");
           }
         }
 

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>获取123云盘Token</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,97 +13,172 @@
       padding: 24px;
       min-height: 100vh;
     }
-    .container { max-width: 600px; margin: 0 auto; }
-    h1 { font-size: 1.4rem; margin-bottom: 8px; color: #62f7ff; }
-    .step {
-      background: rgba(12, 23, 51, 0.8);
-      border: 1px solid rgba(126, 239, 255, 0.18);
-      border-radius: 16px;
-      padding: 20px;
+    .container { max-width: 500px; margin: 0 auto; }
+    h1 { font-size: 1.4rem; margin-bottom: 6px; color: #62f7ff; }
+    .sub { color: #7e97ad; margin-bottom: 24px; font-size: 0.9rem; }
+    .form {
+      background: rgba(12,23,51,0.85);
+      border: 1px solid rgba(126,239,255,0.2);
+      border-radius: 18px;
+      padding: 24px;
       margin-bottom: 16px;
     }
-    .step h3 { color: #00ffa3; font-size: 0.85rem; margin-bottom: 10px; letter-spacing: 0.1em; }
-    .step p { color: #9fb2c5; font-size: 0.92rem; line-height: 1.7; }
-    .code {
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(98,247,255,0.2);
-      border-radius: 10px;
-      padding: 14px;
-      margin: 10px 0;
-      font-family: monospace;
-      font-size: 0.8rem;
-      color: #62f7ff;
-      word-break: break-all;
-    }
-    .btn {
-      display: inline-block;
-      padding: 14px 28px;
-      border: 1px solid rgba(0,255,163,0.5);
+    .form label { display: block; color: #8ea4ba; font-size: 0.82rem; margin-bottom: 6px; margin-top: 14px; font-weight: 800; }
+    .form label:first-child { margin-top: 0; }
+    .form input {
+      width: 100%; padding: 14px;
+      border: 1px solid rgba(98,247,255,0.25);
       border-radius: 12px;
-      background: rgba(0,255,163,0.12);
-      color: #00ffa3;
-      font-weight: 800;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      font: inherit;
       font-size: 1rem;
-      text-decoration: none;
-      cursor: pointer;
-      margin-top: 8px;
+      outline: none;
     }
+    .form input:focus { border-color: #62f7ff; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #00e5ff, #7c3aed);
+      color: #fff;
+      font: inherit;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .result {
       background: rgba(0,255,163,0.08);
       border: 1px solid rgba(0,255,163,0.3);
       border-radius: 16px;
       padding: 16px;
-      margin-top: 10px;
+      margin-top: 16px;
       word-break: break-all;
     }
-    .result .label { color: #00ffa3; font-size: 0.8rem; font-weight: 900; margin-bottom: 6px; }
-    .result .token { font-family: monospace; font-size: 0.75rem; color: #fff; }
-    .error { color: #ff5a78; }
-    input { width: 100%; padding: 14px; border: 1px solid rgba(98,247,255,0.3); border-radius: 10px; background: rgba(0,0,0,0.4); color: #fff; font: inherit; margin: 10px 0; }
+    .result .label { color: #00ffa3; font-size: 0.8rem; font-weight: 900; margin-bottom: 8px; }
+    .result .token { font-family: monospace; font-size: 0.72rem; color: #fff; line-height: 1.5; }
+    .error { color: #ff5a78; margin-top: 10px; font-size: 0.9rem; }
+    .info { color: #ffd166; margin-top: 10px; font-size: 0.9rem; }
+    .copy-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 12px;
+      border: 1px solid rgba(0,255,163,0.5);
+      border-radius: 10px;
+      background: rgba(0,255,163,0.12);
+      color: #00ffa3;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .note {
+      background: rgba(255,209,102,0.08);
+      border: 1px solid rgba(255,209,102,0.2);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 16px;
+      color: #9fb2c5;
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+    hr { border: none; border-top: 1px solid rgba(126,239,255,0.1); margin: 20px 0; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>获取123云盘Token</h1>
-    <p style="color:#7e97ad;margin-bottom:20px;">用于 GitHub Actions 镜像脚本</p>
+    <p class="sub">此页面从你的浏览器直接调用123云盘登录API，不会经过第三方服务器</p>
 
-    <div class="step">
-      <h3>方式一 · 书签法（手机可用）</h3>
-      <p>1. 添加一个书签，名称随意，网址填下面这段：</p>
-      <div class="code" id="bm">javascript:(function(){var t=JSON.parse(localStorage.user||'{}').token;if(t){var e=document.createElement('textarea');e.value=t;e.style.position='fixed';e.style.top='0';e.style.left='0';e.style.width='100%';e.style.height='200px';e.style.zIndex='99999';e.style.background='#111';e.style.color='#0f0';e.style.fontSize='12px';e.style.padding='10px';document.body.appendChild(e);e.select();e.setSelectionRange(0,99999);navigator.clipboard.writeText(t);alert('Token已复制: '+t.substring(0,30)+'...')}else{alert('未找到，请先登录并在 yun.123pan.cn 页面点击')}})();</div>
-      <p>2. 打开 <a href="https://www.123pan.com" target="_blank" style="color:#62f7ff;">123pan.com</a> 登录，登录后会跳转到 <strong style="color:#ffd166;">yun.123pan.cn</strong></p>
-      <p>3. 在 <strong style="color:#ffd166;">yun.123pan.cn</strong> 页面点击那个书签，Token 会自动复制并弹出</p>
-    </div>
-
-    <div class="step">
-      <h3>方式二 · 电脑浏览器（最简单）</h3>
-      <p>在电脑上登录 123pan.com，登录后跳转至 yun.123pan.cn，按 F12 → Console，粘贴下面代码回车：</p>
-      <div class="code">JSON.parse(localStorage.user).token</div>
-      <p>输出的那串文字就是 Token，复制即可。</p>
-    </div>
-
-    <div class="step">
-      <h3>方式三 · 手动输入</h3>
-      <p>如果你能通过其他方式获取 Token，直接粘贴到下方：</p>
-      <input id="tokenInput" placeholder="粘贴 Bearer Token...">
-      <button class="btn" onclick="showToken()">确认</button>
+    <div class="form">
+      <label>123云盘手机号</label>
+      <input id="phone" type="tel" placeholder="输入手机号">
+      <label>123云盘密码</label>
+      <input id="password" type="password" placeholder="输入密码">
+      <button class="btn" id="loginBtn" onclick="doLogin()">登录并获取Token</button>
       <div id="result"></div>
     </div>
 
-    <div class="step">
-      <h3>拿到Token后</h3>
-      <p>去 GitHub 仓库 → <strong>Settings → Secrets → Actions → Secrets</strong></p>
-      <p>新建 <code>PAN123_TOKEN</code>，粘贴 Token</p>
-      <p style="margin-top:10px;color:#8ea4ba;">然后触发 "Mirror to 123pan" workflow</p>
+    <div class="note">
+      <strong style="color:#ffd166;">原理：</strong>你的手机浏览器在国内，直接调用123云盘API不会触发境外IP拦截。拿到Token后存入GitHub Secrets，GitHub Actions就能用Token直接访问了。
+    </div>
+
+    <hr>
+
+    <div class="note">
+      <strong style="color:#ffd166;">拿到Token后：</strong><br>
+      GitHub → Settings → Secrets → Actions → 新建 <code>PAN123_TOKEN</code>，粘贴Token → 触发 "Mirror to 123pan" workflow
     </div>
   </div>
 
   <script>
-    function showToken() {
-      var t = document.getElementById('tokenInput').value.trim();
-      if (t) {
-        document.getElementById('result').innerHTML = '<div class="result"><div class="label">Token已就绪（已复制到剪贴板）</div><div class="token">'+t+'</div></div>';
-        navigator.clipboard.writeText(t).catch(()=>{});
+    async function doLogin() {
+      const phone = document.getElementById('phone').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const btn = document.getElementById('loginBtn');
+      const result = document.getElementById('result');
+
+      if (!phone || !password) {
+        result.innerHTML = '<div class="error">请填写手机号和密码</div>';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '登录中...';
+      result.innerHTML = '<div class="info">正在调用123云盘登录API...</div>';
+
+      try {
+        const res = await fetch('https://user.123pan.cn/api/user/sign_in', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Origin': 'https://yun.123pan.cn',
+            'Referer': 'https://yun.123pan.cn/',
+            'Platform': 'web',
+            'App-Version': '3'
+          },
+          body: JSON.stringify({
+            remember: true,
+            passport: phone,
+            password: password
+          })
+        });
+
+        const json = await res.json();
+
+        if (json.code === 200 && json.data && json.data.token) {
+          const token = json.data.token;
+          // Copy to clipboard
+          try {
+            await navigator.clipboard.writeText(token);
+            result.innerHTML = `
+              <div class="result">
+                <div class="label">✓ 登录成功！Token已自动复制到剪贴板</div>
+                <div class="token">${token}</div>
+              </div>
+              <button class="copy-btn" onclick="navigator.clipboard.writeText('${token.replace(/'/g, "\\'")}')">再次复制</button>
+            `;
+          } catch {
+            result.innerHTML = `
+              <div class="result">
+                <div class="label">✓ 登录成功！长按下方Token复制</div>
+                <div class="token">${token}</div>
+              </div>
+            `;
+          }
+        } else if (json.code === 401 || (json.message && json.message.includes('验证'))) {
+          result.innerHTML = `<div class="error">需要验证码：${json.message || ''}<br>请先在浏览器中打开 yun.123pan.cn 登录一次，再回来重试。</div>`;
+        } else {
+          result.innerHTML = `<div class="error">登录失败：code=${json.code} ${json.message || ''}</div>`;
+        }
+      } catch (err) {
+        result.innerHTML = `<div class="error">网络错误：${err.message}<br>请检查网络连接后重试</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '登录并获取Token';
       }
     }
   </script>

@@ -42,6 +42,7 @@ type ArchiveFile = {
   date?: string;
   size?: string;
   url?: string;
+  url_123pan?: string;
   changelog?: string;
 };
 
@@ -516,15 +517,20 @@ export default function App() {
                           {file.url && (
                             <>
                               <a href={file.url} target="_blank" onClick={(e) => e.stopPropagation()}>
-                                下载
+                                {file.url_123pan ? "原链" : "下载"}
                               </a>
+                              {file.url_123pan && (
+                                <a className="mirrorLink" href={file.url_123pan} target="_blank" onClick={(e) => e.stopPropagation()}>
+                                  国内
+                                </a>
+                              )}
                               <button
                                 className="copyBtn"
                                 type="button"
                                 title="复制下载链接"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleCopy(file.url!, file.id);
+                                  handleCopy(file.url_123pan || file.url!, file.id);
                                 }}
                               >
                                 {copiedId === file.id ? "✓" : "⎘"}
@@ -572,14 +578,19 @@ export default function App() {
                     {file.url && (
                       <div className="mobileCardActions">
                         <a href={file.url} target="_blank" onClick={(e) => e.stopPropagation()}>
-                          下载
+                          {file.url_123pan ? "原链" : "下载"}
                         </a>
+                        {file.url_123pan && (
+                          <a className="mirrorLink" href={file.url_123pan} target="_blank" onClick={(e) => e.stopPropagation()}>
+                            国内下载
+                          </a>
+                        )}
                         <button
                           className="copyBtn"
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleCopy(file.url!, file.id);
+                            handleCopy(file.url_123pan || file.url!, file.id);
                           }}
                         >
                           {copiedId === file.id ? "✓ 已复制" : "⎘ 复制链接"}

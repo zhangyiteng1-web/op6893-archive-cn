@@ -667,6 +667,15 @@ td a {
   color: #00ffa3;
 }
 
+td a.mirrorLink {
+  color: #ffa940;
+  margin-left: 4px;
+}
+
+td a.mirrorLink:hover {
+  color: #ffd166;
+}
+
 td .actionsCell {
   display: flex;
   align-items: center;
@@ -829,6 +838,12 @@ th.sortable:hover {
   color: #00ffa3;
   font-weight: 800;
   font-size: 0.9rem;
+}
+
+.mobileCardActions a.mirrorLink {
+  border-color: rgba(255, 169, 64, 0.4);
+  background: rgba(255, 169, 64, 0.1);
+  color: #ffa940;
 }
 
 .mobileCardActions .copyBtn {

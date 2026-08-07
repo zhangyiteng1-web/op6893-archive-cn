@@ -20,10 +20,9 @@
 import { readFile, writeFile, stat, unlink, mkdir } from "node:fs/promises";
 import { createWriteStream, createReadStream } from "node:fs";
 import { createHash } from "node:crypto";
-import { pipeline } from "node:stream/promises";
-import { basename } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { spawn } from "node:child_process";
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -456,16 +455,117 @@ async function createShare(fileId, fileName, shareName) {
 
 // ── Download file from archive.org ──────────────────────────────────────────
 
+/**
+ * Check if aria2c is available on the system.
+ */
+function checkAria2() {
+  return new Promise((resolve) => {
+    const proc = spawn("aria2c", ["--version"], { stdio: "pipe" });
+    proc.on("close", (code) => resolve(code === 0));
+    proc.on("error", () => resolve(false));
+  });
+}
+
+/**
+ * Download a file using aria2c for multi-threaded acceleration.
+ * Falls back to fetch() if aria2c is not installed.
+ */
 async function downloadFile(url, destPath) {
   log(`  Downloading ${url}...`);
 
   if (DRY_RUN) {
     log(`  [DRY RUN] Would download to ${destPath}`);
-    // Create a dummy file
     await writeFile(destPath, "dummy");
     return;
   }
 
+  const aria2Available = await checkAria2();
+
+  if (aria2Available) {
+    await downloadWithAria2(url, destPath);
+  } else {
+    warn("  aria2c not found, falling back to single-threaded fetch()...");
+    await downloadWithFetch(url, destPath);
+  }
+}
+
+/**
+ * Multi-threaded download via aria2c.
+ * -x 16: 16 connections per server
+ * -s 16: split into 16 chunks
+ * -k 1M: minimum chunk size 1MB
+ * --file-allocation=none: skip preallocation (faster start on ext4/xfs)
+ * --allow-overwrite=true: overwrite partial downloads
+ */
+async function downloadWithAria2(url, destPath) {
+  const dir = dirname(destPath);
+  const out = basename(destPath);
+
+  const args = [
+    url,
+    "-x", "16",            // max connections per server
+    "-s", "16",            // split into 16 chunks
+    "-k", "1M",            // min split size
+    "-d", dir,             // output directory
+    "-o", out,             // output filename
+    "--file-allocation=none",
+    "--allow-overwrite=true",
+    "--console-log-level=notice",
+    "--summary-interval=10",
+    "--max-tries=5",
+    "--retry-wait=5",
+    "--connect-timeout=10",
+    "--timeout=30",
+    "--max-connection-per-server=16",
+    "--min-split-size=1M",
+    "--check-certificate=false",
+  ];
+
+  log(`  aria2c: ${args.slice(0, 1).join(" ")} -x 16 -s 16 -o ${out}`);
+
+  await new Promise((resolve, reject) => {
+    const proc = spawn("aria2c", args, { stdio: ["ignore", "pipe", "pipe"] });
+
+    let lastLog = 0;
+
+    proc.stdout.on("data", (data) => {
+      const text = data.toString();
+      // Parse aria2c progress lines like:
+      // [#1 256MiB/3.6GiB(6%) CN:16 DL:48MiB/s ETA:1m12s]
+      const match = text.match(/\[#\w+\s+([^\]]+)\]/);
+      if (match) {
+        const now = Date.now();
+        if (now - lastLog >= 5000) { // Log every 5s max
+          lastLog = now;
+          log(`    ${match[1].trim()}`);
+        }
+      }
+    });
+
+    proc.stderr.on("data", (data) => {
+      const text = data.toString().trim();
+      if (text && !text.includes("WARNING")) {
+        warn(`  aria2c: ${text}`);
+      }
+    });
+
+    proc.on("close", (code) => {
+      if (code === 0) {
+        log(`    aria2c download complete`);
+        resolve();
+      } else {
+        reject(new Error(`aria2c exited with code ${code}`));
+      }
+    });
+
+    proc.on("error", reject);
+  });
+}
+
+/**
+ * Single-threaded fallback using fetch() stream.
+ */
+async function downloadWithFetch(url, destPath) {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Download failed: ${res.status} ${res.statusText}`);
@@ -479,17 +579,14 @@ async function downloadFile(url, destPath) {
   let lastLog = 0;
 
   const reader = res.body.getReader();
-  const chunks = [];
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
 
-    chunks.push(value);
     downloaded += value.length;
     fileStream.write(value);
 
-    // Log progress every 10MB
     if (downloaded - lastLog >= 10 * 1024 * 1024) {
       lastLog = downloaded;
       const pct = total ? ` ${(downloaded / total * 100).toFixed(0)}%` : "";

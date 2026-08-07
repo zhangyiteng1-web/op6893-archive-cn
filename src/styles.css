@@ -653,14 +653,6 @@ tbody tr:hover {
   background: transparent;
 }
 
-tbody tr.clickable {
-  cursor: default;
-}
-
-tbody tr.expanded {
-  background: transparent;
-}
-
 td {
   color: #dce9f5;
 }
@@ -669,36 +661,6 @@ td strong {
   display: block;
   margin-bottom: 7px;
   color: #ffffff;
-}
-
-td strong.expandToggle {
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  transition: color 0.15s ease;
-}
-
-td strong.expandToggle:hover {
-  color: #62f7ff;
-}
-
-td .expandIcon {
-  display: inline-block;
-  margin-left: 4px;
-  color: #62f7ff;
-  font-size: 0.85rem;
-  transition: transform 0.15s ease;
-}
-
-td small,
-td .changelogPreview {
-  display: -webkit-box;
-  max-width: 560px;
-  overflow: hidden;
-  color: #8ea4ba;
-  line-height: 1.58;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 
 td a {
@@ -810,19 +772,11 @@ th.sortable:hover {
   border-color: rgba(98, 247, 255, 0.36);
 }
 
-.mobileCard h4.expandToggle {
-  cursor: pointer;
-  user-select: none;
-  transition: color 0.15s ease;
-}
-
-.mobileCard h4.expandToggle:hover {
-  color: #62f7ff;
-}
-
-.mobileCard h4 .expandIcon {
-  color: #62f7ff;
-  font-size: 0.85rem;
+.mobileCard h4 {
+  margin-bottom: 10px;
+  color: #f8fbff;
+  font-size: 1.05rem;
+  line-height: 1.35;
 }
 
 .mobileCardHeader {
@@ -857,13 +811,6 @@ th.sortable:hover {
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.03);
   font-size: 0.8rem;
-}
-
-.mobileCardHint {
-  display: block;
-  color: #5a7a90;
-  font-size: 0.82rem;
-  margin-top: 8px;
 }
 
 .mobileCardActions {

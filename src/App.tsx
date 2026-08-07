@@ -130,15 +130,6 @@ function sortFiles(files: FileWithCategory[], key: SortKey, asc: boolean): FileW
   });
 }
 
-function formatChangelog(text: string): string {
-  // Split on bullet-like markers: -, *, •, 1., etc.
-  return text
-    .split(/(?:\s*[-–•*]\s+|\s*\d+\.\s+)/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .join(" || ");
-}
-
 function renderChangelogHtml(text: string): string {
   const lines = text.split(/\n/).filter(Boolean);
   if (lines.length <= 1 && !text.includes("- ") && !text.includes("• ") && !text.includes("* ")) {
@@ -202,7 +193,6 @@ export default function App() {
   const [category, setCategory] = useState("all");
   const [sortBy, setSortBy] = useState<SortKey>("date");
   const [sortAsc, setSortAsc] = useState(false);
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState("");
   const [showToast, setShowToast] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -286,15 +276,6 @@ export default function App() {
       setSortBy(key);
       setSortAsc(false);
     }
-  };
-
-  const toggleRow = (id: string) => {
-    setExpandedRows((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
   };
 
   const handleCopy = async (url: string, id: string) => {
@@ -509,29 +490,15 @@ export default function App() {
                 </thead>
                 <tbody>
                   {filteredFiles.map((file) => {
-                    const isExpanded = expandedRows.has(file.id);
                     const changelog = file.changelog ?? "";
                     return (
-                      <tr
-                        key={file.id}
-                        className={`${isExpanded ? "expanded" : ""} ${changelog ? "clickable" : ""}`}
-                      >
+                      <tr key={file.id}>
                         <td>
                           <span className="tag">{file.categoryLabel}</span>
                         </td>
                         <td>
-                          <strong
-                            className={changelog ? "expandToggle" : ""}
-                            onClick={() => changelog && toggleRow(file.id)}
-                            title={changelog ? (isExpanded ? "点击收起" : "点击展开日志") : ""}
-                          >
-                            {file.name ?? "未命名文件"}
-                            {changelog && <span className="expandIcon">{isExpanded ? " ▾" : " ▸"}</span>}
-                          </strong>
-                          {changelog && !isExpanded && (
-                            <small className="changelogPreview">{formatChangelog(changelog)}</small>
-                          )}
-                          {changelog && isExpanded && (
+                          <strong>{file.name ?? "未命名文件"}</strong>
+                          {changelog && (
                             <div
                               className="changelogFull"
                               dangerouslySetInnerHTML={{ __html: renderChangelogHtml(changelog) }}
@@ -577,7 +544,6 @@ export default function App() {
             {/* Mobile card view */}
             <div className="mobileCards">
               {filteredFiles.map((file) => {
-                const isExpanded = expandedRows.has(file.id);
                 const changelog = file.changelog ?? "";
                 return (
                   <article
@@ -588,26 +554,17 @@ export default function App() {
                       <span className="tag">{file.categoryLabel}</span>
                       <span className="mobileCardDate">{file.date ?? "—"}</span>
                     </div>
-                    <h4
-                      className={changelog ? "expandToggle" : ""}
-                      onClick={() => changelog && toggleRow(file.id)}
-                    >
-                      {file.name ?? "未命名文件"}
-                      {changelog && <span className="expandIcon">{isExpanded ? " ▾" : " ▸"}</span>}
-                    </h4>
+                    <h4>{file.name ?? "未命名文件"}</h4>
                     <div className="mobileCardMeta">
                       <span>Android {file.android ?? "—"}</span>
                       <span>{file.version ? `v${file.version}` : "—"}</span>
                       <span>{file.size ?? "—"}</span>
                     </div>
-                    {changelog && isExpanded && (
+                    {changelog && (
                       <div
                         className="changelogFull"
                         dangerouslySetInnerHTML={{ __html: renderChangelogHtml(changelog) }}
                       />
-                    )}
-                    {changelog && !isExpanded && (
-                      <small className="changelogPreview">{formatChangelog(changelog)}</small>
                     )}
                     {file.url && (
                       <div className="mobileCardActions">

@@ -177,6 +177,11 @@ h3 {
   line-height: 1.08;
 }
 
+.statsPanel .deviceList {
+  font-size: clamp(1rem, 1.7vw, 1.35rem);
+  line-height: 1.35;
+}
+
 .notice,
 .state {
   margin-bottom: 34px;

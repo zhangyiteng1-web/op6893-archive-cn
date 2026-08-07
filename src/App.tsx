@@ -5,6 +5,13 @@ const DATA_SOURCES = [
   "https://raw.githubusercontent.com/xCaptaiN09/rmx3031-archive/main/public/index.json",
 ];
 
+const SUPPORTED_DEVICES = [
+  "Realme X7 Max",
+  "Realme GT Neo",
+  "Realme GT Neo Flash",
+  "OnePlus Nord 2",
+];
+
 const CATEGORY_ORDER = [
   "roms",
   "kernels",
@@ -184,9 +191,10 @@ export default function App() {
         <div className="heroGrid">
           <div>
             <p className="eyebrow">自动同步 · 中文索引 · 静态部署</p>
-            <h1>Realme X7 Max / OnePlus Nord 2 刷机资源中文站</h1>
+            <h1>OP6893 家族刷机资源中文站</h1>
             <p className="summary">
-              本站读取 RMX3031 Archive 的公开数据源，整理展示 ROM、内核、Recovery、固件和模块等资源。
+              本站读取 RMX3031 Archive 的公开数据源，整理展示 Realme X7 Max、Realme GT Neo、
+              Realme GT Neo Flash 和 OnePlus Nord 2 的 ROM、内核、Recovery、固件和模块等资源。
               下载链接仍指向原始归档地址，本站只做中文索引和导航。
             </p>
             <div className="actions">
@@ -201,8 +209,8 @@ export default function App() {
 
           <div className="panel statsPanel">
             <div>
-              <span>设备</span>
-              <strong>{data?.device ?? "Realme X7 Max"}</strong>
+              <span>支持设备</span>
+              <strong className="deviceList">{SUPPORTED_DEVICES.join(" / ")}</strong>
             </div>
             <div>
               <span>代号</span>

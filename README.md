@@ -2,6 +2,8 @@
 
 这是一个中文静态站点模板，用来展示 `RMX3031 Archive` 的公开刷机资源数据。站点本身不保存刷机文件，下载链接仍指向上游归档地址。
 
+支持设备按原站说明展示为 OP6893 家族：Realme X7 Max、Realme GT Neo、Realme GT Neo Flash、OnePlus Nord 2。上游 JSON 的 `device` 字段目前只写了 `Realme X7 Max`，页面不会直接用它作为唯一支持设备。
+
 ## 功能
 
 - 中文首页、最新收录、全部资源列表

@@ -131,9 +131,15 @@
       result.innerHTML = '<div class="info">正在调用123云盘登录API...</div>';
 
       try {
-        const res = await fetch('/api/123pan-login', {
+        const res = await fetch('https://user.123pan.cn/api/user/sign_in', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Origin': 'https://yun.123pan.cn',
+            'Referer': 'https://yun.123pan.cn/',
+            'Platform': 'web',
+            'App-Version': '3'
+          },
           body: JSON.stringify({
             remember: true,
             passport: phone,

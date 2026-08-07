@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-const DATA_SOURCES = [
-  "https://rmx3031-archive.pages.dev/index.json",
-  "https://raw.githubusercontent.com/xCaptaiN09/rmx3031-archive/main/public/index.json",
-];
+const DATA_SOURCE = "/index.json";
 
 const SUPPORTED_DEVICES = [
   "Realme X7 Max",
@@ -106,23 +103,15 @@ function sortByDateDesc(files: FileWithCategory[]) {
 }
 
 async function fetchArchiveData(): Promise<{ data: ArchiveData; source: string }> {
-  let lastError: unknown;
+  const response = await fetch(`${DATA_SOURCE}?t=${Date.now()}`, {
+    cache: "no-store",
+  });
 
-  for (const source of DATA_SOURCES) {
-    try {
-      const response = await fetch(`${source}?t=${Date.now()}`, {
-        cache: "no-store",
-      });
-      if (!response.ok) {
-        throw new Error(`读取失败：${response.status}`);
-      }
-      return { data: await response.json(), source };
-    } catch (error) {
-      lastError = error;
-    }
+  if (!response.ok) {
+    throw new Error(`读取失败：${response.status}`);
   }
 
-  throw lastError;
+  return { data: await response.json(), source: DATA_SOURCE };
 }
 
 function getErrorMessage(error: unknown) {
@@ -215,7 +204,7 @@ export default function App() {
             </div>
             <div className="consoleScreen">
               <p className="consoleLine">system.boot = OP6893_ARCHIVE_CN</p>
-              <p className="consoleLine">sync.source = {source ? "ONLINE" : "WAITING"}</p>
+              <p className="consoleLine">sync.source = {source ? "CLOUDFLARE_EDGE" : "WAITING"}</p>
               <p className="consoleLine">device.codename = {data?.codename ?? "OP6893"}</p>
               <p className="consoleLine">records.total = {files.length || "..."}</p>
               <div className="signalRing">
@@ -296,7 +285,7 @@ export default function App() {
               <p className="source">
                 数据源：
                 <a href={source} target="_blank">
-                  {source.includes("github") ? "GitHub Raw" : "原站 index.json"}
+                  Cloudflare 缓存 index.json
                 </a>
               </p>
             </div>

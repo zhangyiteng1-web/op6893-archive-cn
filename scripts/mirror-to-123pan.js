@@ -440,6 +440,13 @@ async function uploadFile(filePath, fileName, parentFileId) {
 
   const { Bucket: bucket, StorageNode: storageNode, Key: key, UploadId: uploadId, FileId: fileId } = reqRes.data;
 
+  if (size === 0) {
+    // 0-byte file: skip PUT, just complete upload
+    log(`  0-byte file, completing upload directly...`);
+    await uploadComplete(fileId);
+    return { fileId, fileName };
+  }
+
   if (size <= SMALL_FILE_THRESHOLD) {
     // Small file: get presigned URL for single-part upload
     const partsRes = await s3PrepareUploadParts(bucket, key, uploadId, storageNode, 1, 1);
@@ -819,6 +826,18 @@ async function main() {
       if (!DRY_RUN) {
         const actualSize = await fileSize(tmpPath);
         log(`  File size on disk: ${(actualSize / 1024 / 1024).toFixed(1)}MB`);
+        if (actualSize === 0) {
+          warn(`  File is 0 bytes, skipping upload`);
+          // Still mark as mirrored so we don't retry it forever
+          mirrored[file.url] = {
+            shareUrl: null,
+            fileId: 0,
+            mirroredAt: new Date().toISOString(),
+            skipped: "empty_file",
+          };
+          skipped++;
+          continue;
+        }
       }
 
       // Upload to 123pan (inside target folder)

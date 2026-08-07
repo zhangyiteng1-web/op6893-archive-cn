@@ -3,12 +3,9 @@ name: Mirror to 123pan
 on:
   workflow_dispatch:
     inputs:
-      phone:
-        description: "123云盘手机号（可选，如果只需用Token则留空）"
-        required: false
-      password:
-        description: "123云盘密码（可选，如果只需用Token则留空）"
-        required: false
+      token:
+        description: "123云盘Token（从 get-token.html 页面获取）"
+        required: true
 
 permissions:
   contents: write
@@ -29,9 +26,7 @@ jobs:
       - name: Mirror new files to 123pan
         run: node scripts/mirror-to-123pan.js
         env:
-          PAN123_PHONE: ${{ github.event.inputs.phone }}
-          PAN123_PASSWORD: ${{ github.event.inputs.password }}
-          PAN123_TOKEN: ${{ secrets.PAN123_TOKEN }}
+          PAN123_TOKEN: ${{ github.event.inputs.token }}
 
       - name: Commit mirrored index
         uses: stefanzweifel/git-auto-commit-action@v5

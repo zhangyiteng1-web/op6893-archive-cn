@@ -34,15 +34,16 @@ async function fetchJson() {
 }
 
 const { data, source } = await fetchJson();
+const now = new Date();
+const syncedAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
 const output = {
   ...data,
-  syncMeta: {
-    source,
-    syncedAt: new Date().toISOString(),
-  },
+  _synced_at: syncedAt,
+  _sync_source: source,
 };
 
 await mkdir("public", { recursive: true });
 await writeFile("public/index.json", `${JSON.stringify(output, null, 2)}\n`, "utf8");
 
-console.log(`已同步 public/index.json，来源：${source}`);
+console.log(`已同步 public/index.json，来源：${source}，时间戳：${syncedAt}`);

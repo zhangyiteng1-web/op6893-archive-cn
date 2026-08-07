@@ -722,8 +722,6 @@
       "changelog": "Git Commands"
     }
   ],
-  "syncMeta": {
-    "source": "https://rmx3031-archive.pages.dev/index.json",
-    "syncedAt": "2026-08-07T11:24:55.299Z"
-  }
+  "_synced_at": "2026-08-07",
+  "_sync_source": "https://rmx3031-archive.pages.dev/index.json"
 }

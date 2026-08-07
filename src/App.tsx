@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 
 const DATA_SOURCE = "/index.json";
 
@@ -49,6 +49,7 @@ type ArchiveData = {
   device?: string;
   codename?: string;
   maintainer?: string;
+  _synced_at?: string;
   [key: string]: unknown;
 };
 
@@ -57,6 +58,8 @@ type FileWithCategory = ArchiveFile & {
   category: string;
   categoryLabel: string;
 };
+
+type SortKey = "date" | "name" | "android" | "size" | "version";
 
 function formatCategory(key: string) {
   return CATEGORY_LABELS[key] ?? key.replace(/[_-]/g, " ").toUpperCase();
@@ -94,15 +97,65 @@ function flattenFiles(data: ArchiveData): FileWithCategory[] {
   });
 }
 
-function sortByDateDesc(files: FileWithCategory[]) {
+function parseSizeToBytes(size: string): number {
+  const match = size.trim().match(/^([\d.]+)\s*(GB|MB|KB|B)$/i);
+  if (!match) return 0;
+  const num = parseFloat(match[1]);
+  const unit = match[2].toUpperCase();
+  const multipliers: Record<string, number> = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3 };
+  return num * (multipliers[unit] ?? 1);
+}
+
+function sortFiles(files: FileWithCategory[], key: SortKey, asc: boolean): FileWithCategory[] {
   return [...files].sort((a, b) => {
-    const left = a.date ? new Date(a.date).getTime() : 0;
-    const right = b.date ? new Date(b.date).getTime() : 0;
-    return right - left;
+    let cmp = 0;
+    switch (key) {
+      case "date":
+        cmp = ((a.date ? new Date(a.date).getTime() : 0)) - ((b.date ? new Date(b.date).getTime() : 0));
+        break;
+      case "name":
+        cmp = (a.name ?? "").localeCompare(b.name ?? "");
+        break;
+      case "android":
+        cmp = parseFloat(a.android ?? "0") - parseFloat(b.android ?? "0");
+        break;
+      case "size":
+        cmp = parseSizeToBytes(a.size ?? "") - parseSizeToBytes(b.size ?? "");
+        break;
+      case "version":
+        cmp = (a.version ?? "").localeCompare(b.version ?? "");
+        break;
+    }
+    return asc ? cmp : -cmp;
   });
 }
 
-async function fetchArchiveData(): Promise<{ data: ArchiveData; source: string }> {
+function formatChangelog(text: string): string {
+  // Split on bullet-like markers: -, *, •, 1., etc.
+  return text
+    .split(/(?:\s*[-–•*]\s+|\s*\d+\.\s+)/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(" || ");
+}
+
+function renderChangelogHtml(text: string): string {
+  const lines = text.split(/\n/).filter(Boolean);
+  if (lines.length <= 1 && !text.includes("- ") && !text.includes("• ") && !text.includes("* ")) {
+    return text;
+  }
+  const items = text
+    .split(/\n/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => l.replace(/^[-–•*]\s*/, "").trim());
+  if (items.length > 1) {
+    return "<ul>" + items.map((i) => `<li>${i}</li>`).join("") + "</ul>";
+  }
+  return text;
+}
+
+async function fetchArchiveData(): Promise<{ data: ArchiveData }> {
   const response = await fetch(`${DATA_SOURCE}?t=${Date.now()}`, {
     cache: "no-store",
   });
@@ -111,38 +164,84 @@ async function fetchArchiveData(): Promise<{ data: ArchiveData; source: string }
     throw new Error(`读取失败：${response.status}`);
   }
 
-  return { data: await response.json(), source: DATA_SOURCE };
+  return { data: await response.json() };
 }
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "无法读取上游数据";
 }
 
+async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // Fallback for older browsers
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.style.position = "fixed";
+    el.style.opacity = "0";
+    document.body.appendChild(el);
+    el.select();
+    try {
+      document.execCommand("copy");
+      return true;
+    } catch {
+      return false;
+    } finally {
+      document.body.removeChild(el);
+    }
+  }
+}
+
 export default function App() {
   const [data, setData] = useState<ArchiveData | null>(null);
-  const [source, setSource] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const [sortBy, setSortBy] = useState<SortKey>("date");
+  const [sortAsc, setSortAsc] = useState(false);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [copiedId, setCopiedId] = useState("");
+  const [showToast, setShowToast] = useState("");
+
+  // Sync category from URL hash
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && CATEGORY_ORDER.includes(hash)) {
+        setCategory(hash);
+      } else if (hash === "archive") {
+        document.getElementById("archive")?.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+    onHashChange();
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  // Update URL hash when category changes
+  const handleCategoryChange = useCallback((newCat: string) => {
+    setCategory(newCat);
+    if (newCat === "all") {
+      window.history.replaceState(null, "", window.location.pathname);
+    } else {
+      window.history.replaceState(null, "", `#${newCat}`);
+    }
+  }, []);
 
   useEffect(() => {
     fetchArchiveData()
-      .then((result) => {
-        setData(result.data);
-        setSource(result.source);
-      })
+      .then((result) => setData(result.data))
       .catch((fetchError) => setError(getErrorMessage(fetchError)))
       .finally(() => setLoading(false));
   }, []);
 
-  const files = useMemo(() => (data ? sortByDateDesc(flattenFiles(data)) : []), [data]);
+  const files = useMemo(() => (data ? flattenFiles(data) : []), [data]);
   const categories = useMemo(
     () => {
-      if (!data) {
-        return [];
-      }
-
+      if (!data) return [];
       return getOrderedCategoryKeys(data).map((key) => ({
         key,
         label: formatCategory(key),
@@ -151,24 +250,57 @@ export default function App() {
     },
     [data, files],
   );
-  const latestFiles = files.slice(0, 8);
+  const latestFiles = useMemo(() => {
+    return sortFiles(files, "date", false).slice(0, 8);
+  }, [files]);
 
   const filteredFiles = useMemo(() => {
     const keyword = query.trim().toLowerCase();
-
-    return files.filter((file) => {
+    const matched = files.filter((file) => {
       const matchesCategory = category === "all" || file.category === category;
-      const target = `${file.name ?? ""} ${file.version ?? ""} ${file.android ?? ""} ${
-        file.changelog ?? ""
-      }`.toLowerCase();
+      const target = `${file.name ?? ""} ${file.version ?? ""} ${file.android ?? ""} ${file.changelog ?? ""}`.toLowerCase();
       return matchesCategory && (!keyword || target.includes(keyword));
     });
-  }, [category, files, query]);
+    return sortFiles(matched, sortBy, sortAsc);
+  }, [category, files, query, sortBy, sortAsc]);
+
+  const handleSort = (key: SortKey) => {
+    if (sortBy === key) {
+      setSortAsc((prev) => !prev);
+    } else {
+      setSortBy(key);
+      setSortAsc(false);
+    }
+  };
+
+  const toggleRow = (id: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleCopy = async (url: string, id: string) => {
+    const ok = await copyToClipboard(url);
+    setCopiedId(id);
+    setShowToast(ok ? "链接已复制" : "复制失败，请手动复制");
+    setTimeout(() => { setCopiedId(""); setShowToast(""); }, 2000);
+  };
 
   const latestDate = files[0]?.date ?? "暂无";
+  const syncTime = data?._synced_at ?? latestDate;
+  const sortIcon = (key: SortKey) => {
+    if (sortBy !== key) return " ↕";
+    return sortAsc ? " ↑" : " ↓";
+  };
 
   return (
     <main>
+      {/* Toast */}
+      {showToast && <div className="toast">{showToast}</div>}
+
       <section className="hero">
         <nav className="nav">
           <span className="brand">OP6893_CN_ARCHIVE</span>
@@ -204,9 +336,10 @@ export default function App() {
             </div>
             <div className="consoleScreen">
               <p className="consoleLine">system.boot = OP6893_ARCHIVE_CN</p>
-              <p className="consoleLine">sync.source = {source ? "CLOUDFLARE_EDGE" : "WAITING"}</p>
+              <p className="consoleLine">sync.source = CLOUDFLARE_EDGE</p>
               <p className="consoleLine">device.codename = {data?.codename ?? "OP6893"}</p>
               <p className="consoleLine">records.total = {files.length || "..."}</p>
+              <p className="consoleLine">sync.updated = {syncTime}</p>
               <div className="signalRing">
                 <span>{files.length || "—"}</span>
                 <small>FILES</small>
@@ -225,12 +358,12 @@ export default function App() {
             <strong>{data?.codename ?? "OP6893"}</strong>
           </div>
           <div>
-            <span>文件数</span>
-            <strong>{files.length || "读取中"}</strong>
+            <span>数据更新</span>
+            <strong className="syncTime">{syncTime}</strong>
           </div>
           <div>
-            <span>最近更新</span>
-            <strong>{latestDate}</strong>
+            <span>文件总数</span>
+            <strong>{files.length || "读取中"}</strong>
           </div>
         </div>
       </section>
@@ -279,14 +412,11 @@ export default function App() {
           <section className="section" id="archive">
             <div className="sectionHeader archiveHeader">
               <div>
-                <p className="eyebrow">Data Matrix</p>
+                <p className="eyebrow">Data Matrix · {syncTime}</p>
                 <h2>全部资源</h2>
               </div>
               <p className="source">
-                数据源：
-                <a href={source} target="_blank">
-                  Cloudflare 缓存 index.json
-                </a>
+                数据缓存于 Cloudflare 边缘节点，由 GitHub Actions 每日同步。
               </p>
             </div>
 
@@ -294,7 +424,7 @@ export default function App() {
               <button
                 className={category === "all" ? "active" : ""}
                 type="button"
-                onClick={() => setCategory("all")}
+                onClick={() => handleCategoryChange("all")}
               >
                 全部
                 <span>{files.length}</span>
@@ -304,7 +434,7 @@ export default function App() {
                   className={category === item.key ? "active" : ""}
                   key={item.key}
                   type="button"
-                  onClick={() => setCategory(item.key)}
+                  onClick={() => handleCategoryChange(item.key)}
                 >
                   {item.label}
                   <span>{item.count}</span>
@@ -322,7 +452,7 @@ export default function App() {
               <select
                 aria-label="筛选分类"
                 value={category}
-                onChange={(event) => setCategory(event.target.value)}
+                onChange={(event) => handleCategoryChange(event.target.value)}
               >
                 <option value="all">全部分类（{files.length}）</option>
                 {categories.map((item) => (
@@ -333,46 +463,144 @@ export default function App() {
               </select>
             </div>
 
-            <div className="tableWrap">
+            {/* Desktop table */}
+            <div className="tableWrap desktopOnly">
               <table>
                 <thead>
                   <tr>
                     <th>分类</th>
-                    <th>名称</th>
-                    <th>Android</th>
-                    <th>版本</th>
-                    <th>日期</th>
-                    <th>大小</th>
+                    <th className="sortable" onClick={() => handleSort("name")}>
+                      名称{sortIcon("name")}
+                    </th>
+                    <th className="sortable" onClick={() => handleSort("android")}>
+                      Android{sortIcon("android")}
+                    </th>
+                    <th className="sortable" onClick={() => handleSort("version")}>
+                      版本{sortIcon("version")}
+                    </th>
+                    <th className="sortable" onClick={() => handleSort("date")}>
+                      日期{sortIcon("date")}
+                    </th>
+                    <th className="sortable" onClick={() => handleSort("size")}>
+                      大小{sortIcon("size")}
+                    </th>
                     <th>操作</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredFiles.map((file) => (
-                    <tr key={file.id}>
-                      <td>
-                        <span className="tag">{file.categoryLabel}</span>
-                      </td>
-                      <td>
-                        <strong>{file.name ?? "未命名文件"}</strong>
-                        {file.changelog && <small>{file.changelog}</small>}
-                      </td>
-                      <td>{file.android ?? "—"}</td>
-                      <td>{file.version ? `v${file.version}` : "—"}</td>
-                      <td>{file.date ?? "—"}</td>
-                      <td>{file.size ?? "—"}</td>
-                      <td>
-                        {file.url ? (
-                          <a href={file.url} target="_blank">
-                            下载
-                          </a>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredFiles.map((file) => {
+                    const isExpanded = expandedRows.has(file.id);
+                    return (
+                      <tr
+                        key={file.id}
+                        className={`${isExpanded ? "expanded" : ""} ${file.changelog ? "clickable" : ""}`}
+                        onClick={() => file.changelog && toggleRow(file.id)}
+                      >
+                        <td>
+                          <span className="tag">{file.categoryLabel}</span>
+                        </td>
+                        <td>
+                          <strong>{file.name ?? "未命名文件"}</strong>
+                          {file.changelog && !isExpanded && (
+                            <small>{formatChangelog(file.changelog)}</small>
+                          )}
+                          {file.changelog && isExpanded && (
+                            <div
+                              className="changelogFull"
+                              dangerouslySetInnerHTML={{ __html: renderChangelogHtml(file.changelog) }}
+                            />
+                          )}
+                        </td>
+                        <td>{file.android ?? "—"}</td>
+                        <td>{file.version ? `v${file.version}` : "—"}</td>
+                        <td>{file.date ?? "—"}</td>
+                        <td>{file.size ?? "—"}</td>
+                        <td className="actionsCell">
+                          {file.url && (
+                            <>
+                              <a href={file.url} target="_blank" onClick={(e) => e.stopPropagation()}>
+                                下载
+                              </a>
+                              <button
+                                className="copyBtn"
+                                type="button"
+                                title="复制下载链接"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopy(file.url!, file.id);
+                                }}
+                              >
+                                {copiedId === file.id ? "✓" : "⎘"}
+                              </button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
+              {filteredFiles.length === 0 && (
+                <div style={{ padding: "32px", textAlign: "center", color: "#7e97ad" }}>
+                  没有匹配的资源，试试调整筛选条件。
+                </div>
+              )}
+            </div>
+
+            {/* Mobile card view */}
+            <div className="mobileCards">
+              {filteredFiles.map((file) => {
+                const isExpanded = expandedRows.has(file.id);
+                return (
+                  <article
+                    className="mobileCard"
+                    key={file.id}
+                    onClick={() => file.changelog && toggleRow(file.id)}
+                  >
+                    <div className="mobileCardHeader">
+                      <span className="tag">{file.categoryLabel}</span>
+                      <span className="mobileCardDate">{file.date ?? "—"}</span>
+                    </div>
+                    <h4>{file.name ?? "未命名文件"}</h4>
+                    <div className="mobileCardMeta">
+                      <span>Android {file.android ?? "—"}</span>
+                      <span>{file.version ? `v${file.version}` : "—"}</span>
+                      <span>{file.size ?? "—"}</span>
+                    </div>
+                    {file.changelog && isExpanded && (
+                      <div
+                        className="changelogFull"
+                        dangerouslySetInnerHTML={{ __html: renderChangelogHtml(file.changelog) }}
+                      />
+                    )}
+                    {file.changelog && !isExpanded && (
+                      <small className="mobileCardHint">点击查看更新日志</small>
+                    )}
+                    {file.url && (
+                      <div className="mobileCardActions">
+                        <a href={file.url} target="_blank" onClick={(e) => e.stopPropagation()}>
+                          下载
+                        </a>
+                        <button
+                          className="copyBtn"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopy(file.url!, file.id);
+                          }}
+                        >
+                          {copiedId === file.id ? "✓ 已复制" : "⎘ 复制链接"}
+                        </button>
+                      </div>
+                    )}
+                  </article>
+                );
+              })}
+              {filteredFiles.length === 0 && (
+                <div style={{ padding: "32px", textAlign: "center", color: "#7e97ad" }}>
+                  没有匹配的资源，试试调整筛选条件。
+                </div>
+              )}
             </div>
           </section>
         </>
@@ -380,7 +608,7 @@ export default function App() {
 
       <footer>
         <p>
-          中文站点模板。上游数据来自 xCaptaiN09/rmx3031-archive；文件版权和刷机风险请以原作者说明为准。
+          数据每日由 GitHub Actions 自动同步，源码托管于 GitHub。上游数据来自 xCaptaiN09/rmx3031-archive；文件版权和刷机风险请以原作者说明为准。
         </p>
       </footer>
     </main>

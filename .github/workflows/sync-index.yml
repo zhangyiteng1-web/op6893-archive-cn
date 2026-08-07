@@ -1,4 +1,4 @@
-name: Sync upstream index and mirror to 123pan
+name: Sync upstream index
 
 on:
   schedule:
@@ -24,37 +24,8 @@ jobs:
       - name: Sync public index
         run: node scripts/sync-index.mjs
 
-      - name: Commit synced index
+      - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: sync upstream archive index"
           file_pattern: public/index.json
-
-  mirror:
-    needs: sync
-    runs-on: ubuntu-latest
-    if: ${{ secrets.PAN123_PHONE != '' }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Mirror new files to 123pan
-        run: node scripts/mirror-to-123pan.js
-        env:
-          PAN123_PHONE: ${{ secrets.PAN123_PHONE }}
-          PAN123_PASSWORD: ${{ secrets.PAN123_PASSWORD }}
-          PAN123_TOKEN: ${{ secrets.PAN123_TOKEN }}
-
-      - name: Commit mirrored index
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: mirror new files to 123pan"
-          file_pattern: |
-            public/index.json
-            public/.mirrored.json

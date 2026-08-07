@@ -10,8 +10,7 @@
       "date": "2026-04-10",
       "size": "1.4GB",
       "url": "https://archive.org/download/rmx3031-lineageos-23-2-apr/lineage-23.2-20260410-UNOFFICIAL-gms-op6893.zip",
-      "changelog": "April Security Patch. Switched to Pixel Thermal Service. Added Screen Off UDFPS support. Fixed Fast Charging & Disconnecting issue. Blobs updated from latest OnePlus Nord 2 stock ROM (vendor security patch: July 2025). Signed build. Misc improvements. By ManshuTyagi.",
-      "changelog_zh": "四月安全补丁。切换到像素热服务。添加了屏幕关闭 UDFPS 支持。修复了快速充电和断开连接问题。从最新的 OnePlus Nord 2 库存 ROM 更新了 Blob（供应商安全补丁：2025 年 7 月）。签名构建。其他改进。作者：ManshuTyagi。"
+      "changelog": "April Security Patch. Switched to Pixel Thermal Service. Added Screen Off UDFPS support. Fixed Fast Charging & Disconnecting issue. Blobs updated from latest OnePlus Nord 2 stock ROM (vendor security patch: July 2025). Signed build. Misc improvements. By ManshuTyagi."
     },
     {
       "name": "Lunaris AOSP 3.8",
@@ -20,8 +19,7 @@
       "date": "2026-03-30",
       "size": "2.4GB",
       "url": "https://archive.org/download/rmx3031-lunaris-aosp-3-8/Lunaris-AOSP-op6893-Community-3.8-GMS-2026032923.zip",
-      "changelog": "Initial release. Added Sony Dolby Atmos (OnePlus UI). Added Warp Charging Overlay. Disabled 6GHz hotspot (broken). Gapps | Userdebug build. SELinux: Enforcing. Signed with release keys. Known bug: Screen Off UDFPS. By Rakhshan.",
-      "changelog_zh": "初次发布。添加了索尼杜比全景声（OnePlus UI）。添加了扭曲充电叠加层。禁用 6GHz 热点（损坏）。加普斯 |用户调试构建。 SELinux：强制执行。使用释放密钥签名。已知错误：屏幕关闭 UDFPS。拉克尚."
+      "changelog": "Initial release. Added Sony Dolby Atmos (OnePlus UI). Added Warp Charging Overlay. Disabled 6GHz hotspot (broken). Gapps | Userdebug build. SELinux: Enforcing. Signed with release keys. Known bug: Screen Off UDFPS. By Rakhshan."
     },
     {
       "name": "EvolutionX v11.6.1",
@@ -30,8 +28,7 @@
       "date": "2025-12-10",
       "size": "3.6GB",
       "url": "https://archive.org/download/rmx3031-evolutionx-16-11-6-1/EvolutionX-16.0-20260302-op6893-11.6.1-Unofficial.zip",
-      "changelog": "Rebranded to op6893. Improved udfps behaviour. Temporarily rolled back some. previous changes(bt, wifi). Synced with latest rom changes. February security patches",
-      "changelog_zh": "更名为 op6893。改进了 udfps 行为。暂时回滚了一些。之前的更改（bt、wifi）。与最新的 rom 更改同步。二月安全补丁"
+      "changelog": "Rebranded to op6893. Improved udfps behaviour. Temporarily rolled back some. previous changes(bt, wifi). Synced with latest rom changes. February security patches"
     },
     {
       "name": "LineageOS 23.2 Unofficial",
@@ -40,8 +37,7 @@
       "size": "1.1GB",
       "android": "16",
       "url": "https://archive.org/download/rmx3031-lineageos-23-2/lineage-23.2-20260301-UNOFFICIAL-op6893.zip",
-      "changelog": "Rebranded to op6893. Switched back to mtk vibrator hal. Fixed video call issues across all major apps. Fixed open and close animations. Misc improvements. By ManshuTyagi.",
-      "changelog_zh": "更名为 op6893。切换回 mtk 振动器 hal。修复了所有主要应用程序的视频通话问题。修复了打开和关闭动画。其他改进。作者：ManshuTyagi。"
+      "changelog": "Rebranded to op6893. Switched back to mtk vibrator hal. Fixed video call issues across all major apps. Fixed open and close animations. Misc improvements. By ManshuTyagi."
     },
     {
       "name": "Axion AOSP V2.2.1",
@@ -50,8 +46,7 @@
       "date": "2025-12-09",
       "size": "2.4GB",
       "url": "https://archive.org/download/rmx3031-axion-aosp-v2-2-1/axion-2.2.1-NIGHTLY-20251209-UNOFFICIAL-GMS-MT6893.zip",
-      "changelog": "Axion AOSP V2.2.1 Nightly. Unofficial GMS build for Cupida (RMX3031) and Denniz. Android 16. Screen off UDFPS now works.",
-      "changelog_zh": "Axion AOSP V2.2.1 每晚。为 Cupida (RMX3031) 和 Denniz 构建的非官方 GMS。 Android 16。屏幕关闭 UDFPS 现在可以使用。"
+      "changelog": "Axion AOSP V2.2.1 Nightly. Unofficial GMS build for Cupida (RMX3031) and Denniz. Android 16. Screen off UDFPS now works."
     },
     {
       "name": "RisingOS Revived 8.1.1",
@@ -60,8 +55,7 @@
       "date": "2025-08-12",
       "size": "3.6GB",
       "url": "https://archive.org/download/rmx3031-risingos-8-1-1/RisingOS_Revived-8.1.1-251005-1609-GAPPS-COMMUNITY-MT6893-ota.zip",
-      "changelog": "RisingOS Revived 8.1.1 unofficial build for RMX3031. Android 16.",
-      "changelog_zh": "RisingOS 恢复了 RMX3031 的 8.1.1 非官方版本。安卓16."
+      "changelog": "RisingOS Revived 8.1.1 unofficial build for RMX3031. Android 16."
     },
     {
       "name": "Axion AOSP 2.5",
@@ -70,8 +64,7 @@
       "size": "3.5GB",
       "url": "https://archive.org/download/rmx3031-axion-aosp-2-5/axion-2.5-REVERIE-20260417-UNOFFICIAL-GMS-op6893.zip",
       "changelog": "Added Oplus Camera. Non-rooted build. Shipped with Revanced Apps. Clean flash mandatory. By zatvio.",
-      "android": "16",
-      "changelog_zh": "添加了 Oplus 相机。非根构建。附带改进的应用程序。强制清洁闪光。通过扎维奥。"
+      "android": "16"
     },
     {
       "name": "LineageOS 23.2 Unofficial III",
@@ -80,8 +73,7 @@
       "size": "1.41GB",
       "url": "https://archive.org/download/rmx3031-lineageos-23-2-may/lineage-gms.zip",
       "changelog": "May Security Patch. Fixed Bottom Speaker for Cupida. Misc Improvements. By ManshuTyagi. GMS build (includes Google Apps).",
-      "android": "16",
-      "changelog_zh": "五月安全补丁。丘比特固定底部扬声器。其他改进。作者：ManshuTyagi。 GMS 构建（包括 Google Apps）。"
+      "android": "16"
     },
     {
       "name": "LineageOS 23.2 Unofficial III (Vanilla)",
@@ -90,8 +82,7 @@
       "size": "1.14GB",
       "url": "https://archive.org/download/rmx3031-lineageos-23-2-may/lineage-nogms.zip",
       "changelog": "May Security Patch. Fixed Bottom Speaker for Cupida. Misc Improvements. By ManshuTyagi. Vanilla build (no Google Apps).",
-      "android": "16",
-      "changelog_zh": "五月安全补丁。丘比特固定底部扬声器。其他改进。作者：ManshuTyagi。 Vanilla 构建（无 Google Apps）。"
+      "android": "16"
     },
     {
       "name": "Evolution X 11.7 (Unofficial)",
@@ -100,8 +91,7 @@
       "size": "3.9GB",
       "url": "https://archive.org/download/rmx3031-evolutionx-11-7/EvolutionX-11.7-20260507-op6893.zip",
       "changelog": "Improved udfps behaviour. Migrated bt and thermal service to aidl. Updated blobs to latest stock. Resolved most opluscam crashes. Synced with latest rom changes. May security patches. Userdebug, signed, vanilla kernel. By Liwhy.",
-      "android": "16",
-      "changelog_zh": "改进了 udfps 行为。将 BT 和热力服务迁移至 AIDL。将 blob 更新为最新库存。解决了大多数 opluscam 崩溃问题。与最新的 rom 更改同步。可能有安全补丁。 Userdebug、签名、普通内核。作者：李维。"
+      "android": "16"
     },
     {
       "name": "PixelOS (Unofficial)",
@@ -110,8 +100,7 @@
       "size": "2.0GB",
       "url": "https://archive.org/download/rmx3031-community/PixelOS_op6893-16.2-20260511-162.zip",
       "changelog": "Initial A16 Release . by ManshuTyagi & liwhy1",
-      "android": "16",
-      "changelog_zh": "最初的 A16 版本。作者：ManshuTyagi & liwhy1"
+      "android": "16"
     },
     {
       "name": "OxygenOS 16 (RMX3031)",
@@ -120,8 +109,7 @@
       "size": "5.3 GB",
       "url": "https://archive.org/download/rmx3031-oxygenos-16/OxygenOS_16_RMX3031.zip",
       "changelog": "Fastboot package. Extract, boot to fastboot, run flash.bat (Win) or ./flash.sh (Linux). Phone auto-reboots to TWRP. Sideload COS16/OOS16 kernel via ADB, format data, reboot.",
-      "android": "16",
-      "changelog_zh": "快速启动包。解压，启动到 fastboot，运行 flash.bat (Win) 或 ./flash.sh (Linux)。手机自动重启至 TWRP。通过 ADB 旁加载 COS16/OOS16 内核、格式化数据、重新启动。"
+      "android": "16"
     },
     {
       "name": "ColorOS 16 (RMX3031)",
@@ -130,8 +118,7 @@
       "size": "4.7 GB",
       "url": "https://archive.org/download/rmx3031-coloros-16/ColorOS_16_RMX3031.zip",
       "changelog": "Fastboot package. Extract, boot to fastboot, run flash.bat (Win) or ./flash.sh (Linux). Phone auto-reboots to TWRP. Sideload COS16/OOS16 kernel via ADB, format data, reboot",
-      "android": "16",
-      "changelog_zh": "快速启动包。解压，启动到 fastboot，运行 flash.bat (Win) 或 ./flash.sh (Linux)。手机自动重启至 TWRP。通过 ADB 旁加载 COS16/OOS16 内核、格式化数据、重启"
+      "android": "16"
     },
     {
       "name": "Lunaris AOSP 3.10",
@@ -140,8 +127,7 @@
       "size": "3.3GB",
       "url": "https://archive.org/download/rmx3031-lunaris-aosp-3.10/Lunaris-AOSP-op6893-OFFICIAL-3.10-GMS-2026052610.zip",
       "changelog": "- Initial Official release\n- Switched to Motorola Dolby\n- Added screen off UDFPS\n- Enabled statusbar and ambient mode burn-in Protection\n- Fixed camera cutout ring allignment\n- Added oneplus camera\n- Added display color profiles\n- Fixed connected but not charging message",
-      "android": "16",
-      "changelog_zh": "- 首次正式发布\n- 切换到摩托罗拉杜比\n- 添加了 UDFPS 关闭屏幕\n- 启用状态栏和环境模式老化保护\n- 修复了相机切口环对齐问题\n- 添加一加相机\n- 添加了显示颜色配置文件\n- 修复已连接但未充电消息"
+      "android": "16"
     },
     {
       "name": "Evolution X 11.7 (Unofficial) II",
@@ -150,8 +136,7 @@
       "size": "3.9GB",
       "url": "https://archive.org/download/rmx3031-evolution-x-11.7/Evolution-X-op6893-11.7-A16-QPR2-20260528.zip",
       "changelog": "- Fixed wpa3 wifi & hotspot issues\n- Added a more consistent fp brightness patch\n- Cleaned up overlays\n- Removed dead powerhint entries\n- Resolved some sepolicy denials\n- Minor improvements\n- Synced with latest rom changes\n- May security patches",
-      "android": "16",
-      "changelog_zh": "- 修复了 wpa3 wifi 和热点问题\n- 添加了更一致的 fp 亮度补丁\n- 清理了覆盖层\n- 删除了无效的电源提示条目\n- 解决了一些 sepolicy 拒绝问题\n- 小改进\n- 与最新的 ROM 更改同步\n- 5月安全补丁"
+      "android": "16"
     },
     {
       "name": "Axion AOSP 2.7",
@@ -160,8 +145,7 @@
       "size": "2.8GB",
       "url": "https://archive.org/download/rmx3031-axion-aosp-2-7-20260606/axion-2.7-PROXIMA_BETA-20260606-UNOFFICIAL-CORE-op6893.zip",
       "changelog": "Axion AOSP 2.7 Proxima BETA. Updated powerhints. Resolved libperfmgr & sepolicy issues. Disabled 6GHz Wi-Fi support via RRO. Configured SoftAP SAE support. Oplus Camera by @liwhy1. Revanced Apps. Non-rooted build. Dirty flash only over prior zatvio builds. By zatvio.",
-      "android": "16",
-      "changelog_zh": "Axion AOSP 2.7 Proxima BETA。更新了电源提示。解决了 libperfmgr 和 sepolicy 问题。通过 RRO 禁用 6GHz Wi-Fi 支持。配置 SoftAP SAE 支持。 Oplus 相机，作者：@liwhy1。改进的应用程序。非根构建。脏闪存仅在之前的 zatvio 版本中出现。通过扎维奥。"
+      "android": "16"
     },
     {
       "name": "LineageOS 23.2 Unofficial IV (GMS)",
@@ -170,8 +154,7 @@
       "size": "1.4GB",
       "url": "https://archive.org/download/rmx3031-lineage-23.2-unofficial-iv/lineage-23.2-20260609-UNOFFICIAL-gms-op6893.zip",
       "changelog": "June Security Patch. Fixed WPA3 WiFi & hotspot issues. Misc Improvements. GMS build (includes Google Apps). By ManshuTyagi.",
-      "android": "16",
-      "changelog_zh": "六月安全补丁。修复了 WPA3 WiFi 和热点问题。其他改进。 GMS 构建（包括 Google Apps）。作者：ManshuTyagi。"
+      "android": "16"
     },
     {
       "name": "LineageOS 23.2 Unofficial IV (Vanilla)",
@@ -180,8 +163,7 @@
       "size": "1.1GB",
       "url": "https://archive.org/download/rmx3031-lineage-23.2-unofficial-iv/lineage-23.2-20260609-UNOFFICIAL-op6893.zip",
       "changelog": "June Security Patch. Fixed WPA3 WiFi & hotspot issues. Misc Improvements. Vanilla build (no Google Apps). By ManshuTyagi.",
-      "android": "16",
-      "changelog_zh": "六月安全补丁。修复了 WPA3 WiFi 和热点问题。其他改进。 Vanilla 构建（无 Google Apps）。作者：ManshuTyagi。"
+      "android": "16"
     },
     {
       "name": "Evolution X 11.8 (Unofficial)",
@@ -190,8 +172,7 @@
       "size": "3.9GB",
       "url": "https://archive.org/download/rmx3031-evolution-x-11-8t/Evolution-X-op6893-11.8-A16-QPR2-20260610.zip",
       "changelog": "Fixed NFC unavailable issue. Synced with latest rom changes. June security patches. Userdebug, signed, vanilla kernel. By Liwhy.",
-      "android": "16",
-      "changelog_zh": "修复 NFC 不可用的问题。与最新的 rom 更改同步。六月安全补丁。 Userdebug、签名、普通内核。作者：李维。"
+      "android": "16"
     },
     {
       "name": "Lunaris AOSP 3.12 (Official)",
@@ -200,8 +181,7 @@
       "size": "3.2GB",
       "url": "https://archive.org/download/lunaris-aosp-3-12-op6893/Lunaris-AOSP-op6893-OFFICIAL-3.12-GMS-2026072421.zip",
       "changelog": "- Gapps build\n- Dolby Atmos\n- by Rakhshan",
-      "android": "16",
-      "changelog_zh": "- Gapps 构建\n- 杜比全景声\n——拉赫尚"
+      "android": "16"
     },
     {
       "name": "InfinityX v3.12 (Unofficial)",
@@ -210,8 +190,7 @@
       "size": "2.6GB",
       "url": "https://archive.org/download/op6893-infinityx-3.12/Project_Infinity-X-3.12-op6893-02.08.2026-GAPPS-UNOFFICIAL.zip",
       "changelog": "- Initial release\n- Gapps | userbuild\n- SELinux: Enforcing\n- Signed with release keys\n- Sony Dolby Atmos (OnePlus UI)\n- Credits: liwhy1 & ManshuTyagi for trees\n- Build By Rakhshan",
-      "android": "16",
-      "changelog_zh": "- 初始版本\n- 加普斯 |用户构建\n- SELinux：强制执行\n- 使用释放密钥签名\n- 索尼杜比全景声（OnePlus UI）\n- 来源：liwhy1 和 ManshuTyagi 的树木\n- 由 Rakhshan 建造"
+      "android": "16"
     }
   ],
   "kernels": [
@@ -221,8 +200,7 @@
       "date": "2026-04-18",
       "size": "19MB",
       "url": "https://archive.org/download/rmx3031-kernels/RESUKISU-CUPIDA-DENNIZ.zip",
-      "changelog": "Resukisu . SuSFS v2.1.0 For AOSP ROMs . By Soulspark",
-      "changelog_zh": "雷苏克苏。 SuSFS v2.1.0 适用于 AOSP ROM。通过灵魂火花"
+      "changelog": "Resukisu . SuSFS v2.1.0 For AOSP ROMs . By Soulspark"
     },
     {
       "name": "ReSukiSU Cupida Denniz (COS16/OOS16)",
@@ -230,8 +208,7 @@
       "date": "2026-04-18",
       "size": "19MB",
       "url": "https://archive.org/download/rmx3031-kernels/COS16-RESUKISU-CUPIDA-DENNIZ.zip",
-      "changelog": "Resukisu . SUSFS v2.1.0 for ColorOS 16 and OxygenOS 16 ROMs . By Soulspark",
-      "changelog_zh": "雷苏克苏。适用于 ColorOS 16 和 OxygenOS 16 ROM 的 SUSFS v2.1.0。通过灵魂火花"
+      "changelog": "Resukisu . SUSFS v2.1.0 for ColorOS 16 and OxygenOS 16 ROMs . By Soulspark"
     },
     {
       "name": "KSU Next Cupida Denniz (COS/OOS)",
@@ -239,16 +216,14 @@
       "date": "2026-03-24",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-1.5.5/KSU_Next_OP6893_COS16.zip",
-      "changelog": "COS 16 kernel . susfs v.1.5.5 . KernelSU Next . LSPosed working . SELinux: Enforcing. Flash SUSFS-FOR-KERNELSU module (required for better stealth/root hiding). Added UDFPS support . By xCaptaiN09",
-      "changelog_zh": "COS 16 内核。 susfs v.1.5.5 。内核SU 接下来。 LS摆出工作姿势。 SELinux：强制执行。 Flash SUSFS-FOR-KERNELSU 模块（需要更好的隐形/根隐藏）。添加了 UDFPS 支持。由 xCaptaiN09 提供"
+      "changelog": "COS 16 kernel . susfs v.1.5.5 . KernelSU Next . LSPosed working . SELinux: Enforcing. Flash SUSFS-FOR-KERNELSU module (required for better stealth/root hiding). Added UDFPS support . By xCaptaiN09"
     },
     {
       "name": "COS/OOS 16 Kernel (No Root)",
       "date": "2026-03-24",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-kernel-realme_ui/Realme_UI_NoRoot_RMX3031.zip",
-      "changelog": "COS 16 kernel without root. Charging fix for RMX3031. Added UDFPS support",
-      "changelog_zh": "COS 16 内核，无需 root。 RMX3031 的充电修复。添加了 UDFPS 支持"
+      "changelog": "COS 16 kernel without root. Charging fix for RMX3031. Added UDFPS support"
     },
     {
       "name": "KSU Next Cupida Denniz (AOSP)",
@@ -256,8 +231,7 @@
       "date": "2026-03-25",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-1.5.5/KSU_Next_OP6893_AOSP.zip",
-      "changelog": "KernelSU Next . susfs v1.5.5 . LSPosed working . SELinux: Enforcing . Flash SUSFS-FOR-KERNELSU module (required for better stealth/root hiding) . Added UDFPS support . By xCaptaiN09",
-      "changelog_zh": "内核SU 接下来。 susfs v1.5.5 。 LS摆出工作姿势。 SELinux：强制执行 . Flash SUSFS-FOR-KERNELSU 模块（需要更好的隐形/根隐藏）。添加了 UDFPS 支持。由 xCaptaiN09 提供"
+      "changelog": "KernelSU Next . susfs v1.5.5 . LSPosed working . SELinux: Enforcing . Flash SUSFS-FOR-KERNELSU module (required for better stealth/root hiding) . Added UDFPS support . By xCaptaiN09"
     },
     {
       "name": "Kernel RMX3031 Charging Fix (No Root)",
@@ -265,8 +239,7 @@
       "date": "2026-03-08",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-kernel-lineage-chargingfix/Lineage_23.2_ChargingFix_RMX3031.zip",
-      "changelog": "Charging fix kernel for RMX3031. Added UDFPS support",
-      "changelog_zh": "RMX3031充电修复内核。添加了 UDFPS 支持"
+      "changelog": "Charging fix kernel for RMX3031. Added UDFPS support"
     },
     {
       "name": "SukiSU Ultra RMX3031 (Unstable)",
@@ -274,8 +247,7 @@
       "date": "2026-03-08",
       "size": "22MB",
       "url": "https://archive.org/download/rmx3031-sukisu-ultra/SukiSU_Ultra_RMX3031.zip",
-      "changelog": "Working: Root via SukiSU Ultra, SuSFS v2.0.0, Zygisk Next, Tricky Store / Play Integrity, Droidspaces / Linux container, KPM modules. Not working: ReZygisk (version check blocks non-submodule KSU), LSPosed (incompatible with Android 16 QPR2 ART).",
-      "changelog_zh": "工作：通过 SukiSU Ultra、SuSFS v2.0.0、Zygisk Next、Tricky Store / Play Integrity、Droidspaces / Linux 容器、KPM 模块进行 Root。不起作用：ReZygisk（版本检查阻止非子模块 KSU）、LSPosed（与 Android 16 QPR2 ART 不兼容）。"
+      "changelog": "Working: Root via SukiSU Ultra, SuSFS v2.0.0, Zygisk Next, Tricky Store / Play Integrity, Droidspaces / Linux container, KPM modules. Not working: ReZygisk (version check blocks non-submodule KSU), LSPosed (incompatible with Android 16 QPR2 ART)."
     },
     {
       "name": "COS 16 Kernel (No Root)(Unstable)",
@@ -283,8 +255,7 @@
       "date": "2026-03-08",
       "size": "20MB",
       "url": "https://archive.org/download/rmx3031-kernels/COS_16_kernel_no_root.zip",
-      "changelog": "COS 16 kernel without root for RMX3031",
-      "changelog_zh": "RMX3031 COS 16 内核免root"
+      "changelog": "COS 16 kernel without root for RMX3031"
     },
     {
       "name": "Stock KSU Kernel",
@@ -292,8 +263,7 @@
       "date": "2026-03-08",
       "size": "23MB",
       "url": "https://archive.org/download/rmx3031-kernels/STOCK_KSU.zip",
-      "changelog": "Stock kernel with KernelSU for RMX3031",
-      "changelog_zh": "适用于 RMX3031 的带有 KernelSU 的库存内核"
+      "changelog": "Stock kernel with KernelSU for RMX3031"
     },
     {
       "name": "SukiSU Ultra 3.2.0",
@@ -301,8 +271,7 @@
       "date": "2026-03-08",
       "size": "26MB",
       "url": "https://archive.org/download/rmx3031-kernels/SukiSU-Ultra_3.2.0.zip",
-      "changelog": "SukiSU Ultra 3.2.0 kernel for RMX3031",
-      "changelog_zh": "适用于 RMX3031 的 SukiSU Ultra 3.2.0 内核"
+      "changelog": "SukiSU Ultra 3.2.0 kernel for RMX3031"
     },
     {
       "name": "Kernel v4.19.325 KSUN SuSFS v1.5.5",
@@ -310,8 +279,7 @@
       "date": "2026-03-08",
       "size": "35MB",
       "url": "https://archive.org/download/rmx3031-kernels/v4.19.325-ksun-v12602-susfs-v1.5.5.zip",
-      "changelog": "Linux 4.19.325 with KernelSU Next and SuSFS v1.5.5 and Nethunter",
-      "changelog_zh": "Linux 4.19.325，带有 KernelSU Next 和 SuSFS v1.5.5 以及 Nethunter"
+      "changelog": "Linux 4.19.325 with KernelSU Next and SuSFS v1.5.5 and Nethunter"
     },
     {
       "name": "KSU Next OP6893 (COS16/OOS16)",
@@ -319,8 +287,7 @@
       "date": "2026-06-16",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.1.0/KSUN_OP6893_COS16.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.1.0 . RUI/COS/OOS 16 kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
-      "changelog_zh": "内核SU 接下来。 SUSFS v.2.1.0。 RUI/COS/OOS 16 内核。 LS摆出工作姿势。 SELinux：强制执行 .由 xCaptaiN09 提供"
+      "changelog": "KernelSU Next . SUSFS v.2.1.0 . RUI/COS/OOS 16 kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
     },
     {
       "name": "KSU Next OP6893 (AOSP)",
@@ -328,8 +295,7 @@
       "date": "2026-06-17",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.1.0/KSUN_OP6893_AOSP.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.1.0 . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
-      "changelog_zh": "内核SU 接下来。 SUSFS v.2.1.0。 AOSP 内核。 LS摆出工作姿势。 SELinux：强制执行 .由 xCaptaiN09 提供"
+      "changelog": "KernelSU Next . SUSFS v.2.1.0 . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
     },
     {
       "name": "KSU Next OP6893 Manual-Hook (AOSP)",
@@ -337,8 +303,7 @@
       "date": "2026-06-19",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.1.0-manualhook-v4/KSUN-Manual-Hook-AOSP.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.1.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
-      "changelog_zh": "内核SU 接下来。 SUSFS v.2.1.0。手动挂钩。 AOSP 内核。 LS摆出工作姿势。 SELinux：强制执行 .由 xCaptaiN09 提供"
+      "changelog": "KernelSU Next . SUSFS v.2.1.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
     },
     {
       "name": "KSU Next OP6893 Manual-Hook (COS16/OOS16)",
@@ -346,8 +311,7 @@
       "date": "2026-06-18",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.1.0-manualhook-v4/KSUN-Manual-Hook-COS-OOS.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.1.0 . Manual Hook . COS/OOS/RUI16 kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
-      "changelog_zh": "内核SU 接下来。 SUSFS v.2.1.0。手动挂钩。 COS/OOS/RUI16 内核。 LS摆出工作姿势。 SELinux：强制执行 .由 xCaptaiN09 提供"
+      "changelog": "KernelSU Next . SUSFS v.2.1.0 . Manual Hook . COS/OOS/RUI16 kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
     },
     {
       "name": "KSU Next OP6893 Manual-Hook III (AOSP)",
@@ -355,8 +319,7 @@
       "date": "2026-07-14",
       "size": "21MB",
       "url": "https://archive.org/download/op6893-susfs-2.2.0-manualhook-v3/KSU-Next-AOSP-v3.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
-      "changelog_zh": "内核SU 接下来。 SUSFS v.2.2.0。手动挂钩。 AOSP 内核。 LS摆出工作姿势。 SELinux：强制执行 .由 xCaptaiN09 提供"
+      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
     },
     {
       "name": "KSU Next OP6893 Manual-Hook III (COS/OOS)",
@@ -364,8 +327,7 @@
       "date": "2026-07-13",
       "size": "21MB",
       "url": "https://archive.org/download/op6893-susfs-2.2.0-manualhook-v3/KSU-Next-RUI-v3.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . COS/OOS kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
-      "changelog_zh": "内核SU 接下来。 SUSFS v.2.2.0。手动挂钩。 COS/OOS 内核。 LS摆出工作姿势。 SELinux：强制执行 .由 xCaptaiN09 提供"
+      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . COS/OOS kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
     },
     {
       "name": "ResukiSU OP6893 (AOSP)",
@@ -373,8 +335,7 @@
       "date": "2026-07-20",
       "size": "20MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.2.0-inline-Hook/ReSukiSU_OP6893.zip",
-      "changelog": "ResukiSU . SUSFS v.2.2.0 . Inline Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By soulspark666",
-      "changelog_zh": "雷苏克苏。 SUSFS v.2.2.0。内联挂钩。 AOSP 内核。 LS摆出工作姿势。 SELinux：强制执行 .通过 灵魂火花666"
+      "changelog": "ResukiSU . SUSFS v.2.2.0 . Inline Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By soulspark666"
     }
   ],
   "modules": [
@@ -384,8 +345,7 @@
       "date": "2026-03-15",
       "size": "1.6KB",
       "url": "https://archive.org/download/rmx3031-modules/ksu_module_susfs.zip",
-      "changelog": "Required for better stealth and root hiding with KernelSU Next. Flash via KSU Manager.",
-      "changelog_zh": "使用 KernelSU Next 实现更好的隐秘性和根隐藏所需。通过 KSU Manager 进行闪存。"
+      "changelog": "Required for better stealth and root hiding with KernelSU Next. Flash via KSU Manager."
     },
     {
       "name": "Permissiver V5",
@@ -393,8 +353,7 @@
       "date": "2026-03-08",
       "size": "1.2MB",
       "url": "https://archive.org/download/permissiver-v-5/Permissiver_v5.zip",
-      "changelog": "Permissiver V5 for RMX3031. Flashable via Magisk or TWRP.",
-      "changelog_zh": "RMX3031 的许可 V5。可通过 Magisk 或 TWRP 进行闪存。"
+      "changelog": "Permissiver V5 for RMX3031. Flashable via Magisk or TWRP."
     }
   ],
   "ota": [
@@ -404,8 +363,7 @@
       "date": "2026-03-11",
       "size": "4.66GB",
       "url": "https://archive.org/download/rmx3031-ota-a15/X7-MAX-A15-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "X7-MAX A22 Toolbox",
@@ -413,8 +371,7 @@
       "date": "2026-03-11",
       "size": "4.47GB",
       "url": "https://archive.org/download/rmx3031-ota-a22/X7-MAX-A22-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "X7-MAX C12 Toolbox",
@@ -422,8 +379,7 @@
       "date": "2026-03-11",
       "size": "5.73GB",
       "url": "https://archive.org/download/rmx3031-ota-c12/X7-MAX-C12-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "X7-MAX C17 Toolbox",
@@ -431,8 +387,7 @@
       "date": "2026-03-11",
       "size": "5.83GB",
       "url": "https://archive.org/download/rmx3031-ota-c17/X7-MAX-C17-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "X7-MAX F01 Toolbox",
@@ -440,8 +395,7 @@
       "date": "2026-03-11",
       "size": "6.01GB",
       "url": "https://archive.org/download/rmx3031-ota-f01/X7-MAX-F01-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "X7-MAX F12 Toolbox",
@@ -449,8 +403,7 @@
       "date": "2026-03-11",
       "size": "6.13GB",
       "url": "https://archive.org/download/rmx3031-ota-f12/X7-MAX-F12-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "X7-MAX F13 Toolbox",
@@ -458,8 +411,7 @@
       "date": "2026-03-11",
       "size": "6.14GB",
       "url": "https://archive.org/download/rmx3031-ota-f13/X7-MAX-F13-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "X7-MAX F24 Toolbox",
@@ -467,8 +419,7 @@
       "date": "2026-03-11",
       "size": "6.43GB",
       "url": "https://archive.org/download/rmx3031-ota-f24/X7-MAX-F24-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "X7-MAX F25 Toolbox",
@@ -476,8 +427,7 @@
       "date": "2026-03-11",
       "size": "6.58GB",
       "url": "https://archive.org/download/rmx3031-ota-f25/X7-MAX-F25-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "X7-MAX A21 (Rollback)",
@@ -485,8 +435,7 @@
       "date": "2026-03-11",
       "size": "3.60GB",
       "url": "https://archive.org/download/rmx3031-rollback-a21/X7MAX_11_A.21.zip",
-      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install.",
-      "changelog_zh": "回滚包。启用开发者模式>设置>关于手机>软件更新>本地安装>选择并安装。重命名为 ota_downgrade.zip 并安装。"
+      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install."
     },
     {
       "name": "X7-MAX C16 (Rollback)",
@@ -494,8 +443,7 @@
       "date": "2026-03-11",
       "size": "5.02GB",
       "url": "https://archive.org/download/rmx3031-rollback-c16/X7MAX_11_C.16.zip",
-      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install.",
-      "changelog_zh": "回滚包。启用开发者模式>设置>关于手机>软件更新>本地安装>选择并安装。重命名为 ota_downgrade.zip 并安装。"
+      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install."
     }
   ],
   "ota_cn": [
@@ -505,8 +453,7 @@
       "date": "2026-03-17",
       "size": "5.45GB",
       "url": "https://archive.org/download/rmx3031-ota-in-a14/RMX3031-A14-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3031 印度变体。顺序升级路径：A27 > C18 > C26 > F01 > F12 > F24 > F25（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "A27 Toolbox",
@@ -514,8 +461,7 @@
       "date": "2026-03-17",
       "size": "5.24GB",
       "url": "https://archive.org/download/rmx3031-ota-in-a27/RMX3031-A27-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3031 印度变体。顺序升级路径：A27 > C18 > C26 > F01 > F12 > F24 > F25（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "C18 Toolbox",
@@ -523,8 +469,7 @@
       "date": "2026-03-17",
       "size": "6.02GB",
       "url": "https://archive.org/download/rmx3031-ota-in-c18/RMX3031-C18-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3031 印度变体。顺序升级路径：A27 > C18 > C26 > F01 > F12 > F24 > F25（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "C26 Toolbox",
@@ -532,8 +477,7 @@
       "date": "2026-03-17",
       "size": "6.28GB",
       "url": "https://archive.org/download/rmx3031-ota-in-c26/RMX3031-C26-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3031 印度变体。顺序升级路径：A27 > C18 > C26 > F01 > F12 > F24 > F25（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "F01 Toolbox",
@@ -541,8 +485,7 @@
       "date": "2026-03-17",
       "size": "6.59GB",
       "url": "https://archive.org/download/rmx3031-ota-in-f01/RMX3031-F01-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3031 印度变体。顺序升级路径：A27 > C18 > C26 > F01 > F12 > F24 > F25（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "F12 Toolbox",
@@ -550,8 +493,7 @@
       "date": "2026-03-30",
       "size": "6.80GB",
       "url": "https://archive.org/download/rmx3031-ota-cn-f12/RMX3031-F12-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3031 印度变体。顺序升级路径：A27 > C18 > C26 > F01 > F12 > F24 > F25（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "F24 Toolbox",
@@ -559,8 +501,7 @@
       "date": "2026-03-30",
       "size": "7.29GB",
       "url": "https://archive.org/download/rmx3031-ota-cn-f24/RMX3031-F24-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3031 印度变体。顺序升级路径：A27 > C18 > C26 > F01 > F12 > F24 > F25（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "F25 Toolbox",
@@ -568,8 +509,7 @@
       "date": "2026-03-30",
       "size": "7.26GB",
       "url": "https://archive.org/download/rmx3031-ota-cn-f25/RMX3031-F25-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3031 印度变体。顺序升级路径：A27 > C18 > C26 > F01 > F12 > F24 > F25（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "A29 (Rollback)",
@@ -577,8 +517,7 @@
       "date": "2026-03-30",
       "size": "4.59GB",
       "url": "https://archive.org/download/rmx3031-rollback-cn-a29/RMX3031_11_A.29.zip",
-      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install.",
-      "changelog_zh": "回滚包。启用开发者模式>设置>关于手机>软件更新>本地安装>选择并安装。重命名为 ota_downgrade.zip 并安装。"
+      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install."
     },
     {
       "name": "C25 (Rollback)",
@@ -586,8 +525,7 @@
       "date": "2026-03-30",
       "size": "5.47GB",
       "url": "https://archive.org/download/rmx3031-rollback-cn-c25/RMX3031_11_C.25.zip",
-      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install.",
-      "changelog_zh": "回滚包。启用开发者模式>设置>关于手机>软件更新>本地安装>选择并安装。重命名为 ota_downgrade.zip 并安装。"
+      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install."
     }
   ],
   "ota_cnf": [
@@ -597,8 +535,7 @@
       "date": "2026-03-31",
       "size": "3.56GB",
       "url": "https://archive.org/download/rmx3350-flash-a07-deep/RMX3350-A07-Deep-Compact-Toolbox-pkg.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Deep Compact variant with smaller size. RMX3350 GT Neo Flash Edition.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。尺寸更小的深紧凑型。 RMX3350 GT Neo Flash 版。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Deep Compact variant with smaller size. RMX3350 GT Neo Flash Edition."
     },
     {
       "name": "A07 Toolbox",
@@ -606,8 +543,7 @@
       "date": "2026-03-31",
       "size": "5.31GB",
       "url": "https://archive.org/download/rmx3350-flash-a07/RMX3350-A07-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3350 GT Neo Flash 版。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "A16 (Compact) Toolbox",
@@ -615,8 +551,7 @@
       "date": "2026-03-31",
       "size": "4.34GB",
       "url": "https://archive.org/download/rmx3350-flash-a16-compact/RMX3350-A16-Compact-Toolbox-pkg.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Compact variant with smaller size. RMX3350 GT Neo Flash Edition.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。尺寸更小的紧凑型。 RMX3350 GT Neo Flash 版。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Compact variant with smaller size. RMX3350 GT Neo Flash Edition."
     },
     {
       "name": "A16 Toolbox",
@@ -624,8 +559,7 @@
       "date": "2026-03-31",
       "size": "5.45GB",
       "url": "https://archive.org/download/rmx3350-flash-a16/RMX3350-A16-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3350 GT Neo Flash 版。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "C15 Toolbox",
@@ -633,8 +567,7 @@
       "date": "2026-03-31",
       "size": "6.07GB",
       "url": "https://archive.org/download/rmx3350-flash-c15/RMX3350-C15-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3350 GT Neo Flash 版。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "C20 Toolbox",
@@ -642,8 +575,7 @@
       "date": "2026-03-31",
       "size": "6.29GB",
       "url": "https://archive.org/download/rmx3350-flash-c20/RMX3350-C20-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3350 GT Neo Flash 版。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "F01 Toolbox",
@@ -651,8 +583,7 @@
       "date": "2026-03-31",
       "size": "6.59GB",
       "url": "https://archive.org/download/rmx3350-flash-f01/RMX3350-F01-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3350 GT Neo Flash 版。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     },
     {
       "name": "F12 Toolbox",
@@ -660,8 +591,7 @@
       "date": "2026-05-06",
       "size": "6.80GB",
       "url": "https://archive.org/download/rmx3350-flash-f12/RMX3350-F12-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
-      "changelog_zh": "三合一套件包括 TWRP、Fastboot 和 SP Flash Tool。 RMX3350 GT Neo Flash 版。顺序升级路径：A22 > C12 > F13 > F24（无需擦除数据）。跨版本升级/降级需要数据格式。"
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
     }
   ],
   "firmware": [
@@ -671,8 +601,7 @@
       "date": "2026-03-08",
       "size": "57MB",
       "url": "https://archive.org/download/rmx3031-firmware/RMX3031_RUI4_F.12_FW_ONLY.zip",
-      "changelog": "RUI4 F.12 firmware only package for RMX3031",
-      "changelog_zh": "适用于 RMX3031 的 RUI4 F.12 固件包"
+      "changelog": "RUI4 F.12 firmware only package for RMX3031"
     },
     {
       "name": "RUI4 F.13 Firmware Only",
@@ -680,8 +609,7 @@
       "date": "2026-03-08",
       "size": "57MB",
       "url": "https://archive.org/download/rmx3031-firmware/RMX3031_RUI4_F.13_FW_ONLY.zip",
-      "changelog": "RUI4 F.13 firmware only package for RMX3031",
-      "changelog_zh": "适用于 RMX3031 的 RUI4 F.13 固件包"
+      "changelog": "RUI4 F.13 firmware only package for RMX3031"
     },
     {
       "name": "OOS 13 F.57 Restore Brom Firmware (Denniz)",
@@ -689,8 +617,7 @@
       "date": "2026-06-07",
       "size": "57MB",
       "url": "https://archive.org/download/rmx3031-firmware-f-57-restore-brom/13.0-F.57-Denniz_Restore_Brom_Firmware.zip",
-      "changelog": "Restore Brom + OxygenOS 13 F.57 firmware for OnePlus Nord 2 (DN2103) . Flash this firmware before installing custom ROMs . By ManshuTyagi.",
-      "changelog_zh": "恢复 OnePlus Nord 2 (DN2103) 的 Brom + OxygenOS 13 F.57 固件。在安装自定义 ROM 之前刷新此固件。作者：ManshuTyagi。"
+      "changelog": "Restore Brom + OxygenOS 13 F.57 firmware for OnePlus Nord 2 (DN2103) . Flash this firmware before installing custom ROMs . By ManshuTyagi."
     },
     {
       "name": "X7 MAX F12",
@@ -698,8 +625,7 @@
       "date": "2026-06-27",
       "size": "6.1GB",
       "url": "https://archive.org/download/rmx3031-ota-f12/X7-MAX-F12.tar",
-      "changelog": "Realme X7 Max F12 firmware . TWRP Flashable",
-      "changelog_zh": "Realme X7 Max F12固件。 TWRP 闪存"
+      "changelog": "Realme X7 Max F12 firmware . TWRP Flashable"
     }
   ],
   "sptool": [
@@ -709,8 +635,7 @@
       "date": "2026-03-12",
       "size": "3.2GB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/A.15.7z",
-      "changelog": "SP Flash Tool firmware package for RMX3031.",
-      "changelog_zh": "RMX3031 的 SP 闪存工具固件包。"
+      "changelog": "SP Flash Tool firmware package for RMX3031."
     },
     {
       "name": "A.22",
@@ -718,8 +643,7 @@
       "date": "2026-03-12",
       "size": "3.0GB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/A.22.7z",
-      "changelog": "SP Flash Tool firmware package for RMX3031.",
-      "changelog_zh": "RMX3031 的 SP 闪存工具固件包。"
+      "changelog": "SP Flash Tool firmware package for RMX3031."
     },
     {
       "name": "C.12saxx",
@@ -727,8 +651,7 @@
       "date": "2026-03-12",
       "size": "4.3GB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/C.12saxx.7z",
-      "changelog": "SP Flash Tool firmware package for RMX3031.",
-      "changelog_zh": "RMX3031 的 SP 闪存工具固件包。"
+      "changelog": "SP Flash Tool firmware package for RMX3031."
     },
     {
       "name": "C.15",
@@ -736,8 +659,7 @@
       "date": "2026-03-12",
       "size": "4.4GB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/C.15.7z",
-      "changelog": "SP Flash Tool firmware package for RMX3031.",
-      "changelog_zh": "RMX3031 的 SP 闪存工具固件包。"
+      "changelog": "SP Flash Tool firmware package for RMX3031."
     },
     {
       "name": "Tools",
@@ -745,8 +667,7 @@
       "date": "2026-03-12",
       "size": "51MB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/Tools.7z",
-      "changelog": "SP Flash Tool and required tools for RMX3031 firmware flashing.",
-      "changelog_zh": "SP Flash Tool 和 RMX3031 固件刷新所需的工具。"
+      "changelog": "SP Flash Tool and required tools for RMX3031 firmware flashing."
     }
   ],
   "recovery": [
@@ -756,8 +677,7 @@
       "date": "2026-03-09",
       "size": "46MB",
       "url": "https://archive.org/download/rmx3031-twrp-rui4/TWRP-3.7.0-12.1-RUI4-RMX3031-20220417.zip",
-      "changelog": "RMX3031-twrp-RUI4",
-      "changelog_zh": "RMX3031-twrp-RUI4"
+      "changelog": "RMX3031-twrp-RUI4"
     },
     {
       "name": "RMX3031 TWRP RUI3",
@@ -765,8 +685,7 @@
       "date": "2026-03-09",
       "size": "45MB",
       "url": "https://archive.org/download/rmx3031-twrp-rui3/TWRP-3.7.0-12-RMX3031-20221024.zip",
-      "changelog": "RMX3031-twrp-RUI3",
-      "changelog_zh": "RMX3031-twrp-RUI3"
+      "changelog": "RMX3031-twrp-RUI3"
     },
     {
       "name": "RMX3031 TWRP RUI2",
@@ -774,8 +693,7 @@
       "date": "2026-03-09",
       "size": "38MB",
       "url": "https://archive.org/download/rmx3031-twrp-rui2/TWRP_RUI2_A11.zip",
-      "changelog": "RMX3031-twrp-RUI2",
-      "changelog_zh": "RMX3031-twrp-RUI2"
+      "changelog": "RMX3031-twrp-RUI2"
     }
   ],
   "other": [
@@ -785,8 +703,7 @@
       "date": "2026-03-09",
       "size": "20KB",
       "url": "https://archive.org/download/rmx3031-docs/ADB_Fastboot_Commands.pdf",
-      "changelog": "commands for ADB & Fastboot",
-      "changelog_zh": "ADB 和 Fastboot 命令"
+      "changelog": "commands for ADB & Fastboot"
     },
     {
       "name": "LOG Capture Commands",
@@ -794,8 +711,7 @@
       "date": "2026-03-09",
       "size": "10KB",
       "url": "https://archive.org/download/rmx3031-docs/LOG%20commands.pdf",
-      "changelog": "Commands to Capture LOGs",
-      "changelog_zh": "捕获日志的命令"
+      "changelog": "Commands to Capture LOGs"
     },
     {
       "name": "Git Commands",
@@ -803,8 +719,7 @@
       "date": "2026-03-09",
       "size": "3MB",
       "url": "https://archive.org/download/rmx3031-docs/git.pdf",
-      "changelog": "Git Commands",
-      "changelog_zh": "Git 命令"
+      "changelog": "Git Commands"
     }
   ],
   "_synced_at": "2026-08-07",

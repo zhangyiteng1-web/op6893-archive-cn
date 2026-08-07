@@ -70,14 +70,14 @@
     <div class="step">
       <h3>方式一 · 书签法（手机可用）</h3>
       <p>1. 添加一个书签，名称随意，网址填下面这段：</p>
-      <div class="code" id="bm">javascript:(function(){var t=JSON.parse(localStorage.user||'{}').token;if(t){var e=document.createElement('textarea');e.value=t;e.style.position='fixed';e.style.top='0';e.style.left='0';e.style.width='100%';e.style.height='200px';e.style.zIndex='99999';e.style.background='#111';e.style.color='#0f0';e.style.fontSize='12px';e.style.padding='10px';document.body.appendChild(e);e.select();e.setSelectionRange(0,99999);navigator.clipboard.writeText(t);alert('Token已复制: '+t.substring(0,30)+'...')}else{alert('未找到，请先登录123pan.com')}})();</div>
-      <p>2. 打开 <a href="https://www.123pan.com" target="_blank" style="color:#62f7ff;">123pan.com</a> 并登录</p>
-      <p>3. 点击那个书签，Token 会自动复制并弹出</p>
+      <div class="code" id="bm">javascript:(function(){var t=JSON.parse(localStorage.user||'{}').token;if(t){var e=document.createElement('textarea');e.value=t;e.style.position='fixed';e.style.top='0';e.style.left='0';e.style.width='100%';e.style.height='200px';e.style.zIndex='99999';e.style.background='#111';e.style.color='#0f0';e.style.fontSize='12px';e.style.padding='10px';document.body.appendChild(e);e.select();e.setSelectionRange(0,99999);navigator.clipboard.writeText(t);alert('Token已复制: '+t.substring(0,30)+'...')}else{alert('未找到，请先登录并在 yun.123pan.cn 页面点击')}})();</div>
+      <p>2. 打开 <a href="https://www.123pan.com" target="_blank" style="color:#62f7ff;">123pan.com</a> 登录，登录后会跳转到 <strong style="color:#ffd166;">yun.123pan.cn</strong></p>
+      <p>3. 在 <strong style="color:#ffd166;">yun.123pan.cn</strong> 页面点击那个书签，Token 会自动复制并弹出</p>
     </div>
 
     <div class="step">
       <h3>方式二 · 电脑浏览器（最简单）</h3>
-      <p>在电脑上登录 123pan.com，按 F12 → Console，粘贴下面代码回车：</p>
+      <p>在电脑上登录 123pan.com，登录后跳转至 yun.123pan.cn，按 F12 → Console，粘贴下面代码回车：</p>
       <div class="code">JSON.parse(localStorage.user).token</div>
       <p>输出的那串文字就是 Token，复制即可。</p>
     </div>

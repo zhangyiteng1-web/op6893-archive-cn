@@ -205,26 +205,61 @@ async function login() {
 // ── Folder management ───────────────────────────────────────────────────────
 
 /**
+ * Standard params for the /b/api/file/list/new web API.
+ */
+function listParams(parentFileId, opts = {}) {
+  return {
+    driveId: 0,
+    parentFileId: String(parentFileId),
+    limit: opts.limit || 100,
+    orderBy: "file_id",
+    orderDirection: "desc",
+    trashed: false,
+    Page: String(opts.page || 1),
+    SearchData: opts.searchData || "",
+    searchType: opts.searchType || 0,
+    OnlyLookAbnormalFile: 0,
+  };
+}
+
+/**
+ * Extract items from a list API response. The web API returns data.InfoList.
+ */
+function extractItems(res) {
+  return res.data?.InfoList || res.data?.fileList || res.data?.infoList || [];
+}
+
+/**
+ * Normalize item field names (web API uses FileName, FileId, Type).
+ */
+function itemName(item) {
+  return item.FileName || item.fileName || item.filename || "";
+}
+
+function itemId(item) {
+  return item.FileId || item.fileId || item.fileID || 0;
+}
+
+function itemType(item) {
+  return item.Type !== undefined ? item.Type : item.type;
+}
+
+/**
  * Find or create the target folder. Returns folderId.
  */
 async function findOrCreateFolder() {
   // Strategy 1: Search by name
   try {
-    const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
-      driveId: 0,
-      parentFileId: 0,
-      limit: 100,
-      page: 1,
+    const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, listParams(0, {
       searchData: TARGET_FOLDER_NAME,
       searchType: 1,
-      trashed: 0,
-    });
-    const items = res.data?.fileList || res.data?.infoList || [];
+    }));
+    const items = extractItems(res);
     for (const item of items) {
-      if (item.fileName === TARGET_FOLDER_NAME || item.filename === TARGET_FOLDER_NAME) {
-        const folderId = item.fileId || item.fileID;
-        log(`Found existing folder "${TARGET_FOLDER_NAME}", id=${folderId}`);
-        return folderId;
+      if (itemName(item) === TARGET_FOLDER_NAME && itemType(item) === 1) {
+        const id = itemId(item);
+        log(`Found existing folder "${TARGET_FOLDER_NAME}", id=${id}`);
+        return id;
       }
     }
   } catch (err) {
@@ -234,20 +269,14 @@ async function findOrCreateFolder() {
   // Strategy 2: Paginate through root
   try {
     for (let page = 1; page <= 10; page++) {
-      const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
-        driveId: 0,
-        parentFileId: 0,
-        limit: 100,
-        page,
-        trashed: 0,
-      });
-      const items = res.data?.fileList || res.data?.infoList || [];
+      const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, listParams(0, { page }));
+      const items = extractItems(res);
       if (!items.length) break;
       for (const item of items) {
-        if (item.fileName === TARGET_FOLDER_NAME || item.filename === TARGET_FOLDER_NAME) {
-          const folderId = item.fileId || item.fileID;
-          log(`Found existing folder "${TARGET_FOLDER_NAME}" via listing, id=${folderId}`);
-          return folderId;
+        if (itemName(item) === TARGET_FOLDER_NAME && itemType(item) === 1) {
+          const id = itemId(item);
+          log(`Found existing folder "${TARGET_FOLDER_NAME}" via listing (page ${page}), id=${id}`);
+          return id;
         }
       }
       if (items.length < 100) break;
@@ -256,19 +285,31 @@ async function findOrCreateFolder() {
     warn(`  Folder listing failed: ${err.message}`);
   }
 
-  // Strategy 3: Create the folder
+  // Strategy 3: Create the folder — try multiple endpoints
   log(`Creating folder "${TARGET_FOLDER_NAME}"...`);
-  const createRes = await apiPost(`${BASE_URL}/b/api/file/mkdir`, {
-    driveId: 0,
-    name: TARGET_FOLDER_NAME,
-    parentFileId: 0,
-  });
-  const folderId = createRes.data?.fileId || createRes.data?.fileID || createRes.data?.FileId;
-  if (!folderId) {
-    throw new Error(`Failed to create folder: ${JSON.stringify(createRes)}`);
+  const mkdirEndpoints = [
+    { url: `${BASE_URL}/b/api/file/newFolder`, body: { driveId: 0, parentFileId: 0, folderName: TARGET_FOLDER_NAME } },
+    { url: `${BASE_URL}/b/api/file/mkdir`, body: { driveId: 0, name: TARGET_FOLDER_NAME, parentFileId: 0 } },
+    { url: `${BASE_URL}/upload/v1/file/mkdir`, body: { name: TARGET_FOLDER_NAME, parentID: 0 } },
+  ];
+
+  let lastErr = null;
+  for (const { url, body } of mkdirEndpoints) {
+    try {
+      const res = await apiPost(url, body);
+      const folderId = res.data?.fileId || res.data?.fileID || res.data?.FileId || res.data?.dirID;
+      if (folderId) {
+        log(`Folder created via ${url.split("/").pop()}, id=${folderId}`);
+        return folderId;
+      }
+      log(`  ${url}: created but no folderId in response: ${JSON.stringify(res.data).slice(0, 100)}`);
+    } catch (err) {
+      lastErr = err;
+      log(`  ${url.split("/").pop()}: ${err.message}`);
+    }
   }
-  log(`Folder created, id=${folderId}`);
-  return folderId;
+
+  throw new Error(`Failed to create folder after trying ${mkdirEndpoints.length} endpoints. Last error: ${lastErr?.message}`);
 }
 
 /**
@@ -278,20 +319,16 @@ async function findOrCreateFolder() {
 async function findFileInFolder(fileName, parentFileId) {
   // Strategy 1: Use search API
   try {
-    const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
-      driveId: 0,
-      parentFileId,
-      limit: 100,
-      page: 1,
+    const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, listParams(parentFileId, {
       searchData: fileName,
       searchType: 1,
-      trashed: 0,
-    });
-    const items = res.data?.fileList || res.data?.infoList || [];
+    }));
+    const items = extractItems(res);
     for (const item of items) {
-      if (item.fileName === fileName || item.filename === fileName) {
-        log(`  Found existing file via search: id=${item.fileId || item.fileID}`);
-        return item.fileId || item.fileID;
+      if (itemName(item) === fileName) {
+        const id = itemId(item);
+        log(`  Found existing file via search: id=${id}`);
+        return id;
       }
     }
   } catch (err) {
@@ -301,19 +338,14 @@ async function findFileInFolder(fileName, parentFileId) {
   // Strategy 2: Paginate through target folder
   try {
     for (let page = 1; page <= 10; page++) {
-      const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
-        driveId: 0,
-        parentFileId,
-        limit: 100,
-        page,
-        trashed: 0,
-      });
-      const items = res.data?.fileList || res.data?.infoList || [];
+      const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, listParams(parentFileId, { page }));
+      const items = extractItems(res);
       if (!items.length) break;
       for (const item of items) {
-        if (item.fileName === fileName || item.filename === fileName) {
-          log(`  Found existing file via listing (page ${page}): id=${item.fileId || item.fileID}`);
-          return item.fileId || item.fileID;
+        if (itemName(item) === fileName) {
+          const id = itemId(item);
+          log(`  Found existing file via listing (page ${page}): id=${id}`);
+          return id;
         }
       }
       if (items.length < 100) break;

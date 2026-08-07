@@ -10,22 +10,24 @@
 - 分类顺序跟随原站：ROM、内核、模块、X7 Max、GT Neo、GT Neo Flash、固件、SP 工具、Recovery、其他
 - 支持按原站分类快速筛选
 - 支持按名称、版本、Android 版本和更新日志搜索
-- 同步脚本可把上游公开数据缓存到 `public/index.json`
+- GitHub Actions 每天自动把上游公开数据缓存到 `public/index.json`
 - 前端只从同域 `/index.json` 读取数据，用户不需要直接访问 GitHub
 - 可部署到 Cloudflare Pages、GitHub Pages、Vercel、Netlify 等静态托管平台
 
 ## 数据同步方式
 
-项目使用“静态缓存”方式：
+项目使用“GitHub Actions 定时同步 + Cloudflare 静态缓存”方式：
 
-1. 同步脚本 `scripts/sync-index.mjs` 拉取上游公开数据。
-2. 数据写入仓库内的 `public/index.json`。
-3. Cloudflare Pages 部署后会把它发布为 `/index.json`。
-4. 用户浏览器只请求当前站点的 `/index.json`。
+1. GitHub Actions 每天运行一次 `.github/workflows/sync-index.yml`。
+2. 同步脚本 `scripts/sync-index.mjs` 拉取上游公开数据。
+3. 数据写入仓库内的 `public/index.json`。
+4. 如果文件有变化，Action 自动提交。
+5. Cloudflare Pages 监听仓库变更并重新部署。
+6. 用户浏览器只请求当前站点的 `/index.json`。
 
 同步脚本会优先读取 `https://rmx3031-archive.pages.dev/index.json`，失败时回退到 `https://raw.githubusercontent.com/xCaptaiN09/rmx3031-archive/main/public/index.json`。这样 GitHub 访问慢或打不开时，不会影响普通用户打开中文站。
 
-如果要启用每天自动同步，需要把 `.github/workflows/sync-index.yml` 提交到仓库。GitHub 要求用于推送 workflow 文件的 token 额外具备 `workflow` 权限。
+默认计划任务为每天 18:00 UTC 运行一次，也可以在 GitHub Actions 页面手动触发。
 
 ## 本地开发
 

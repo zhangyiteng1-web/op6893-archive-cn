@@ -475,8 +475,6 @@ async function uploadFile(filePath, fileName, parentFileId) {
     const totalParts = Math.ceil(size / CHUNK_SIZE);
     log(`  Multipart upload: ${totalParts} parts of ${(CHUNK_SIZE / 1024 / 1024).toFixed(0)}MB each`);
 
-    const fd = await readFile(filePath); // Read entire file for simplicity; for really large files use streams
-    // Actually, for 5GB files we need streaming. Let's use streaming.
     const stream = createReadStream(filePath, { highWaterMark: CHUNK_SIZE });
 
     let partNumber = 0;

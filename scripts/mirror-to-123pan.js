@@ -199,6 +199,59 @@ async function login() {
 
 // ── Upload ───────────────────────────────────────────────────────────────────
 
+/**
+ * Search for a file by name in the root directory.
+ * Tries search API first, then falls back to paginating through all files.
+ * Returns fileId or null.
+ */
+async function findFileByName(fileName) {
+  // Strategy 1: Use search API
+  try {
+    const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
+      driveId: 0,
+      parentFileId: 0,
+      limit: 100,
+      page: 1,
+      searchData: fileName,
+      searchType: 1,
+    });
+    const items = res.data?.fileList || res.data?.infoList || [];
+    for (const item of items) {
+      if (item.fileName === fileName || item.filename === fileName) {
+        log(`  Found existing file via search: id=${item.fileId || item.fileID}`);
+        return item.fileId || item.fileID;
+      }
+    }
+  } catch (err) {
+    warn(`  Search API failed: ${err.message}, trying listing...`);
+  }
+
+  // Strategy 2: Paginate through root directory (no search filter)
+  try {
+    for (let page = 1; page <= 10; page++) {
+      const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
+        driveId: 0,
+        parentFileId: 0,
+        limit: 100,
+        page,
+      });
+      const items = res.data?.fileList || res.data?.infoList || [];
+      if (!items.length) break;
+      for (const item of items) {
+        if (item.fileName === fileName || item.filename === fileName) {
+          log(`  Found existing file via listing (page ${page}): id=${item.fileId || item.fileID}`);
+          return item.fileId || item.fileID;
+        }
+      }
+      if (items.length < 100) break; // Last page
+    }
+  } catch (err) {
+    warn(`  File listing failed: ${err.message}`);
+  }
+
+  return null;
+}
+
 async function uploadRequest(fileName, etag, size) {
   return apiPost(`${BASE_URL}/b/api/file/upload_request`, {
     driveId: 0,
@@ -207,7 +260,7 @@ async function uploadRequest(fileName, etag, size) {
     parentFileId: 0,
     size,
     type: 0,
-    duplicate: 1, // 1 = keep both if duplicate
+    duplicate: 0, // 0 = default, reuse existing file
   });
 }
 
@@ -251,11 +304,34 @@ async function uploadFile(filePath, fileName) {
   }
 
   // Step 1: upload_request
-  const reqRes = await uploadRequest(fileName, etag, size);
+  let reqRes = await uploadRequest(fileName, etag, size);
 
   if (reqRes.data.Reuse) {
-    log(`  File already exists on 123pan (reuse), fileId=${reqRes.data.FileId}`);
-    return { fileId: reqRes.data.FileId, fileName };
+    let fileId = reqRes.data.FileId;
+    // If Reuse returned fileId=0, search by name
+    if (!fileId || fileId === 0) {
+      log(`  Reuse returned fileId=0, searching for existing file...`);
+      fileId = await findFileByName(fileName);
+    }
+    if (fileId && fileId !== 0) {
+      log(`  File already exists on 123pan (reuse), fileId=${fileId}`);
+      return { fileId, fileName };
+    }
+    // Could not find fileId — force a fresh upload with duplicate=1
+    warn(`  Could not find existing fileId, forcing fresh upload...`);
+    reqRes = await apiPost(`${BASE_URL}/b/api/file/upload_request`, {
+      driveId: 0,
+      etag,
+      fileName,
+      parentFileId: 0,
+      size,
+      type: 0,
+      duplicate: 1, // Force create new file even if duplicate
+    });
+    if (reqRes.data.Reuse) {
+      throw new Error(`Still got Reuse after forcing duplicate=1 for ${fileName}`);
+    }
+    log(`  Forced fresh upload for ${fileName}`);
   }
 
   const { Bucket: bucket, StorageNode: storageNode, Key: key, UploadId: uploadId, FileId: fileId } = reqRes.data;

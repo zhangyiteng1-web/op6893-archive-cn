@@ -5,7 +5,8 @@
 ## 功能
 
 - 中文首页、最新收录、全部资源列表
-- 支持按分类筛选
+- 分类顺序跟随原站：ROM、内核、模块、X7 Max、GT Neo、GT Neo Flash、固件、SP 工具、Recovery、其他
+- 支持按原站分类筛选
 - 支持按名称、版本、Android 版本和更新日志搜索
 - 自动同步上游公开数据
 - 可部署到 Cloudflare Pages、GitHub Pages、Vercel、Netlify 等静态托管平台

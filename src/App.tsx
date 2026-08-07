@@ -5,17 +5,29 @@ const DATA_SOURCES = [
   "https://raw.githubusercontent.com/xCaptaiN09/rmx3031-archive/main/public/index.json",
 ];
 
+const CATEGORY_ORDER = [
+  "roms",
+  "kernels",
+  "modules",
+  "ota",
+  "ota_cn",
+  "ota_cnf",
+  "firmware",
+  "sptool",
+  "recovery",
+  "other",
+];
+
 const CATEGORY_LABELS: Record<string, string> = {
-  roms: "ROM 系统",
+  roms: "ROM",
   kernels: "内核",
-  recoveries: "Recovery",
-  recovery: "Recovery",
-  firmware: "固件",
-  firmwares: "固件",
-  ota: "OTA",
   modules: "模块",
+  ota: "X7 Max",
+  ota_cn: "GT Neo",
+  ota_cnf: "GT Neo Flash",
+  firmware: "固件",
   sptool: "SP 工具",
-  sp_tools: "SP 工具",
+  recovery: "Recovery",
   other: "其他",
 };
 
@@ -53,9 +65,21 @@ function isFileList(value: unknown): value is ArchiveFile[] {
   );
 }
 
+function getOrderedCategoryKeys(data: ArchiveData) {
+  const listKeys = Object.entries(data)
+    .filter(([, value]) => isFileList(value))
+    .map(([key]) => key);
+  const knownKeys = CATEGORY_ORDER.filter((key) => listKeys.includes(key));
+  const unknownKeys = listKeys.filter((key) => !CATEGORY_ORDER.includes(key));
+  return [...knownKeys, ...unknownKeys];
+}
+
 function flattenFiles(data: ArchiveData): FileWithCategory[] {
-  return Object.entries(data).flatMap(([category, value]) => {
-    if (!isFileList(value)) return [];
+  return getOrderedCategoryKeys(data).flatMap((category) => {
+    const value = data[category];
+    if (!isFileList(value)) {
+      return [];
+    }
 
     return value.map((file, index) => ({
       ...file,
@@ -118,13 +142,18 @@ export default function App() {
 
   const files = useMemo(() => (data ? sortByDateDesc(flattenFiles(data)) : []), [data]);
   const categories = useMemo(
-    () =>
-      Array.from(new Set(files.map((file) => file.category))).map((key) => ({
+    () => {
+      if (!data) {
+        return [];
+      }
+
+      return getOrderedCategoryKeys(data).map((key) => ({
         key,
         label: formatCategory(key),
         count: files.filter((file) => file.category === key).length,
-      })),
-    [files],
+      }));
+    },
+    [data, files],
   );
   const latestFiles = files.slice(0, 8);
 

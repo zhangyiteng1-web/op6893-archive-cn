@@ -34,6 +34,7 @@ const MIRRORED_FILE = "public/.mirrored.json";
 const INDEX_FILE = "public/index.json";
 const CHUNK_SIZE = 8 * 1024 * 1024; // 8MB chunks for multipart upload
 const SMALL_FILE_THRESHOLD = 10 * 1024 * 1024; // 10MB, below this use direct upload
+const TARGET_FOLDER_NAME = "rmx3031刷机包";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -198,21 +199,90 @@ async function login() {
 
 // ── Upload ───────────────────────────────────────────────────────────────────
 
+// ── Folder management ───────────────────────────────────────────────────────
+
 /**
- * Search for a file by name in the root directory.
- * Tries search API first, then falls back to paginating through all files.
- * Returns fileId or null.
+ * Find or create the target folder. Returns folderId.
  */
-async function findFileByName(fileName) {
-  // Strategy 1: Use search API
+async function findOrCreateFolder() {
+  // Strategy 1: Search by name
   try {
     const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
       driveId: 0,
       parentFileId: 0,
       limit: 100,
       page: 1,
+      searchData: TARGET_FOLDER_NAME,
+      searchType: 1,
+      trashed: 0,
+    });
+    const items = res.data?.fileList || res.data?.infoList || [];
+    for (const item of items) {
+      if (item.fileName === TARGET_FOLDER_NAME || item.filename === TARGET_FOLDER_NAME) {
+        const folderId = item.fileId || item.fileID;
+        log(`Found existing folder "${TARGET_FOLDER_NAME}", id=${folderId}`);
+        return folderId;
+      }
+    }
+  } catch (err) {
+    warn(`  Folder search failed: ${err.message}`);
+  }
+
+  // Strategy 2: Paginate through root
+  try {
+    for (let page = 1; page <= 10; page++) {
+      const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
+        driveId: 0,
+        parentFileId: 0,
+        limit: 100,
+        page,
+        trashed: 0,
+      });
+      const items = res.data?.fileList || res.data?.infoList || [];
+      if (!items.length) break;
+      for (const item of items) {
+        if (item.fileName === TARGET_FOLDER_NAME || item.filename === TARGET_FOLDER_NAME) {
+          const folderId = item.fileId || item.fileID;
+          log(`Found existing folder "${TARGET_FOLDER_NAME}" via listing, id=${folderId}`);
+          return folderId;
+        }
+      }
+      if (items.length < 100) break;
+    }
+  } catch (err) {
+    warn(`  Folder listing failed: ${err.message}`);
+  }
+
+  // Strategy 3: Create the folder
+  log(`Creating folder "${TARGET_FOLDER_NAME}"...`);
+  const createRes = await apiPost(`${BASE_URL}/b/api/file/mkdir`, {
+    driveId: 0,
+    name: TARGET_FOLDER_NAME,
+    parentFileId: 0,
+  });
+  const folderId = createRes.data?.fileId || createRes.data?.fileID || createRes.data?.FileId;
+  if (!folderId) {
+    throw new Error(`Failed to create folder: ${JSON.stringify(createRes)}`);
+  }
+  log(`Folder created, id=${folderId}`);
+  return folderId;
+}
+
+/**
+ * Search for a file by name in the target folder.
+ * Returns fileId or null.
+ */
+async function findFileInFolder(fileName, parentFileId) {
+  // Strategy 1: Use search API
+  try {
+    const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
+      driveId: 0,
+      parentFileId,
+      limit: 100,
+      page: 1,
       searchData: fileName,
       searchType: 1,
+      trashed: 0,
     });
     const items = res.data?.fileList || res.data?.infoList || [];
     for (const item of items) {
@@ -225,14 +295,15 @@ async function findFileByName(fileName) {
     warn(`  Search API failed: ${err.message}, trying listing...`);
   }
 
-  // Strategy 2: Paginate through root directory (no search filter)
+  // Strategy 2: Paginate through target folder
   try {
     for (let page = 1; page <= 10; page++) {
       const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, {
         driveId: 0,
-        parentFileId: 0,
+        parentFileId,
         limit: 100,
         page,
+        trashed: 0,
       });
       const items = res.data?.fileList || res.data?.infoList || [];
       if (!items.length) break;
@@ -242,7 +313,7 @@ async function findFileByName(fileName) {
           return item.fileId || item.fileID;
         }
       }
-      if (items.length < 100) break; // Last page
+      if (items.length < 100) break;
     }
   } catch (err) {
     warn(`  File listing failed: ${err.message}`);
@@ -251,15 +322,15 @@ async function findFileByName(fileName) {
   return null;
 }
 
-async function uploadRequest(fileName, etag, size) {
+async function uploadRequest(fileName, etag, size, parentFileId) {
   return apiPost(`${BASE_URL}/b/api/file/upload_request`, {
     driveId: 0,
     etag,
     fileName,
-    parentFileId: 0,
+    parentFileId,
     size,
     type: 0,
-    duplicate: 0, // 0 = default, reuse existing file
+    duplicate: 0,
   });
 }
 
@@ -288,29 +359,28 @@ async function s3CompleteMultipartUpload(bucket, key, uploadId, storageNode) {
 }
 
 /**
- * Upload a local file to 123pan.
+ * Upload a local file to 123pan inside the target folder.
  * Returns { fileId, fileName }.
  */
-async function uploadFile(filePath, fileName) {
+async function uploadFile(filePath, fileName, parentFileId) {
   const size = await fileSize(filePath);
   const etag = await md5FromFile(filePath);
 
   log(`Uploading ${fileName} (${(size / 1024 / 1024).toFixed(1)}MB, etag=${etag})...`);
 
   if (DRY_RUN) {
-    log(`[DRY RUN] Would upload ${fileName}`);
+    log(`[DRY RUN] Would upload ${fileName} to folder ${parentFileId}`);
     return { fileId: `dry_run_${Date.now()}`, fileName };
   }
 
   // Step 1: upload_request
-  let reqRes = await uploadRequest(fileName, etag, size);
+  let reqRes = await uploadRequest(fileName, etag, size, parentFileId);
 
   if (reqRes.data.Reuse) {
     let fileId = reqRes.data.FileId;
-    // If Reuse returned fileId=0, search by name
     if (!fileId || fileId === 0) {
-      log(`  Reuse returned fileId=0, searching for existing file...`);
-      fileId = await findFileByName(fileName);
+      log(`  Reuse returned fileId=0, searching in folder...`);
+      fileId = await findFileInFolder(fileName, parentFileId);
     }
     if (fileId && fileId !== 0) {
       log(`  File already exists on 123pan (reuse), fileId=${fileId}`);
@@ -322,10 +392,10 @@ async function uploadFile(filePath, fileName) {
       driveId: 0,
       etag,
       fileName,
-      parentFileId: 0,
+      parentFileId,
       size,
       type: 0,
-      duplicate: 1, // Force create new file even if duplicate
+      duplicate: 1,
     });
     if (reqRes.data.Reuse) {
       throw new Error(`Still got Reuse after forcing duplicate=1 for ${fileName}`);
@@ -649,7 +719,10 @@ async function main() {
   // 1. Login
   await login();
 
-  // 2. Load state
+  // 2. Find or create target folder
+  const folderId = await findOrCreateFolder();
+
+  // 3. Load state
   const indexData = await loadIndex();
   const mirrored = await loadMirrored();
   const allFiles = flattenFiles(indexData);
@@ -657,7 +730,7 @@ async function main() {
   log(`Loaded index: ${allFiles.length} files across ${Object.keys(indexData).filter(isCategoryKey).length} categories`);
   log(`Previously mirrored: ${Object.keys(mirrored).length} files`);
 
-  // 3. Find new files
+  // 4. Find new files
   const newFiles = allFiles.filter((f) => !mirrored[f.file.url]);
 
   if (newFiles.length === 0) {
@@ -667,7 +740,7 @@ async function main() {
 
   log(`Found ${newFiles.length} new files to mirror`);
 
-  // 4. Size check
+  // 5. Size check
   let skipped = 0;
   const toProcess = [];
   for (const f of newFiles) {
@@ -691,7 +764,7 @@ async function main() {
     return;
   }
 
-  // 5. Process each file
+  // 6. Process each file
   const tmpDir = join(tmpdir(), "123pan-mirror");
   await mkdir(tmpDir, { recursive: true });
 
@@ -713,8 +786,8 @@ async function main() {
         log(`  File size on disk: ${(actualSize / 1024 / 1024).toFixed(1)}MB`);
       }
 
-      // Upload to 123pan
-      const { fileId } = await uploadFile(tmpPath, fileName);
+      // Upload to 123pan (inside target folder)
+      const { fileId } = await uploadFile(tmpPath, fileName, folderId);
 
       // Create share
       const shareName = file.name || fileName;
@@ -747,7 +820,7 @@ async function main() {
     }
   }
 
-  // 6. Save state
+  // 7. Save state
   await saveIndex(indexData);
   await saveMirrored(mirrored);
 

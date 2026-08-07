@@ -182,15 +182,15 @@ export default function App() {
     <main>
       <section className="hero">
         <nav className="nav">
-          <span className="brand">OP6893 中文归档</span>
+          <span className="brand">OP6893_CN_ARCHIVE</span>
           <a href="https://github.com/xCaptaiN09/rmx3031-archive" target="_blank">
             上游项目
           </a>
         </nav>
 
         <div className="heroGrid">
-          <div>
-            <p className="eyebrow">自动同步 · 中文索引 · 静态部署</p>
+          <div className="heroCopy">
+            <p className="eyebrow">SYNCED INDEX · OP6893 FAMILY · CN MIRROR UI</p>
             <h1>OP6893 家族刷机资源中文站</h1>
             <p className="summary">
               本站读取 RMX3031 Archive 的公开数据源，整理展示 Realme X7 Max、Realme GT Neo、
@@ -207,23 +207,41 @@ export default function App() {
             </div>
           </div>
 
-          <div className="panel statsPanel">
-            <div>
-              <span>支持设备</span>
-              <strong className="deviceList">{SUPPORTED_DEVICES.join(" / ")}</strong>
+          <div className="heroConsole">
+            <div className="consoleTop">
+              <span />
+              <span />
+              <span />
             </div>
-            <div>
-              <span>代号</span>
-              <strong>{data?.codename ?? "OP6893"}</strong>
+            <div className="consoleScreen">
+              <p className="consoleLine">system.boot = OP6893_ARCHIVE_CN</p>
+              <p className="consoleLine">sync.source = {source ? "ONLINE" : "WAITING"}</p>
+              <p className="consoleLine">device.codename = {data?.codename ?? "OP6893"}</p>
+              <p className="consoleLine">records.total = {files.length || "..."}</p>
+              <div className="signalRing">
+                <span>{files.length || "—"}</span>
+                <small>FILES</small>
+              </div>
             </div>
-            <div>
-              <span>文件数</span>
-              <strong>{files.length || "读取中"}</strong>
-            </div>
-            <div>
-              <span>最近更新</span>
-              <strong>{latestDate}</strong>
-            </div>
+          </div>
+        </div>
+
+        <div className="panel statsPanel">
+          <div>
+            <span>支持设备</span>
+            <strong className="deviceList">{SUPPORTED_DEVICES.join(" / ")}</strong>
+          </div>
+          <div>
+            <span>代号</span>
+            <strong>{data?.codename ?? "OP6893"}</strong>
+          </div>
+          <div>
+            <span>文件数</span>
+            <strong>{files.length || "读取中"}</strong>
+          </div>
+          <div>
+            <span>最近更新</span>
+            <strong>{latestDate}</strong>
           </div>
         </div>
       </section>
@@ -244,8 +262,10 @@ export default function App() {
         <>
           <section className="section">
             <div className="sectionHeader">
-              <p className="eyebrow">Latest</p>
-              <h2>最新收录</h2>
+              <div>
+                <p className="eyebrow">Latest Builds</p>
+                <h2>最新收录</h2>
+              </div>
             </div>
             <div className="latestGrid">
               {latestFiles.map((file) => (
@@ -270,7 +290,7 @@ export default function App() {
           <section className="section" id="archive">
             <div className="sectionHeader archiveHeader">
               <div>
-                <p className="eyebrow">Archive</p>
+                <p className="eyebrow">Data Matrix</p>
                 <h2>全部资源</h2>
               </div>
               <p className="source">
@@ -279,6 +299,28 @@ export default function App() {
                   {source.includes("github") ? "GitHub Raw" : "原站 index.json"}
                 </a>
               </p>
+            </div>
+
+            <div className="categoryRail" aria-label="资源分类">
+              <button
+                className={category === "all" ? "active" : ""}
+                type="button"
+                onClick={() => setCategory("all")}
+              >
+                全部
+                <span>{files.length}</span>
+              </button>
+              {categories.map((item) => (
+                <button
+                  className={category === item.key ? "active" : ""}
+                  key={item.key}
+                  type="button"
+                  onClick={() => setCategory(item.key)}
+                >
+                  {item.label}
+                  <span>{item.count}</span>
+                </button>
+              ))}
             </div>
 
             <div className="filters">

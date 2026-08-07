@@ -30,6 +30,7 @@ const BASE_URL = "https://www.123pan.cn";
 const USER_API = "https://user.123pan.cn";
 const MAX_SIZE_MB = parseInt(process.env.PAN123_MAX_SIZE_MB || "0", 10); // 0 = no limit
 const DRY_RUN = process.env.PAN123_DRY_RUN === "1";
+const FORCE_ALL = process.env.PAN123_FORCE_ALL === "1";
 const MIRRORED_FILE = "public/.mirrored.json";
 const INDEX_FILE = "public/index.json";
 const CHUNK_SIZE = 8 * 1024 * 1024; // 8MB chunks for multipart upload
@@ -61,6 +62,10 @@ function md5FromStream(stream) {
 
 function md5FromFile(filePath) {
   return md5FromStream(createReadStream(filePath));
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function fileSize(path) {
@@ -772,15 +777,21 @@ async function main() {
   log(`Loaded index: ${allFiles.length} files across ${Object.keys(indexData).filter(isCategoryKey).length} categories`);
   log(`Previously mirrored: ${Object.keys(mirrored).length} files`);
 
-  // 4. Find new files
-  const newFiles = allFiles.filter((f) => !mirrored[f.file.url]);
+  if (FORCE_ALL) {
+    log("FORCE_ALL mode: ignoring mirrored state, will process all files");
+  }
+
+  // 4. Find new files (or all files in FORCE_ALL mode)
+  const newFiles = FORCE_ALL
+    ? allFiles
+    : allFiles.filter((f) => !mirrored[f.file.url]);
 
   if (newFiles.length === 0) {
-    log("No new files to mirror. Done.");
+    log("No files to mirror. Done.");
     return;
   }
 
-  log(`Found ${newFiles.length} new files to mirror`);
+  log(`Found ${newFiles.length} files to mirror${FORCE_ALL ? " (FORCE_ALL)" : ""}`);
 
   // 5. Size check
   let skipped = 0;
@@ -812,65 +823,84 @@ async function main() {
 
   let success = 0;
   let failed = 0;
+  const failedFiles = [];
+  const MAX_RETRIES = 3;
 
   for (const { file, category, index } of toProcess) {
     const fileName = basename(new URL(file.url).pathname) || file.name || "unknown";
     const tmpPath = join(tmpDir, fileName);
 
-    try {
-      log(`\n--- Processing: ${file.name} (${file.size || "unknown"}) ---`);
+    let lastErr = null;
+    let mirroredEntry = null;
 
-      // Download
-      await downloadFile(file.url, tmpPath);
-
-      if (!DRY_RUN) {
-        const actualSize = await fileSize(tmpPath);
-        log(`  File size on disk: ${(actualSize / 1024 / 1024).toFixed(1)}MB`);
-        if (actualSize === 0) {
-          warn(`  File is 0 bytes, skipping upload`);
-          // Still mark as mirrored so we don't retry it forever
-          mirrored[file.url] = {
-            shareUrl: null,
-            fileId: 0,
-            mirroredAt: new Date().toISOString(),
-            skipped: "empty_file",
-          };
-          skipped++;
-          continue;
-        }
-      }
-
-      // Upload to 123pan (inside target folder)
-      const { fileId } = await uploadFile(tmpPath, fileName, folderId);
-
-      // Create share
-      const shareName = file.name || fileName;
-      const { shareUrl } = await createShare(fileId, fileName, shareName);
-
-      // Update index.json
-      indexData[category][index].url_123pan = shareUrl;
-      indexData[category][index].url_original = file.url;
-
-      // Record in mirrored state
-      mirrored[file.url] = {
-        shareUrl,
-        fileId,
-        mirroredAt: new Date().toISOString(),
-      };
-
-      success++;
-      log(`  ✓ Mirrored: ${shareUrl}`);
-    } catch (err) {
-      error(`  ✗ Failed to mirror ${file.name}: ${err.message}`);
-      failed++;
-      // Continue with next file
-    } finally {
-      // Clean up temp file
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        await unlink(tmpPath);
-      } catch {
-        // Ignore cleanup errors
+        if (attempt > 1) {
+          const delay = Math.min(attempt * 5, 20);
+          log(`  Retry ${attempt}/${MAX_RETRIES} after ${delay}s...`);
+          await sleep(delay * 1000);
+        }
+
+        log(`\n--- Processing: ${file.name} (${file.size || "unknown"})${attempt > 1 ? ` [attempt ${attempt}]` : ""} ---`);
+
+        // Download
+        await downloadFile(file.url, tmpPath);
+
+        if (!DRY_RUN) {
+          const actualSize = await fileSize(tmpPath);
+          log(`  File size on disk: ${(actualSize / 1024 / 1024).toFixed(1)}MB`);
+          if (actualSize === 0) {
+            warn(`  File is 0 bytes, skipping upload`);
+            mirroredEntry = {
+              shareUrl: null,
+              fileId: 0,
+              mirroredAt: new Date().toISOString(),
+              skipped: "empty_file",
+            };
+            skipped++;
+            break;
+          }
+        }
+
+        // Upload to 123pan (inside target folder)
+        const { fileId } = await uploadFile(tmpPath, fileName, folderId);
+
+        // Create share
+        const shareName = file.name || fileName;
+        const { shareUrl } = await createShare(fileId, fileName, shareName);
+
+        // Update index.json
+        indexData[category][index].url_123pan = shareUrl;
+        indexData[category][index].url_original = file.url;
+
+        mirroredEntry = {
+          shareUrl,
+          fileId,
+          mirroredAt: new Date().toISOString(),
+        };
+
+        success++;
+        log(`  ✓ Mirrored: ${shareUrl}`);
+        break; // success, exit retry loop
+      } catch (err) {
+        lastErr = err;
+        if (attempt < MAX_RETRIES) {
+          warn(`  Attempt ${attempt} failed: ${err.message}`);
+        } else {
+          error(`  ✗ Failed to mirror ${file.name} after ${MAX_RETRIES} attempts: ${err.message}`);
+        }
+      } finally {
+        // Clean up temp file between retries
+        try { await unlink(tmpPath); } catch { /* ignore */ }
       }
+    }
+
+    if (mirroredEntry) {
+      // Record in mirrored state (whether success or skipped)
+      mirrored[file.url] = mirroredEntry;
+    } else {
+      failed++;
+      failedFiles.push(`${file.name}: ${lastErr?.message || "unknown"}`);
     }
   }
 
@@ -879,6 +909,13 @@ async function main() {
   await saveMirrored(mirrored);
 
   log(`\n=== Done: ${success} succeeded, ${failed} failed, ${skipped} skipped ===`);
+
+  if (failedFiles.length > 0) {
+    log(`\nFailed files:`);
+    for (const f of failedFiles) {
+      error(`  ${f}`);
+    }
+  }
 
   if (failed > 0) {
     process.exit(1);

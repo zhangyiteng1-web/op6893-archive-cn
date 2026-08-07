@@ -43,7 +43,6 @@ type ArchiveFile = {
   size?: string;
   url?: string;
   changelog?: string;
-  changelog_zh?: string;
 };
 
 type ArchiveData = {
@@ -138,10 +137,6 @@ function formatChangelog(text: string): string {
     .map((s) => s.trim())
     .filter(Boolean)
     .join(" || ");
-}
-
-function getBestChangelog(file: ArchiveFile): string {
-  return file.changelog_zh ?? file.changelog ?? "";
 }
 
 function renderChangelogHtml(text: string): string {
@@ -263,7 +258,7 @@ export default function App() {
     const keyword = query.trim().toLowerCase();
     const matched = files.filter((file) => {
       const matchesCategory = category === "all" || file.category === category;
-      const target = `${file.name ?? ""} ${file.version ?? ""} ${file.android ?? ""} ${file.changelog ?? ""} ${file.changelog_zh ?? ""}`.toLowerCase();
+      const target = `${file.name ?? ""} ${file.version ?? ""} ${file.android ?? ""} ${file.changelog ?? ""}`.toLowerCase();
       return matchesCategory && (!keyword || target.includes(keyword));
     });
     return sortFiles(matched, sortBy, sortAsc);
@@ -495,31 +490,31 @@ export default function App() {
                 <tbody>
                   {filteredFiles.map((file) => {
                     const isExpanded = expandedRows.has(file.id);
-                    const bestChangelog = getBestChangelog(file);
+                    const changelog = file.changelog ?? "";
                     return (
                       <tr
                         key={file.id}
-                        className={`${isExpanded ? "expanded" : ""} ${bestChangelog ? "clickable" : ""}`}
+                        className={`${isExpanded ? "expanded" : ""} ${changelog ? "clickable" : ""}`}
                       >
                         <td>
                           <span className="tag">{file.categoryLabel}</span>
                         </td>
                         <td>
                           <strong
-                            className={bestChangelog ? "expandToggle" : ""}
-                            onClick={() => bestChangelog && toggleRow(file.id)}
-                            title={bestChangelog ? (isExpanded ? "点击收起" : "点击展开日志") : ""}
+                            className={changelog ? "expandToggle" : ""}
+                            onClick={() => changelog && toggleRow(file.id)}
+                            title={changelog ? (isExpanded ? "点击收起" : "点击展开日志") : ""}
                           >
                             {file.name ?? "未命名文件"}
-                            {bestChangelog && <span className="expandIcon">{isExpanded ? " ▾" : " ▸"}</span>}
+                            {changelog && <span className="expandIcon">{isExpanded ? " ▾" : " ▸"}</span>}
                           </strong>
-                          {bestChangelog && !isExpanded && (
-                            <small className="changelogPreview">{formatChangelog(bestChangelog)}</small>
+                          {changelog && !isExpanded && (
+                            <small className="changelogPreview">{formatChangelog(changelog)}</small>
                           )}
-                          {bestChangelog && isExpanded && (
+                          {changelog && isExpanded && (
                             <div
                               className="changelogFull"
-                              dangerouslySetInnerHTML={{ __html: renderChangelogHtml(bestChangelog) }}
+                              dangerouslySetInnerHTML={{ __html: renderChangelogHtml(changelog) }}
                             />
                           )}
                         </td>
@@ -563,7 +558,7 @@ export default function App() {
             <div className="mobileCards">
               {filteredFiles.map((file) => {
                 const isExpanded = expandedRows.has(file.id);
-                const bestChangelog = getBestChangelog(file);
+                const changelog = file.changelog ?? "";
                 return (
                   <article
                     className="mobileCard"
@@ -574,24 +569,24 @@ export default function App() {
                       <span className="mobileCardDate">{file.date ?? "—"}</span>
                     </div>
                     <h4
-                      className={bestChangelog ? "expandToggle" : ""}
-                      onClick={() => bestChangelog && toggleRow(file.id)}
+                      className={changelog ? "expandToggle" : ""}
+                      onClick={() => changelog && toggleRow(file.id)}
                     >
                       {file.name ?? "未命名文件"}
-                      {bestChangelog && <span className="expandIcon">{isExpanded ? " ▾" : " ▸"}</span>}
+                      {changelog && <span className="expandIcon">{isExpanded ? " ▾" : " ▸"}</span>}
                     </h4>
                     <div className="mobileCardMeta">
                       <span>Android {file.android ?? "—"}</span>
                       <span>{file.version ? `v${file.version}` : "—"}</span>
                       <span>{file.size ?? "—"}</span>
                     </div>
-                    {bestChangelog && isExpanded && (
+                    {changelog && isExpanded && (
                       <div
                         className="changelogFull"
-                        dangerouslySetInnerHTML={{ __html: renderChangelogHtml(bestChangelog) }}
+                        dangerouslySetInnerHTML={{ __html: renderChangelogHtml(changelog) }}
                       />
                     )}
-                    {bestChangelog && !isExpanded && null}
+                    {changelog && !isExpanded && null}
                     {file.url && (
                       <div className="mobileCardActions">
                         <a href={file.url} target="_blank" onClick={(e) => e.stopPropagation()}>

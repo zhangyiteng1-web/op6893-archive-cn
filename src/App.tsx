@@ -651,6 +651,22 @@ export default function App() {
         </button>
       )}
 
+      <section className="section sponsorSection">
+        <div className="sponsorCard">
+          <div className="sponsorCopy">
+            <p className="eyebrow">SUPPORT THE PROJECT</p>
+            <h2>赞助支持</h2>
+            <p>
+              如果你觉得本站有用，欢迎请我喝杯咖啡。你的支持是我持续维护的动力。
+            </p>
+          </div>
+          <div className="sponsorQr">
+            <img src="/sponsor-qrcode.png" alt="赞助二维码" />
+            <span>微信扫码赞助</span>
+          </div>
+        </div>
+      </section>
+
       <footer>
         <p>
           数据每日由 GitHub Actions 自动同步，源码托管于 GitHub。上游数据来自 xCaptaiN09/rmx3031-archive；文件版权和刷机风险请以原作者说明为准。

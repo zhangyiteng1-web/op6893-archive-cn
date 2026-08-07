@@ -205,6 +205,8 @@ export default function App() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState("");
   const [showToast, setShowToast] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   // Sync category from URL hash
   useEffect(() => {
@@ -231,6 +233,19 @@ export default function App() {
     }
   }, []);
 
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query.trim().toLowerCase()), 200);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  // Show back-to-top button on scroll
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   useEffect(() => {
     fetchArchiveData()
       .then((result) => setData(result.data))
@@ -255,14 +270,14 @@ export default function App() {
   }, [files]);
 
   const filteredFiles = useMemo(() => {
-    const keyword = query.trim().toLowerCase();
+    const keyword = debouncedQuery;
     const matched = files.filter((file) => {
       const matchesCategory = category === "all" || file.category === category;
       const target = `${file.name ?? ""} ${file.version ?? ""} ${file.android ?? ""} ${file.changelog ?? ""}`.toLowerCase();
       return matchesCategory && (!keyword || target.includes(keyword));
     });
     return sortFiles(matched, sortBy, sortAsc);
-  }, [category, files, query, sortBy, sortAsc]);
+  }, [category, files, debouncedQuery, sortBy, sortAsc]);
 
   const handleSort = (key: SortKey) => {
     if (sortBy === key) {
@@ -463,6 +478,11 @@ export default function App() {
               </select>
             </div>
 
+            <div className="resultCount">
+              共找到 <strong>{filteredFiles.length}</strong> 个资源
+              {debouncedQuery && <>，匹配 "<strong>{debouncedQuery}</strong>"</>}
+            </div>
+
             {/* Desktop table */}
             <div className="tableWrap desktopOnly">
               <table>
@@ -586,7 +606,9 @@ export default function App() {
                         dangerouslySetInnerHTML={{ __html: renderChangelogHtml(changelog) }}
                       />
                     )}
-                    {changelog && !isExpanded && null}
+                    {changelog && !isExpanded && (
+                      <small className="changelogPreview">{formatChangelog(changelog)}</small>
+                    )}
                     {file.url && (
                       <div className="mobileCardActions">
                         <a href={file.url} target="_blank" onClick={(e) => e.stopPropagation()}>
@@ -615,6 +637,18 @@ export default function App() {
             </div>
           </section>
         </>
+      )}
+
+      {showBackToTop && (
+        <button
+          className="backToTop"
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="回到顶部"
+          title="回到顶部"
+        >
+          ↑
+        </button>
       )}
 
       <footer>

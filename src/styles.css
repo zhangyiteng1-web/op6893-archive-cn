@@ -890,6 +890,47 @@ th.sortable:hover {
   border-radius: 14px;
 }
 
+/* Result count and back-to-top */
+.resultCount {
+  text-align: center;
+  margin: 16px 0;
+  color: #8ea4ba;
+  font-size: 0.9rem;
+}
+
+.resultCount strong {
+  color: #62f7ff;
+}
+
+.backToTop {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 50;
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(98, 247, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(12, 23, 51, 0.85);
+  color: #62f7ff;
+  cursor: pointer;
+  font-size: 1.3rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  animation: toastIn 0.3s ease;
+}
+
+.backToTop:hover {
+  border-color: rgba(0, 255, 163, 0.6);
+  background: rgba(0, 255, 163, 0.15);
+  color: #00ffa3;
+  transform: translateY(-2px);
+}
+
 /* Footer */
 footer {
   padding: 48px 0;

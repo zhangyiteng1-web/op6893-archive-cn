@@ -114,22 +114,36 @@ async function apiGet(url, params = {}) {
  * Validate that the current token is still usable.
  */
 async function validateToken() {
-  try {
-    const res = await fetch(`${BASE_URL}/b/api/file/list/new`, {
-      headers: headers(),
-    });
-    const json = await res.json();
-    return json.code === 0 || json.code === 200;
-  } catch {
-    return false;
+  // Try multiple endpoints to validate the token
+  const endpoints = [
+    `${BASE_URL}/b/api/file/list/new`,
+    `${BASE_URL}/a/api/user/info`,
+    `https://www.123pan.cn/a/api/user/info`,
+  ];
+
+  for (const url of endpoints) {
+    try {
+      const res = await fetch(url, { headers: headers() });
+      const json = await res.json();
+      log(`Token validation (${url}): code=${json.code} message=${json.message || ""}`);
+      if (json.code === 0 || json.code === 200) {
+        return true;
+      }
+    } catch (err) {
+      log(`Token validation error (${url}): ${err.message}`);
+    }
   }
+
+  return false;
 }
 
 async function login() {
   // 1. Try token first (most reliable, avoids overseas IP block)
-  const token = process.env.PAN123_TOKEN;
+  let token = process.env.PAN123_TOKEN;
 
   if (token) {
+    // Strip "Bearer " prefix if user pasted the full header
+    token = token.replace(/^Bearer\s+/i, "").trim();
     authToken = token;
     log("Using PAN123_TOKEN...");
 
@@ -139,7 +153,7 @@ async function login() {
       return;
     }
 
-    warn("Token expired or invalid");
+    warn("Token validation failed — check the log above for the API response code");
   }
 
   // 2. Fallback: phone + password (may be blocked for overseas IPs)
@@ -179,9 +193,7 @@ async function login() {
   }
 
   throw new Error(
-    "No valid authentication method. Set PAN123_TOKEN (preferred) in GitHub Secrets, " +
-    "or provide phone+password via workflow inputs. " +
-    "Get your token at: https://your-site.pages.dev/get-token.html"
+    "Token验证失败。请重新从 get-token.html 获取Token，确保完整复制。"
   );
 }
 

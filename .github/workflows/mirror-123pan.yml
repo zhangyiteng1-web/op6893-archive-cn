@@ -28,10 +28,12 @@ jobs:
 
       - name: Mirror new files to 123pan
         run: node scripts/mirror-to-123pan.js
+        continue-on-error: true
         env:
           PAN123_TOKEN: ${{ github.event.inputs.token }}
 
       - name: Commit mirrored index
+        if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: mirror new files to 123pan"

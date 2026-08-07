@@ -126,7 +126,23 @@ async function validateToken() {
 }
 
 async function login() {
-  // 1. Try phone + password (primary, device will be remembered after first login)
+  // 1. Try token first (most reliable, avoids overseas IP block)
+  const token = process.env.PAN123_TOKEN;
+
+  if (token) {
+    authToken = token;
+    log("Using PAN123_TOKEN...");
+
+    const valid = await validateToken();
+    if (valid) {
+      log("Token is valid, proceeding");
+      return;
+    }
+
+    warn("Token expired or invalid");
+  }
+
+  // 2. Fallback: phone + password (may be blocked for overseas IPs)
   const phone = process.env.PAN123_PHONE;
   const password = process.env.PAN123_PASSWORD;
 
@@ -154,38 +170,18 @@ async function login() {
     if (json.code === 200) {
       authToken = json.data.token;
       log("Login successful");
+      log(`TOKEN_FOR_REUSE: ${authToken}`);
       return;
     }
 
-    if (json.code === 401 || json.message?.includes("verify") || json.message?.includes("验证")) {
-      warn(`Login requires verification: ${json.message}`);
-      warn("Please check your email for the verification code and enter it at https://yun.123pan.cn/");
-      warn("Or wait a few minutes and try again — 123pan may trust this IP after the first attempt.");
-      throw new Error(`Login blocked: ${json.message || JSON.stringify(json)}`);
-    }
-
-    // If phone login failed but not due to verification, try token
-    warn(`Phone login failed (code=${json.code}), trying token...`);
-  }
-
-  // 2. Try token fallback
-  const token = process.env.PAN123_TOKEN;
-
-  if (token) {
-    authToken = token;
-    log("Using PAN123_TOKEN...");
-
-    const valid = await validateToken();
-    if (valid) {
-      log("Token is valid, skipping login");
-      return;
-    }
-
-    warn("Token expired or invalid");
+    warn(`Login failed: code=${json.code} message=${json.message || ""}`);
+    throw new Error(`Login blocked: ${json.message || JSON.stringify(json)}`);
   }
 
   throw new Error(
-    "Authentication failed. Provide PAN123_PHONE + PAN123_PASSWORD (or PAN123_TOKEN) in GitHub Secrets."
+    "No valid authentication method. Set PAN123_TOKEN (preferred) in GitHub Secrets, " +
+    "or provide phone+password via workflow inputs. " +
+    "Get your token at: https://your-site.pages.dev/get-token.html"
   );
 }
 

@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       phone:
-        description: "123云盘手机号"
-        required: true
+        description: "123云盘手机号（可选，如果只需用Token则留空）"
+        required: false
       password:
-        description: "123云盘密码"
-        required: true
+        description: "123云盘密码（可选，如果只需用Token则留空）"
+        required: false
 
 permissions:
   contents: write
@@ -31,6 +31,7 @@ jobs:
         env:
           PAN123_PHONE: ${{ github.event.inputs.phone }}
           PAN123_PASSWORD: ${{ github.event.inputs.password }}
+          PAN123_TOKEN: ${{ secrets.PAN123_TOKEN }}
 
       - name: Commit mirrored index
         uses: stefanzweifel/git-auto-commit-action@v5

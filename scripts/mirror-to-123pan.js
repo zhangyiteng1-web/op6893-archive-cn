@@ -573,8 +573,8 @@ async function downloadWithAria2(url, destPath) {
 
   const args = [
     url,
-    "-x", "16",            // max connections per server
-    "-s", "16",            // split into 16 chunks
+    "-x", "8",             // max connections per server
+    "-s", "8",             // split into 8 chunks
     "-k", "1M",            // min split size
     "-d", dir,             // output directory
     "-o", out,             // output filename
@@ -586,12 +586,12 @@ async function downloadWithAria2(url, destPath) {
     "--retry-wait=5",
     "--connect-timeout=10",
     "--timeout=30",
-    "--max-connection-per-server=16",
+    "--max-connection-per-server=8",
     "--min-split-size=1M",
     "--check-certificate=false",
   ];
 
-  log(`  aria2c: ${args.slice(0, 1).join(" ")} -x 16 -s 16 -o ${out}`);
+  log(`  aria2c: ${args.slice(0, 1).join(" ")} -x 8 -s 8 -o ${out}`);
 
   await new Promise((resolve, reject) => {
     const proc = spawn("aria2c", args, { stdio: ["ignore", "pipe", "pipe"] });

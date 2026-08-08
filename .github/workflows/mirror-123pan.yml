@@ -2,6 +2,13 @@ name: Mirror to 123pan (离线下载)
 
 on:
   workflow_dispatch:
+    inputs:
+      client_id:
+        description: "123云盘 OpenAPI Client ID"
+        required: true
+      client_secret:
+        description: "123云盘 OpenAPI Client Secret"
+        required: true
 
 permissions:
   contents: write
@@ -23,8 +30,8 @@ jobs:
       - name: Mirror via offline download
         run: node scripts/mirror-to-123pan.js
         env:
-          PAN123_CLIENT_ID: ${{ secrets.PAN123_CLIENT_ID }}
-          PAN123_CLIENT_SECRET: ${{ secrets.PAN123_CLIENT_SECRET }}
+          PAN123_CLIENT_ID: ${{ github.event.inputs.client_id }}
+          PAN123_CLIENT_SECRET: ${{ github.event.inputs.client_secret }}
 
       - name: Commit updated index
         if: always()

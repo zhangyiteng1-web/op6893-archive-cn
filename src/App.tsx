@@ -404,6 +404,11 @@ export default function App() {
                       下载文件
                     </a>
                   )}
+                  {file.url_123pan && (
+                    <a className="mirrorLink" href={file.url_123pan} target="_blank">
+                      123云盘
+                    </a>
+                  )}
                 </article>
               ))}
             </div>
@@ -521,7 +526,7 @@ export default function App() {
                               </a>
                               {file.url_123pan && (
                                 <a className="mirrorLink" href={file.url_123pan} target="_blank" onClick={(e) => e.stopPropagation()}>
-                                  国内
+                                  123云盘
                                 </a>
                               )}
                               <button
@@ -582,7 +587,7 @@ export default function App() {
                         </a>
                         {file.url_123pan && (
                           <a className="mirrorLink" href={file.url_123pan} target="_blank" onClick={(e) => e.stopPropagation()}>
-                            国内下载
+                            123云盘
                           </a>
                         )}
                         <button

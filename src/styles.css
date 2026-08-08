@@ -523,6 +523,26 @@ h4 {
 
 .card a { color: #00ffa3; }
 
+.card a.mirrorLink {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 169, 64, 0.4);
+  border-radius: 14px;
+  margin-left: 8px;
+  padding: 4px 12px;
+  background: rgba(255, 169, 64, 0.1);
+  color: #ffa940;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.card a.mirrorLink:hover {
+  background: rgba(255, 169, 64, 0.2);
+  color: #ffd166;
+}
+
 .tag {
   display: inline-flex;
   width: fit-content;
@@ -668,12 +688,24 @@ td a {
 }
 
 td a.mirrorLink {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 169, 64, 0.4);
+  border-radius: 14px;
+  margin-left: 6px;
+  padding: 4px 12px;
+  background: rgba(255, 169, 64, 0.1);
   color: #ffa940;
-  margin-left: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
 }
 
 td a.mirrorLink:hover {
+  background: rgba(255, 169, 64, 0.2);
   color: #ffd166;
+  border-color: rgba(255, 169, 64, 0.6);
 }
 
 tr:last-child td {

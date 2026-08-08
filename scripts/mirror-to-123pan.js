@@ -489,6 +489,10 @@ async function main() {
 
   log("\n━━━ Phase 3: 分享并更新资源站 ━━━\n");
 
+  // 等待几秒让服务器索引完成
+  log("等待服务器处理...");
+  await sleep(5000);
+
   // ═══════════════════════════════════════════════════════════════════════════
   // Phase 3: 分享所有成功下载的文件
   // ═══════════════════════════════════════════════════════════════════════════
@@ -512,7 +516,15 @@ async function main() {
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        if (attempt > 1) await sleep(3000);
+        if (attempt > 1) {
+          await sleep(attempt * 3000);
+          // 重试前重新查找文件 ID（可能刚完成索引）
+          const freshId = await findFileInFolder(task.filename, folderId);
+          if (freshId && freshId !== task.fileId) {
+            log(`  fileId 已更新: ${task.fileId} → ${freshId}`);
+            task.fileId = freshId;
+          }
+        }
 
         const result = await createShare(task.fileId, task.filename);
         shareUrl = result.shareUrl;
@@ -520,6 +532,14 @@ async function main() {
         shareDone = true;
         break;
       } catch (err) {
+        if (err.message.includes("文件已被删除或移动") || err.message.includes("分享ID非法")) {
+          warn(`  分享失败 (${err.message})，重新查找文件...`);
+          const freshId = await findFileInFolder(task.filename, folderId);
+          if (freshId) {
+            log(`  重新找到 fileId=${freshId}`);
+            task.fileId = freshId;
+          }
+        }
         if (attempt === MAX_RETRIES) {
           error_(`[${i + 1}/${tasks.length}] ✗ 分享失败: ${err.message}`);
         }

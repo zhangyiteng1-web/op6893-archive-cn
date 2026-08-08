@@ -142,7 +142,8 @@
       "size": "4.7 GB",
       "url": "https://archive.org/download/rmx3031-coloros-16/ColorOS_16_RMX3031.zip",
       "changelog": "Fastboot package. Extract, boot to fastboot, run flash.bat (Win) or ./flash.sh (Linux). Phone auto-reboots to TWRP. Sideload COS16/OOS16 kernel via ADB, format data, reboot",
-      "android": "16"
+      "android": "16",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-Fd6zv"
     },
     {
       "name": "Lunaris AOSP 3.10",
@@ -151,7 +152,8 @@
       "size": "3.3GB",
       "url": "https://archive.org/download/rmx3031-lunaris-aosp-3.10/Lunaris-AOSP-op6893-OFFICIAL-3.10-GMS-2026052610.zip",
       "changelog": "- Initial Official release\n- Switched to Motorola Dolby\n- Added screen off UDFPS\n- Enabled statusbar and ambient mode burn-in Protection\n- Fixed camera cutout ring allignment\n- Added oneplus camera\n- Added display color profiles\n- Fixed connected but not charging message",
-      "android": "16"
+      "android": "16",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-m1ozv"
     },
     {
       "name": "Evolution X 11.7 (Unofficial) II",
@@ -160,7 +162,8 @@
       "size": "3.9GB",
       "url": "https://archive.org/download/rmx3031-evolution-x-11.7/Evolution-X-op6893-11.7-A16-QPR2-20260528.zip",
       "changelog": "- Fixed wpa3 wifi & hotspot issues\n- Added a more consistent fp brightness patch\n- Cleaned up overlays\n- Removed dead powerhint entries\n- Resolved some sepolicy denials\n- Minor improvements\n- Synced with latest rom changes\n- May security patches",
-      "android": "16"
+      "android": "16",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-MF3zv"
     },
     {
       "name": "Axion AOSP 2.7",
@@ -169,7 +172,8 @@
       "size": "2.8GB",
       "url": "https://archive.org/download/rmx3031-axion-aosp-2-7-20260606/axion-2.7-PROXIMA_BETA-20260606-UNOFFICIAL-CORE-op6893.zip",
       "changelog": "Axion AOSP 2.7 Proxima BETA. Updated powerhints. Resolved libperfmgr & sepolicy issues. Disabled 6GHz Wi-Fi support via RRO. Configured SoftAP SAE support. Oplus Camera by @liwhy1. Revanced Apps. Non-rooted build. Dirty flash only over prior zatvio builds. By zatvio.",
-      "android": "16"
+      "android": "16",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-TgYiv"
     },
     {
       "name": "LineageOS 23.2 Unofficial IV (GMS)",
@@ -178,7 +182,8 @@
       "size": "1.4GB",
       "url": "https://archive.org/download/rmx3031-lineage-23.2-unofficial-iv/lineage-23.2-20260609-UNOFFICIAL-gms-op6893.zip",
       "changelog": "June Security Patch. Fixed WPA3 WiFi & hotspot issues. Misc Improvements. GMS build (includes Google Apps). By ManshuTyagi.",
-      "android": "16"
+      "android": "16",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-vgYiv"
     },
     {
       "name": "LineageOS 23.2 Unofficial IV (Vanilla)",
@@ -187,7 +192,8 @@
       "size": "1.1GB",
       "url": "https://archive.org/download/rmx3031-lineage-23.2-unofficial-iv/lineage-23.2-20260609-UNOFFICIAL-op6893.zip",
       "changelog": "June Security Patch. Fixed WPA3 WiFi & hotspot issues. Misc Improvements. Vanilla build (no Google Apps). By ManshuTyagi.",
-      "android": "16"
+      "android": "16",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-Kj0iv"
     },
     {
       "name": "Evolution X 11.8 (Unofficial)",
@@ -196,7 +202,8 @@
       "size": "3.9GB",
       "url": "https://archive.org/download/rmx3031-evolution-x-11-8t/Evolution-X-op6893-11.8-A16-QPR2-20260610.zip",
       "changelog": "Fixed NFC unavailable issue. Synced with latest rom changes. June security patches. Userdebug, signed, vanilla kernel. By Liwhy.",
-      "android": "16"
+      "android": "16",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-SDCzv"
     },
     {
       "name": "Lunaris AOSP 3.12 (Official)",
@@ -205,7 +212,8 @@
       "size": "3.2GB",
       "url": "https://archive.org/download/lunaris-aosp-3-12-op6893/Lunaris-AOSP-op6893-OFFICIAL-3.12-GMS-2026072421.zip",
       "changelog": "- Gapps build\n- Dolby Atmos\n- by Rakhshan",
-      "android": "16"
+      "android": "16",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-lDCzv"
     },
     {
       "name": "InfinityX v3.12 (Unofficial)",
@@ -214,7 +222,8 @@
       "size": "2.6GB",
       "url": "https://archive.org/download/op6893-infinityx-3.12/Project_Infinity-X-3.12-op6893-02.08.2026-GAPPS-UNOFFICIAL.zip",
       "changelog": "- Initial release\n- Gapps | userbuild\n- SELinux: Enforcing\n- Signed with release keys\n- Sony Dolby Atmos (OnePlus UI)\n- Credits: liwhy1 & ManshuTyagi for trees\n- Build By Rakhshan",
-      "android": "16"
+      "android": "16",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-dgYiv"
     }
   ],
   "kernels": [
@@ -240,14 +249,16 @@
       "date": "2026-03-24",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-1.5.5/KSU_Next_OP6893_COS16.zip",
-      "changelog": "COS 16 kernel . susfs v.1.5.5 . KernelSU Next . LSPosed working . SELinux: Enforcing. Flash SUSFS-FOR-KERNELSU module (required for better stealth/root hiding). Added UDFPS support . By xCaptaiN09"
+      "changelog": "COS 16 kernel . susfs v.1.5.5 . KernelSU Next . LSPosed working . SELinux: Enforcing. Flash SUSFS-FOR-KERNELSU module (required for better stealth/root hiding). Added UDFPS support . By xCaptaiN09",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-11ozv"
     },
     {
       "name": "COS/OOS 16 Kernel (No Root)",
       "date": "2026-03-24",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-kernel-realme_ui/Realme_UI_NoRoot_RMX3031.zip",
-      "changelog": "COS 16 kernel without root. Charging fix for RMX3031. Added UDFPS support"
+      "changelog": "COS 16 kernel without root. Charging fix for RMX3031. Added UDFPS support",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-uj0iv"
     },
     {
       "name": "KSU Next Cupida Denniz (AOSP)",
@@ -255,7 +266,8 @@
       "date": "2026-03-25",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-1.5.5/KSU_Next_OP6893_AOSP.zip",
-      "changelog": "KernelSU Next . susfs v1.5.5 . LSPosed working . SELinux: Enforcing . Flash SUSFS-FOR-KERNELSU module (required for better stealth/root hiding) . Added UDFPS support . By xCaptaiN09"
+      "changelog": "KernelSU Next . susfs v1.5.5 . LSPosed working . SELinux: Enforcing . Flash SUSFS-FOR-KERNELSU module (required for better stealth/root hiding) . Added UDFPS support . By xCaptaiN09",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-G4czv"
     },
     {
       "name": "Kernel RMX3031 Charging Fix (No Root)",
@@ -263,7 +275,8 @@
       "date": "2026-03-08",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-kernel-lineage-chargingfix/Lineage_23.2_ChargingFix_RMX3031.zip",
-      "changelog": "Charging fix kernel for RMX3031. Added UDFPS support"
+      "changelog": "Charging fix kernel for RMX3031. Added UDFPS support",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-3gYiv"
     },
     {
       "name": "SukiSU Ultra RMX3031 (Unstable)",
@@ -287,7 +300,8 @@
       "date": "2026-03-08",
       "size": "23MB",
       "url": "https://archive.org/download/rmx3031-kernels/STOCK_KSU.zip",
-      "changelog": "Stock kernel with KernelSU for RMX3031"
+      "changelog": "Stock kernel with KernelSU for RMX3031",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-ovBzv"
     },
     {
       "name": "SukiSU Ultra 3.2.0",
@@ -311,7 +325,8 @@
       "date": "2026-06-16",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.1.0/KSUN_OP6893_COS16.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.1.0 . RUI/COS/OOS 16 kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
+      "changelog": "KernelSU Next . SUSFS v.2.1.0 . RUI/COS/OOS 16 kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-7DCzv"
     },
     {
       "name": "KSU Next OP6893 (AOSP)",
@@ -319,7 +334,8 @@
       "date": "2026-06-17",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.1.0/KSUN_OP6893_AOSP.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.1.0 . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
+      "changelog": "KernelSU Next . SUSFS v.2.1.0 . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-41ozv"
     },
     {
       "name": "KSU Next OP6893 Manual-Hook (AOSP)",
@@ -327,7 +343,8 @@
       "date": "2026-06-19",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.1.0-manualhook-v4/KSUN-Manual-Hook-AOSP.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.1.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
+      "changelog": "KernelSU Next . SUSFS v.2.1.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-jcYzv"
     },
     {
       "name": "KSU Next OP6893 Manual-Hook (COS16/OOS16)",
@@ -335,7 +352,8 @@
       "date": "2026-06-18",
       "size": "21MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.1.0-manualhook-v4/KSUN-Manual-Hook-COS-OOS.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.1.0 . Manual Hook . COS/OOS/RUI16 kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
+      "changelog": "KernelSU Next . SUSFS v.2.1.0 . Manual Hook . COS/OOS/RUI16 kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-0YKzv"
     },
     {
       "name": "KSU Next OP6893 Manual-Hook III (AOSP)",
@@ -343,7 +361,8 @@
       "date": "2026-07-14",
       "size": "21MB",
       "url": "https://archive.org/download/op6893-susfs-2.2.0-manualhook-v3/KSU-Next-AOSP-v3.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
+      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-mvBzv"
     },
     {
       "name": "KSU Next OP6893 Manual-Hook III (COS/OOS)",
@@ -351,7 +370,8 @@
       "date": "2026-07-13",
       "size": "21MB",
       "url": "https://archive.org/download/op6893-susfs-2.2.0-manualhook-v3/KSU-Next-RUI-v3.zip",
-      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . COS/OOS kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
+      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . COS/OOS kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-P4czv"
     },
     {
       "name": "ResukiSU OP6893 (AOSP)",
@@ -359,7 +379,8 @@
       "date": "2026-07-20",
       "size": "20MB",
       "url": "https://archive.org/download/rmx3031-susfs-2.2.0-inline-Hook/ReSukiSU_OP6893.zip",
-      "changelog": "ResukiSU . SUSFS v.2.2.0 . Inline Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By soulspark666"
+      "changelog": "ResukiSU . SUSFS v.2.2.0 . Inline Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By soulspark666",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-hgYiv"
     }
   ],
   "modules": [
@@ -369,7 +390,8 @@
       "date": "2026-03-15",
       "size": "1.6KB",
       "url": "https://archive.org/download/rmx3031-modules/ksu_module_susfs.zip",
-      "changelog": "Required for better stealth and root hiding with KernelSU Next. Flash via KSU Manager."
+      "changelog": "Required for better stealth and root hiding with KernelSU Next. Flash via KSU Manager.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-toCiv"
     },
     {
       "name": "Permissiver V5",
@@ -395,7 +417,8 @@
       "date": "2026-03-11",
       "size": "4.47GB",
       "url": "https://archive.org/download/rmx3031-ota-a22/X7-MAX-A22-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-KYKzv"
     },
     {
       "name": "X7-MAX C12 Toolbox",
@@ -403,7 +426,8 @@
       "date": "2026-03-11",
       "size": "5.73GB",
       "url": "https://archive.org/download/rmx3031-ota-c12/X7-MAX-C12-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-x1ozv"
     },
     {
       "name": "X7-MAX C17 Toolbox",
@@ -411,7 +435,8 @@
       "date": "2026-03-11",
       "size": "5.83GB",
       "url": "https://archive.org/download/rmx3031-ota-c17/X7-MAX-C17-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-ioCiv"
     },
     {
       "name": "X7-MAX F01 Toolbox",
@@ -419,7 +444,8 @@
       "date": "2026-03-11",
       "size": "6.01GB",
       "url": "https://archive.org/download/rmx3031-ota-f01/X7-MAX-F01-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-bDCzv"
     },
     {
       "name": "X7-MAX F12 Toolbox",
@@ -427,7 +453,8 @@
       "date": "2026-03-11",
       "size": "6.13GB",
       "url": "https://archive.org/download/rmx3031-ota-f12/X7-MAX-F12-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-ZDCzv"
     },
     {
       "name": "X7-MAX F13 Toolbox",
@@ -435,7 +462,8 @@
       "date": "2026-03-11",
       "size": "6.14GB",
       "url": "https://archive.org/download/rmx3031-ota-f13/X7-MAX-F13-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-Uj0iv"
     },
     {
       "name": "X7-MAX F24 Toolbox",
@@ -443,7 +471,8 @@
       "date": "2026-03-11",
       "size": "6.43GB",
       "url": "https://archive.org/download/rmx3031-ota-f24/X7-MAX-F24-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-uYKzv"
     },
     {
       "name": "X7-MAX F25 Toolbox",
@@ -459,7 +488,8 @@
       "date": "2026-03-11",
       "size": "3.60GB",
       "url": "https://archive.org/download/rmx3031-rollback-a21/X7MAX_11_A.21.zip",
-      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install."
+      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-1vBzv"
     },
     {
       "name": "X7-MAX C16 (Rollback)",
@@ -467,7 +497,8 @@
       "date": "2026-03-11",
       "size": "5.02GB",
       "url": "https://archive.org/download/rmx3031-rollback-c16/X7MAX_11_C.16.zip",
-      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install."
+      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-cDCzv"
     }
   ],
   "ota_cn": [
@@ -477,7 +508,8 @@
       "date": "2026-03-17",
       "size": "5.45GB",
       "url": "https://archive.org/download/rmx3031-ota-in-a14/RMX3031-A14-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-zoCiv"
     },
     {
       "name": "A27 Toolbox",
@@ -485,7 +517,8 @@
       "date": "2026-03-17",
       "size": "5.24GB",
       "url": "https://archive.org/download/rmx3031-ota-in-a27/RMX3031-A27-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-wF3zv"
     },
     {
       "name": "C18 Toolbox",
@@ -493,7 +526,8 @@
       "date": "2026-03-17",
       "size": "6.02GB",
       "url": "https://archive.org/download/rmx3031-ota-in-c18/RMX3031-C18-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-LoCiv"
     },
     {
       "name": "C26 Toolbox",
@@ -509,7 +543,8 @@
       "date": "2026-03-17",
       "size": "6.59GB",
       "url": "https://archive.org/download/rmx3031-ota-in-f01/RMX3031-F01-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-gF3zv"
     },
     {
       "name": "F12 Toolbox",
@@ -533,7 +568,8 @@
       "date": "2026-03-30",
       "size": "7.26GB",
       "url": "https://archive.org/download/rmx3031-ota-cn-f25/RMX3031-F25-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-eDCzv"
     },
     {
       "name": "A29 (Rollback)",
@@ -549,7 +585,8 @@
       "date": "2026-03-30",
       "size": "5.47GB",
       "url": "https://archive.org/download/rmx3031-rollback-cn-c25/RMX3031_11_C.25.zip",
-      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install."
+      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-UYKzv"
     }
   ],
   "ota_cnf": [
@@ -559,7 +596,8 @@
       "date": "2026-03-31",
       "size": "3.56GB",
       "url": "https://archive.org/download/rmx3350-flash-a07-deep/RMX3350-A07-Deep-Compact-Toolbox-pkg.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Deep Compact variant with smaller size. RMX3350 GT Neo Flash Edition."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Deep Compact variant with smaller size. RMX3350 GT Neo Flash Edition.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-Sj0iv"
     },
     {
       "name": "A07 Toolbox",
@@ -575,7 +613,8 @@
       "date": "2026-03-31",
       "size": "4.34GB",
       "url": "https://archive.org/download/rmx3350-flash-a16-compact/RMX3350-A16-Compact-Toolbox-pkg.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Compact variant with smaller size. RMX3350 GT Neo Flash Edition."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Compact variant with smaller size. RMX3350 GT Neo Flash Edition.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-p1ozv"
     },
     {
       "name": "A16 Toolbox",
@@ -599,7 +638,8 @@
       "date": "2026-03-31",
       "size": "6.29GB",
       "url": "https://archive.org/download/rmx3350-flash-c20/RMX3350-C20-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-X4czv"
     },
     {
       "name": "F01 Toolbox",
@@ -625,7 +665,8 @@
       "date": "2026-03-08",
       "size": "57MB",
       "url": "https://archive.org/download/rmx3031-firmware/RMX3031_RUI4_F.12_FW_ONLY.zip",
-      "changelog": "RUI4 F.12 firmware only package for RMX3031"
+      "changelog": "RUI4 F.12 firmware only package for RMX3031",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-Yd6zv"
     },
     {
       "name": "RUI4 F.13 Firmware Only",
@@ -641,7 +682,8 @@
       "date": "2026-06-07",
       "size": "57MB",
       "url": "https://archive.org/download/rmx3031-firmware-f-57-restore-brom/13.0-F.57-Denniz_Restore_Brom_Firmware.zip",
-      "changelog": "Restore Brom + OxygenOS 13 F.57 firmware for OnePlus Nord 2 (DN2103) . Flash this firmware before installing custom ROMs . By ManshuTyagi."
+      "changelog": "Restore Brom + OxygenOS 13 F.57 firmware for OnePlus Nord 2 (DN2103) . Flash this firmware before installing custom ROMs . By ManshuTyagi.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-FF3zv"
     },
     {
       "name": "X7 MAX F12",
@@ -649,7 +691,8 @@
       "date": "2026-06-27",
       "size": "6.1GB",
       "url": "https://archive.org/download/rmx3031-ota-f12/X7-MAX-F12.tar",
-      "changelog": "Realme X7 Max F12 firmware . TWRP Flashable"
+      "changelog": "Realme X7 Max F12 firmware . TWRP Flashable",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-f1ozv"
     }
   ],
   "sptool": [
@@ -683,7 +726,8 @@
       "date": "2026-03-12",
       "size": "4.4GB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/C.15.7z",
-      "changelog": "SP Flash Tool firmware package for RMX3031."
+      "changelog": "SP Flash Tool firmware package for RMX3031.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-TeYzv"
     },
     {
       "name": "Tools",
@@ -691,7 +735,8 @@
       "date": "2026-03-12",
       "size": "51MB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/Tools.7z",
-      "changelog": "SP Flash Tool and required tools for RMX3031 firmware flashing."
+      "changelog": "SP Flash Tool and required tools for RMX3031 firmware flashing.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-HOaiv"
     }
   ],
   "recovery": [
@@ -717,7 +762,8 @@
       "date": "2026-03-09",
       "size": "38MB",
       "url": "https://archive.org/download/rmx3031-twrp-rui2/TWRP_RUI2_A11.zip",
-      "changelog": "RMX3031-twrp-RUI2"
+      "changelog": "RMX3031-twrp-RUI2",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-n4czv"
     }
   ],
   "other": [
@@ -727,7 +773,8 @@
       "date": "2026-03-09",
       "size": "20KB",
       "url": "https://archive.org/download/rmx3031-docs/ADB_Fastboot_Commands.pdf",
-      "changelog": "commands for ADB & Fastboot"
+      "changelog": "commands for ADB & Fastboot",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-YF3zv"
     },
     {
       "name": "LOG Capture Commands",
@@ -735,7 +782,8 @@
       "date": "2026-03-09",
       "size": "10KB",
       "url": "https://archive.org/download/rmx3031-docs/LOG%20commands.pdf",
-      "changelog": "Commands to Capture LOGs"
+      "changelog": "Commands to Capture LOGs",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-tDCzv"
     },
     {
       "name": "Git Commands",
@@ -743,7 +791,8 @@
       "date": "2026-03-09",
       "size": "3MB",
       "url": "https://archive.org/download/rmx3031-docs/git.pdf",
-      "changelog": "Git Commands"
+      "changelog": "Git Commands",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-SYKzv"
     }
   ],
   "_synced_at": "2026-08-07",

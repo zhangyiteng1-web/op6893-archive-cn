@@ -11,8 +11,7 @@
       "size": "1.4GB",
       "url": "https://archive.org/download/rmx3031-lineageos-23-2-apr/lineage-23.2-20260410-UNOFFICIAL-gms-op6893.zip",
       "changelog": "April Security Patch. Switched to Pixel Thermal Service. Added Screen Off UDFPS support. Fixed Fast Charging & Disconnecting issue. Blobs updated from latest OnePlus Nord 2 stock ROM (vendor security patch: July 2025). Signed build. Misc improvements. By ManshuTyagi.",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-rYKzv",
-      "url_original": "https://archive.org/download/rmx3031-lineageos-23-2-apr/lineage-23.2-20260410-UNOFFICIAL-gms-op6893.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-rYKzv"
     },
     {
       "name": "Lunaris AOSP 3.8",
@@ -22,8 +21,7 @@
       "size": "2.4GB",
       "url": "https://archive.org/download/rmx3031-lunaris-aosp-3-8/Lunaris-AOSP-op6893-Community-3.8-GMS-2026032923.zip",
       "changelog": "Initial release. Added Sony Dolby Atmos (OnePlus UI). Added Warp Charging Overlay. Disabled 6GHz hotspot (broken). Gapps | Userdebug build. SELinux: Enforcing. Signed with release keys. Known bug: Screen Off UDFPS. By Rakhshan.",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-VwYiv",
-      "url_original": "https://archive.org/download/rmx3031-lunaris-aosp-3-8/Lunaris-AOSP-op6893-Community-3.8-GMS-2026032923.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-VwYiv"
     },
     {
       "name": "EvolutionX v11.6.1",
@@ -33,8 +31,7 @@
       "size": "3.6GB",
       "url": "https://archive.org/download/rmx3031-evolutionx-16-11-6-1/EvolutionX-16.0-20260302-op6893-11.6.1-Unofficial.zip",
       "changelog": "Rebranded to op6893. Improved udfps behaviour. Temporarily rolled back some. previous changes(bt, wifi). Synced with latest rom changes. February security patches",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-9vBzv",
-      "url_original": "https://archive.org/download/rmx3031-evolutionx-16-11-6-1/EvolutionX-16.0-20260302-op6893-11.6.1-Unofficial.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-9vBzv"
     },
     {
       "name": "LineageOS 23.2 Unofficial",
@@ -44,8 +41,7 @@
       "android": "16",
       "url": "https://archive.org/download/rmx3031-lineageos-23-2/lineage-23.2-20260301-UNOFFICIAL-op6893.zip",
       "changelog": "Rebranded to op6893. Switched back to mtk vibrator hal. Fixed video call issues across all major apps. Fixed open and close animations. Misc improvements. By ManshuTyagi.",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-boCiv",
-      "url_original": "https://archive.org/download/rmx3031-lineageos-23-2/lineage-23.2-20260301-UNOFFICIAL-op6893.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-boCiv"
     },
     {
       "name": "Axion AOSP V2.2.1",
@@ -55,8 +51,7 @@
       "size": "2.4GB",
       "url": "https://archive.org/download/rmx3031-axion-aosp-v2-2-1/axion-2.2.1-NIGHTLY-20251209-UNOFFICIAL-GMS-MT6893.zip",
       "changelog": "Axion AOSP V2.2.1 Nightly. Unofficial GMS build for Cupida (RMX3031) and Denniz. Android 16. Screen off UDFPS now works.",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-ZoCiv",
-      "url_original": "https://archive.org/download/rmx3031-axion-aosp-v2-2-1/axion-2.2.1-NIGHTLY-20251209-UNOFFICIAL-GMS-MT6893.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-ZoCiv"
     },
     {
       "name": "RisingOS Revived 8.1.1",
@@ -66,8 +61,7 @@
       "size": "3.6GB",
       "url": "https://archive.org/download/rmx3031-risingos-8-1-1/RisingOS_Revived-8.1.1-251005-1609-GAPPS-COMMUNITY-MT6893-ota.zip",
       "changelog": "RisingOS Revived 8.1.1 unofficial build for RMX3031. Android 16.",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-Md6zv",
-      "url_original": "https://archive.org/download/rmx3031-risingos-8-1-1/RisingOS_Revived-8.1.1-251005-1609-GAPPS-COMMUNITY-MT6893-ota.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-Md6zv"
     },
     {
       "name": "Axion AOSP 2.5",
@@ -77,8 +71,7 @@
       "url": "https://archive.org/download/rmx3031-axion-aosp-2-5/axion-2.5-REVERIE-20260417-UNOFFICIAL-GMS-op6893.zip",
       "changelog": "Added Oplus Camera. Non-rooted build. Shipped with Revanced Apps. Clean flash mandatory. By zatvio.",
       "android": "16",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-aF3zv",
-      "url_original": "https://archive.org/download/rmx3031-axion-aosp-2-5/axion-2.5-REVERIE-20260417-UNOFFICIAL-GMS-op6893.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-aF3zv"
     },
     {
       "name": "LineageOS 23.2 Unofficial III",
@@ -88,8 +81,7 @@
       "url": "https://archive.org/download/rmx3031-lineageos-23-2-may/lineage-gms.zip",
       "changelog": "May Security Patch. Fixed Bottom Speaker for Cupida. Misc Improvements. By ManshuTyagi. GMS build (includes Google Apps).",
       "android": "16",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-5cYzv",
-      "url_original": "https://archive.org/download/rmx3031-lineageos-23-2-may/lineage-gms.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-5cYzv"
     },
     {
       "name": "LineageOS 23.2 Unofficial III (Vanilla)",
@@ -99,8 +91,7 @@
       "url": "https://archive.org/download/rmx3031-lineageos-23-2-may/lineage-nogms.zip",
       "changelog": "May Security Patch. Fixed Bottom Speaker for Cupida. Misc Improvements. By ManshuTyagi. Vanilla build (no Google Apps).",
       "android": "16",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-o1ozv",
-      "url_original": "https://archive.org/download/rmx3031-lineageos-23-2-may/lineage-nogms.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-o1ozv"
     },
     {
       "name": "Evolution X 11.7 (Unofficial)",
@@ -110,8 +101,7 @@
       "url": "https://archive.org/download/rmx3031-evolutionx-11-7/EvolutionX-11.7-20260507-op6893.zip",
       "changelog": "Improved udfps behaviour. Migrated bt and thermal service to aidl. Updated blobs to latest stock. Resolved most opluscam crashes. Synced with latest rom changes. May security patches. Userdebug, signed, vanilla kernel. By Liwhy.",
       "android": "16",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-w4czv",
-      "url_original": "https://archive.org/download/rmx3031-evolutionx-11-7/EvolutionX-11.7-20260507-op6893.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-w4czv"
     },
     {
       "name": "PixelOS (Unofficial)",
@@ -121,8 +111,7 @@
       "url": "https://archive.org/download/rmx3031-community/PixelOS_op6893-16.2-20260511-162.zip",
       "changelog": "Initial A16 Release . by ManshuTyagi & liwhy1",
       "android": "16",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-8YKzv",
-      "url_original": "https://archive.org/download/rmx3031-community/PixelOS_op6893-16.2-20260511-162.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-8YKzv"
     },
     {
       "name": "OxygenOS 16 (RMX3031)",
@@ -132,8 +121,7 @@
       "url": "https://archive.org/download/rmx3031-oxygenos-16/OxygenOS_16_RMX3031.zip",
       "changelog": "Fastboot package. Extract, boot to fastboot, run flash.bat (Win) or ./flash.sh (Linux). Phone auto-reboots to TWRP. Sideload COS16/OOS16 kernel via ADB, format data, reboot.",
       "android": "16",
-      "url_123pan": "https://www.123pan.com/s/MsA8vd-dOaiv",
-      "url_original": "https://archive.org/download/rmx3031-oxygenos-16/OxygenOS_16_RMX3031.zip"
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-dOaiv"
     },
     {
       "name": "ColorOS 16 (RMX3031)",
@@ -795,6 +783,6 @@
       "url_123pan": "https://www.123pan.com/s/MsA8vd-SYKzv"
     }
   ],
-  "_synced_at": "2026-08-07",
+  "_synced_at": "2026-08-08",
   "_sync_source": "https://rmx3031-archive.pages.dev/index.json"
 }

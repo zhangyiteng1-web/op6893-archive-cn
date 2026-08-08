@@ -435,6 +435,8 @@ async function downloadFile(url, destPath) {
     return;
   }
 
+  log(`  下载中...`);
+
   // 1. HEAD 请求获取文件大小
   const headRes = await fetch(url, { method: "HEAD" });
   const totalSize = parseInt(headRes.headers.get("content-length") || "0", 10);
@@ -442,8 +444,10 @@ async function downloadFile(url, destPath) {
 
   // 小文件或服务器不支持 Range → 单线程
   if (totalSize === 0 || totalSize < MULTI_THREAD_MIN_SIZE || acceptRanges !== "bytes") {
-    return downloadSingleThread(url, destPath);
+    return downloadSingleThread(url, destPath, totalSize);
   }
+
+  log(`  文件大小: ${(totalSize / 1024 / 1024).toFixed(1)}MB, ${DOWNLOAD_THREADS}线程下载...`);
 
   // 2. 预分配文件空间
   const fd = await open(destPath, "w");
@@ -454,12 +458,22 @@ async function downloadFile(url, destPath) {
   const chunkSize = Math.ceil(totalSize / DOWNLOAD_THREADS);
   const tasks = [];
   const startTime = Date.now();
+  let completedChunks = 0;
 
   for (let i = 0; i < DOWNLOAD_THREADS; i++) {
     const start = i * chunkSize;
     const end = i === DOWNLOAD_THREADS - 1 ? totalSize - 1 : start + chunkSize - 1;
     if (start >= totalSize) break;
-    tasks.push(downloadChunk(url, destPath, start, end, i));
+    tasks.push(
+      downloadChunk(url, destPath, start, end, i).then(() => {
+        completedChunks++;
+        const pct = Math.round((completedChunks / tasks.length) * 100);
+        const elapsed = (Date.now() - startTime) / 1000;
+        const downloaded = completedChunks * chunkSize;
+        const speed = elapsed > 0 ? ((downloaded / 1024 / 1024) / elapsed).toFixed(1) : "?";
+        log(`  下载进度: ${pct}% (${completedChunks}/${tasks.length}线程), ${speed}MB/s`);
+      })
+    );
   }
 
   await Promise.all(tasks);
@@ -469,9 +483,14 @@ async function downloadFile(url, destPath) {
   log(`  下载完成: ${(totalSize / 1024 / 1024).toFixed(1)}MB (${DOWNLOAD_THREADS}线程, ${elapsed}s, ${speed}MB/s)`);
 }
 
-async function downloadSingleThread(url, destPath) {
+async function downloadSingleThread(url, destPath, totalSize) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`下载失败: ${res.status} ${res.statusText}`);
+
+  const actualSize = totalSize || parseInt(res.headers.get("content-length") || "0", 10);
+  const startTime = Date.now();
+  let downloaded = 0;
+  let lastLogPct = 0;
 
   const fileStream = createWriteStream(destPath);
   const reader = res.body.getReader();
@@ -480,6 +499,17 @@ async function downloadSingleThread(url, destPath) {
     const { done, value } = await reader.read();
     if (done) break;
     fileStream.write(value);
+    downloaded += value.length;
+
+    if (actualSize > 0) {
+      const pct = Math.round((downloaded / actualSize) * 100);
+      if (pct >= lastLogPct + 10) {
+        const elapsed = (Date.now() - startTime) / 1000;
+        const speed = elapsed > 0 ? ((downloaded / 1024 / 1024) / elapsed).toFixed(1) : "?";
+        log(`  下载进度: ${pct}%, ${speed}MB/s`);
+        lastLogPct = Math.floor(pct / 10) * 10;
+      }
+    }
   }
 
   fileStream.end();

@@ -218,8 +218,8 @@ async function findFileInFolder(fileName, parentFileId) {
 // ── Upload (V2 API) ─────────────────────────────────────────────────────────
 
 /**
- * Upload a file to 123pan via OpenAPI V2.
- * Uses streaming reads to avoid loading entire file into memory.
+ * Upload a file to 123pan via OpenAPI V1 (get_upload_url + PUT).
+ * V1 使用预签名 PUT URL，走同一 API 域名，比 V2 的 multipart 上传更稳定。
  * Returns fileID.
  */
 async function uploadFile(filePath, fileName, parentFileId) {
@@ -233,15 +233,15 @@ async function uploadFile(filePath, fileName, parentFileId) {
     return `dry_${Date.now()}`;
   }
 
-  // Step 1: V2 Create upload
-  const createJson = await apiPostRaw("/upload/v2/file/create", {
-    parentFileID: parentFileId,
+  // Step 1: Create upload (V1)
+  const createJson = await apiPostRaw("/upload/v1/file/create", {
+    parentFileID: String(parentFileId),
     filename: fileName,
     etag: etag,
     size: size,
   });
 
-  // 文件名重复 → 文件已存在，直接查找
+  // 文件名重复
   if (createJson.code === 1) {
     log("  文件已存在（文件名重复），查找已有文件...");
     const existingId = await findFileInFolder(fileName, parentFileId);
@@ -258,17 +258,14 @@ async function uploadFile(filePath, fileName, parentFileId) {
 
   const data = createJson.data;
 
-  // 秒传：文件已存在（MD5 匹配）
-  // 注意：reuse 时 API 返回的 fileID 可能为 0 或无效值，不可信
-  // 必须通过搜索文件名来获取真实 fileID
+  // 秒传
   if (data.reuse) {
-    log(`  秒传成功（create返回fileID=${data.fileID}），搜索已有文件...`);
+    log(`  秒传成功，搜索已有文件...`);
     const existingId = await findFileInFolder(fileName, parentFileId);
     if (existingId) {
       log(`  找到已有文件, id=${existingId}`);
       return existingId;
     }
-    // 可能文件刚创建，列表还没刷新，等几秒再试
     await sleep(3000);
     const retryId = await findFileInFolder(fileName, parentFileId);
     if (retryId) {
@@ -280,70 +277,59 @@ async function uploadFile(filePath, fileName, parentFileId) {
 
   const preuploadID = data.preuploadID;
   const sliceSize = data.sliceSize;
-  const servers = data.servers && data.servers.length > 0 ? data.servers : [API_BASE.replace("https://", "")];
-
-  // Step 2: Upload each slice via multipart form (with retry)
   const totalParts = Math.ceil(size / sliceSize);
   let lastLogPercent = 0;
 
+  // Step 2: 列出已上传的分片（断点续传）
+  let uploadedParts = new Set();
+  try {
+    const partsData = await apiPost("/upload/v1/file/list_upload_parts", { preuploadID });
+    for (const part of partsData.parts || []) {
+      uploadedParts.add(part.partNumber);
+    }
+    if (uploadedParts.size > 0) {
+      log(`  已上传 ${uploadedParts.size}/${totalParts} 分片，继续...`);
+    }
+  } catch { /* 无已上传分片 */ }
+
+  // Step 3: 逐个分片：获取预签名 URL → PUT 上传
   for (let i = 1; i <= totalParts; i++) {
+    if (uploadedParts.has(i)) continue;
+
     const start = (i - 1) * sliceSize;
     const end = Math.min(start + sliceSize, size);
-
     const chunk = await readChunk(filePath, start, end);
-    const sliceMD5 = md5FromBuffer(chunk);
 
-    // 分片级重试（最多3次，轮换 upload server）
     let sliceOk = false;
     let lastErr = null;
 
     for (let retry = 0; retry < 3 && !sliceOk; retry++) {
       if (retry > 0) await sleep(3000 * retry);
 
-      // 轮换使用不同的 upload server
-      const svr = servers[retry % servers.length] || servers[0];
-      const sliceUrl = `https://${svr}/upload/v2/file/slice`;
-
       try {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 300_000); // 5 分钟超时
-
-        const form = new FormData();
-        form.append("preuploadID", preuploadID);
-        form.append("sliceNo", String(i));
-        form.append("sliceMD5", sliceMD5);
-        form.append("filename", fileName);
-        form.append("slice", new Blob([chunk]), fileName);
-
-        const sliceRes = await fetch(sliceUrl, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Platform: "open_platform",
-          },
-          body: form,
-          signal: ctrl.signal,
+        // 获取预签名上传 URL
+        const urlData = await apiPost("/upload/v1/file/get_upload_url", {
+          preuploadID: preuploadID,
+          sliceNo: i,
         });
 
-        clearTimeout(timer);
+        const putRes = await fetch(urlData.presignedURL, {
+          method: "PUT",
+          body: chunk,
+          headers: { "Content-Type": "application/octet-stream" },
+        });
 
-        const sliceJson = await sliceRes.json();
-        if (sliceJson.code !== 0) {
-          throw new Error(`code=${sliceJson.code} message=${sliceJson.message || ""}`);
+        if (!putRes.ok) {
+          throw new Error(`HTTP ${putRes.status}`);
         }
         sliceOk = true;
       } catch (err) {
         lastErr = err;
-        if (err.name === "AbortError") {
-          warn(`  分片 ${i}/${totalParts} 超时，重试 ${retry + 1}/3...`);
-        } else {
-          warn(`  分片 ${i}/${totalParts} 失败: ${err.message}，重试 ${retry + 1}/3...`);
-        }
       }
     }
 
     if (!sliceOk) {
-      throw new Error(`分片 ${i}/${totalParts} 上传失败（3次重试后）: ${lastErr?.message}`);
+      throw new Error(`分片 ${i}/${totalParts} 上传失败: ${lastErr?.message}`);
     }
 
     // 每 10% 打印进度
@@ -354,26 +340,34 @@ async function uploadFile(filePath, fileName, parentFileId) {
     }
   }
 
-  // Step 3: Complete upload (poll until done)
-  log(`  所有分片上传完成，等待服务器合并...`);
-  for (let attempt = 1; attempt <= 60; attempt++) {
-    await sleep(2000);
+  // Step 4: 完成上传 + 轮询
+  log(`  所有分片上传完成，等待服务器处理...`);
+  const completeData = await apiPost("/upload/v1/file/upload_complete", { preuploadID });
+
+  if (completeData.completed && (completeData.fileID || completeData.fileId)) {
+    const fileId = completeData.fileID || completeData.fileId;
+    log(`  上传完成 fileId=${fileId}`);
+    return fileId;
+  }
+
+  // 轮询异步结果
+  log("  等待异步处理...");
+  for (let attempt = 1; attempt <= 30; attempt++) {
+    await sleep(3000);
     try {
-      const completeData = await apiPost("/upload/v2/file/upload_complete", { preuploadID });
-      if (completeData.completed && (completeData.fileID || completeData.fileId)) {
-        const fileId = completeData.fileID || completeData.fileId;
-        log(`  上传完成 fileId=${fileId}`);
+      const result = await apiPost("/upload/v1/file/upload_async_result", { preuploadID });
+      if (result.completed && (result.fileID || result.fileId)) {
+        const fileId = result.fileID || result.fileId;
+        log(`  异步处理完成 fileId=${fileId}`);
         return fileId;
       }
-    } catch (err) {
-      // Keep polling
-    }
+    } catch { /* 继续轮询 */ }
     if (attempt % 10 === 0) {
-      log(`  等待合并中... (${attempt}/60)`);
+      log(`  等待中... (${attempt}/30)`);
     }
   }
 
-  throw new Error("上传超时：60次轮询后仍未完成");
+  throw new Error("上传超时：30次轮询后仍未完成");
 }
 
 // ── Share ────────────────────────────────────────────────────────────────────

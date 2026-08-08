@@ -1,0 +1,10 @@
+# HTML & data — 不缓存，确保每次部署后立即生效
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.json
+  Cache-Control: public, max-age=60
+
+# 静态资源（Vite 构建的文件名带 hash）— 永久缓存
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

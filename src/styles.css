@@ -566,6 +566,12 @@ h4 {
   border-radius: 24px;
   margin-bottom: 16px;
   padding: 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.categoryRail::-webkit-scrollbar {
+  display: none;
 }
 
 .categoryRail button {
@@ -963,6 +969,7 @@ tr:last-child td {
   height: 140px;
   border-radius: 12px;
   object-fit: contain;
+  max-width: 100%;
 }
 
 .sponsorQr span {
@@ -982,8 +989,14 @@ footer {
 
 /* Responsive */
 @media (max-width: 980px) {
-  .heroGrid,
-  .filters,
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
   .sponsorCard {
     grid-template-columns: 1fr;
   }
@@ -1007,47 +1020,551 @@ footer {
   .mobileCards {
     display: block;
   }
-}
 
-@media (max-width: 620px) {
-  main {
-    width: min(100% - 22px, 1220px);
-  }
-
-  .nav,
-  .sectionHeader,
-  .sponsorCard {
-    align-items: start;
-    flex-direction: column;
-  }
-
-  .sponsorCard {
-    padding: 24px;
-  }
-
-  .nav {
-    border-radius: 24px;
-  }
-
-  .latestGrid,
-  .statsPanel {
-    grid-template-columns: 1fr;
+  h1 {
+    font-size: clamp(2.4rem, 7vw, 4.5rem);
   }
 
   .heroConsole {
-    min-height: 360px;
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 680px) {
+  main {
+    width: min(100% - 24px, 1220px);
+  }
+
+  .nav {
+    border-radius: 20px;
+    padding: 10px 14px;
+    top: 8px;
+  }
+
+  .brand {
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+  }
+
+  .nav a {
+    font-size: 0.82rem;
+  }
+
+  .hero {
+    padding: 16px 0 28px;
+  }
+
+  .heroGrid {
+    gap: 20px;
+  }
+
+  .heroConsole {
+    min-height: 280px;
+    border-radius: 24px;
+  }
+
+  .consoleScreen {
+    padding: 18px 16px;
+    min-height: 240px;
+  }
+
+  .consoleLine {
+    font-size: 0.76rem;
+    margin-bottom: 8px;
   }
 
   .signalRing {
-    width: 140px;
-    height: 140px;
+    width: 110px;
+    height: 110px;
+    right: 18px;
+    bottom: 18px;
   }
 
   .signalRing span {
-    font-size: 2.45rem;
+    font-size: 2rem;
+  }
+
+  .signalRing small {
+    font-size: 0.65rem;
   }
 
   h1 {
-    font-size: 3.2rem;
+    font-size: clamp(2rem, 6.5vw, 3.2rem);
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    margin-bottom: 10px;
+  }
+
+  .summary {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    max-width: 100%;
+  }
+
+  .actions {
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .button {
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 0.88rem;
+  }
+
+  .statsPanel {
+    grid-template-columns: 1fr 1fr;
+    border-radius: 20px;
+    margin-top: 18px;
+  }
+
+  .statsPanel div {
+    min-height: 90px;
+    padding: 14px 16px;
+  }
+
+  .statsPanel span {
+    font-size: 0.68rem;
+    margin-bottom: 8px;
+  }
+
+  .statsPanel strong {
+    font-size: 1rem;
+  }
+
+  .statsPanel .deviceList {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .latestGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card {
+    min-height: auto;
+    border-radius: 20px;
+    padding: 16px;
+  }
+
+  .card h3 {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+
+  .card p {
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .section {
+    padding: 32px 0;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .source {
+    font-size: 0.82rem;
+  }
+
+  .categoryRail {
+    border-radius: 18px;
+    padding: 8px;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .categoryRail button {
+    padding: 7px 10px;
+    font-size: 0.78rem;
+    gap: 4px;
+  }
+
+  .categoryRail button span {
+    font-size: 0.7rem;
+  }
+
+  .filters {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  input,
+  select {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    border-radius: 14px;
+  }
+
+  .resultCount {
+    font-size: 0.82rem;
+    margin: 12px 0;
+  }
+
+  .mobileCard {
+    padding: 14px;
+    border-radius: 18px;
+    margin-bottom: 10px;
+  }
+
+  .mobileCard h4 {
+    font-size: 0.92rem;
+    margin-bottom: 8px;
+  }
+
+  .mobileCardMeta {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .mobileCardMeta span {
+    padding: 3px 8px;
+    font-size: 0.74rem;
+    border-radius: 8px;
+  }
+
+  .mobileCardActions {
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .mobileCardActions a {
+    padding: 7px 14px;
+    font-size: 0.82rem;
+    border-radius: 12px;
+  }
+
+  .mobileCardActions .copyBtn {
+    font-size: 0.8rem;
+    padding: 7px 12px;
+    border-radius: 12px;
+  }
+
+  .changelogFull {
+    font-size: 0.8rem;
+    padding: 10px 0 0;
+    margin-top: 6px;
+  }
+
+  .notice,
+  .state {
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-size: 0.86rem;
+    margin-bottom: 20px;
+  }
+
+  .sponsorCard {
+    padding: 20px;
+    border-radius: 20px;
+    gap: 16px;
+  }
+
+  .sponsorCopy h2 {
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+  }
+
+  .sponsorCopy p {
+    font-size: 0.86rem;
+    line-height: 1.6;
+  }
+
+  .sponsorQr {
+    padding: 12px;
+    border-radius: 16px;
+    gap: 6px;
+  }
+
+  .sponsorQr img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .sponsorQr span {
+    font-size: 0.7rem;
+  }
+
+  footer {
+    padding: 32px 0;
+    font-size: 0.8rem;
+  }
+
+  .backToTop {
+    width: 40px;
+    height: 40px;
+    right: 16px;
+    bottom: 16px;
+    font-size: 1.1rem;
+  }
+
+  .toast {
+    padding: 10px 20px;
+    font-size: 0.82rem;
+    top: 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  main {
+    width: calc(100% - 16px);
+  }
+
+  .nav {
+    padding: 8px 10px;
+    top: 4px;
+  }
+
+  .brand {
+    font-size: 0.7rem;
+  }
+
+  .brand::before {
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+  }
+
+  .nav a {
+    font-size: 0.74rem;
+  }
+
+  .hero {
+    padding: 8px 0 20px;
+  }
+
+  .heroGrid {
+    gap: 14px;
+  }
+
+  .heroConsole {
+    min-height: 220px;
+    border-radius: 18px;
+  }
+
+  .consoleTop {
+    padding: 10px 14px;
+  }
+
+  .consoleTop span {
+    width: 7px;
+    height: 7px;
+  }
+
+  .consoleScreen {
+    padding: 14px 12px;
+    min-height: 180px;
+  }
+
+  .consoleLine {
+    font-size: 0.68rem;
+    margin-bottom: 6px;
+  }
+
+  .signalRing {
+    width: 80px;
+    height: 80px;
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .signalRing span {
+    font-size: 1.5rem;
+  }
+
+  .signalRing small {
+    font-size: 0.58rem;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+    margin-bottom: 10px;
+    line-height: 1.05;
+  }
+
+  .eyebrow {
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+  }
+
+  .summary {
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .button {
+    width: 100%;
+    min-height: 38px;
+    justify-content: center;
+    font-size: 0.82rem;
+  }
+
+  .statsPanel {
+    grid-template-columns: 1fr 1fr;
+    border-radius: 16px;
+    margin-top: 14px;
+  }
+
+  .statsPanel div {
+    min-height: 70px;
+    padding: 10px 12px;
+  }
+
+  .statsPanel span {
+    font-size: 0.62rem;
+    margin-bottom: 4px;
+  }
+
+  .statsPanel strong {
+    font-size: 0.88rem;
+  }
+
+  .statsPanel .deviceList {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+
+  .card {
+    border-radius: 16px;
+    padding: 12px;
+  }
+
+  .card h3 {
+    font-size: 0.86rem;
+  }
+
+  .card p {
+    font-size: 0.76rem;
+  }
+
+  .tag {
+    font-size: 0.66rem;
+    padding: 3px 8px;
+    margin-bottom: 8px;
+  }
+
+  .section {
+    padding: 24px 0;
+  }
+
+  .categoryRail {
+    border-radius: 14px;
+    padding: 6px;
+    gap: 4px;
+  }
+
+  .categoryRail button {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+
+  .categoryRail button span {
+    font-size: 0.64rem;
+  }
+
+  input,
+  select {
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    border-radius: 12px;
+  }
+
+  .mobileCard {
+    padding: 12px;
+    border-radius: 14px;
+    margin-bottom: 8px;
+  }
+
+  .mobileCard h4 {
+    font-size: 0.84rem;
+  }
+
+  .mobileCardMeta span {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+
+  .mobileCardActions a {
+    padding: 6px 10px;
+    font-size: 0.76rem;
+    border-radius: 10px;
+  }
+
+  .mobileCardActions .copyBtn {
+    font-size: 0.74rem;
+    padding: 6px 10px;
+  }
+
+  .mobileCardHeader .tag {
+    margin-bottom: 0;
+  }
+
+  .mobileCardDate {
+    font-size: 0.68rem;
+  }
+
+  .notice,
+  .state {
+    padding: 12px 14px;
+    font-size: 0.78rem;
+    border-radius: 14px;
+  }
+
+  .sponsorCard {
+    padding: 16px;
+    border-radius: 16px;
+    gap: 12px;
+  }
+
+  .sponsorCopy h2 {
+    font-size: 1.2rem;
+  }
+
+  .sponsorCopy p {
+    font-size: 0.78rem;
+  }
+
+  .sponsorQr img {
+    width: 80px;
+    height: 80px;
+  }
+
+  footer {
+    padding: 24px 0;
+    font-size: 0.72rem;
+  }
+
+  .backToTop {
+    width: 36px;
+    height: 36px;
+    right: 12px;
+    bottom: 12px;
+    font-size: 1rem;
+  }
+
+  .toast {
+    padding: 8px 16px;
+    font-size: 0.76rem;
+    top: 10px;
   }
 }

@@ -403,7 +403,7 @@ async function main() {
         }
       }
     }
-    await sleep(10000); // 间隔 10 秒
+    await sleep(3000); // 间隔 3 秒
   }
 
   log(`\n已提交 ${tasks.filter(t => t.taskID || t.fileId).length}/${tasks.length} 个任务\n`);

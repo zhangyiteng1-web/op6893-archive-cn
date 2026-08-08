@@ -293,6 +293,9 @@ async function uploadFile(filePath, fileName, parentFileId) {
   } catch { /* 无已上传分片 */ }
 
   // Step 3: 逐个分片：获取预签名 URL → PUT 上传
+  const logInterval = totalParts > 100 ? 5 : 10; // 大文件每 5% 报告进度
+  log(`  共 ${totalParts} 个分片，开始上传...`);
+
   for (let i = 1; i <= totalParts; i++) {
     if (uploadedParts.has(i)) continue;
 
@@ -313,11 +316,17 @@ async function uploadFile(filePath, fileName, parentFileId) {
           sliceNo: i,
         });
 
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 300_000); // 每个分片 5 分钟超时
+
         const putRes = await fetch(urlData.presignedURL, {
           method: "PUT",
           body: chunk,
           headers: { "Content-Type": "application/octet-stream" },
+          signal: ctrl.signal,
         });
+
+        clearTimeout(timer);
 
         if (!putRes.ok) {
           throw new Error(`HTTP ${putRes.status}`);
@@ -325,6 +334,9 @@ async function uploadFile(filePath, fileName, parentFileId) {
         sliceOk = true;
       } catch (err) {
         lastErr = err;
+        if (err.name === "AbortError") {
+          warn(`  分片 ${i} PUT 超时`);
+        }
       }
     }
 
@@ -332,11 +344,11 @@ async function uploadFile(filePath, fileName, parentFileId) {
       throw new Error(`分片 ${i}/${totalParts} 上传失败: ${lastErr?.message}`);
     }
 
-    // 每 10% 打印进度
+    // 每 logInterval% 打印进度
     const pct = Math.round((i / totalParts) * 100);
-    if (pct >= lastLogPercent + 10 || i === totalParts) {
+    if (pct >= lastLogPercent + logInterval || i === totalParts) {
       log(`  上传进度: ${pct}% (${i}/${totalParts})`);
-      lastLogPercent = Math.floor(pct / 10) * 10;
+      lastLogPercent = Math.floor(pct / logInterval) * logInterval;
     }
   }
 

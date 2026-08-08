@@ -259,17 +259,23 @@ async function uploadFile(filePath, fileName, parentFileId) {
   const data = createJson.data;
 
   // 秒传：文件已存在（MD5 匹配）
+  // 注意：reuse 时 API 返回的 fileID 可能为 0 或无效值，不可信
+  // 必须通过搜索文件名来获取真实 fileID
   if (data.reuse) {
-    log("  文件已存在，秒传成功");
-    const reuseId = data.fileID || data.fileId;
-    if (reuseId) return reuseId;
-
+    log(`  秒传成功（create返回fileID=${data.fileID}），搜索已有文件...`);
     const existingId = await findFileInFolder(fileName, parentFileId);
     if (existingId) {
       log(`  找到已有文件, id=${existingId}`);
       return existingId;
     }
-    throw new Error("秒传成功但无法获取 fileID");
+    // 可能文件刚创建，列表还没刷新，等几秒再试
+    await sleep(3000);
+    const retryId = await findFileInFolder(fileName, parentFileId);
+    if (retryId) {
+      log(`  延迟搜索找到, id=${retryId}`);
+      return retryId;
+    }
+    throw new Error("秒传成功但搜索不到文件ID");
   }
 
   const preuploadID = data.preuploadID;

@@ -489,9 +489,9 @@ async function main() {
 
   log("\n━━━ Phase 3: 分享并更新资源站 ━━━\n");
 
-  // 等待几秒让服务器索引完成
-  log("等待服务器处理...");
-  await sleep(5000);
+  // 等待一段时间让服务器完成文件索引
+  log("等待服务器处理文件索引...");
+  await sleep(10000);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // Phase 3: 分享所有成功下载的文件
@@ -510,19 +510,25 @@ async function main() {
       continue;
     }
 
-    // 分享
+    // 分享（最多重试 6 次，每次间隔递增）
     let shareDone = false;
     let shareUrl = null;
 
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    for (let attempt = 1; attempt <= 6; attempt++) {
       try {
         if (attempt > 1) {
-          await sleep(attempt * 3000);
-          // 重试前重新查找文件 ID（可能刚完成索引）
+          const waitSec = attempt * 5;
+          log(`  等待 ${waitSec}s 后重试...`);
+          await sleep(waitSec * 1000);
+          // 重新查找最新的 fileId
           const freshId = await findFileInFolder(task.filename, folderId);
-          if (freshId && freshId !== task.fileId) {
-            log(`  fileId 已更新: ${task.fileId} → ${freshId}`);
+          if (freshId) {
+            if (freshId !== task.fileId) {
+              log(`  fileId 已更新: ${task.fileId} → ${freshId}`);
+            }
             task.fileId = freshId;
+          } else {
+            warn(`  未找到文件 ${task.filename}，继续使用旧 ID`);
           }
         }
 
@@ -532,16 +538,14 @@ async function main() {
         shareDone = true;
         break;
       } catch (err) {
-        if (err.message.includes("文件已被删除或移动") || err.message.includes("分享ID非法")) {
-          warn(`  分享失败 (${err.message})，重新查找文件...`);
-          const freshId = await findFileInFolder(task.filename, folderId);
-          if (freshId) {
-            log(`  重新找到 fileId=${freshId}`);
-            task.fileId = freshId;
-          }
+        const msg = err.message || "";
+        if (msg.includes("文件已被删除或移动") || msg.includes("分享ID非法")) {
+          warn(`  文件尚未就绪 (${msg})，${attempt}/6`);
+        } else {
+          warn(`  分享失败: ${msg}`);
         }
-        if (attempt === MAX_RETRIES) {
-          error_(`[${i + 1}/${tasks.length}] ✗ 分享失败: ${err.message}`);
+        if (attempt === 6) {
+          error_(`[${i + 1}/${tasks.length}] ✗ 分享失败 (已重试6次): ${msg}`);
         }
       }
     }

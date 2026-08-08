@@ -224,7 +224,9 @@ async function findFileInFolder(fileName, parentFileId) {
  */
 async function uploadFile(filePath, fileName, parentFileId) {
   const size = await fileSize(filePath);
+  log(`  计算文件 MD5...`);
   const etag = await md5FromFile(filePath);
+  log(`  MD5: ${etag}`);
 
   log(`  上传 ${fileName} (${(size / 1024 / 1024).toFixed(1)}MB)...`);
 
@@ -294,7 +296,8 @@ async function uploadFile(filePath, fileName, parentFileId) {
 
   // Step 3: 逐个分片：获取预签名 URL → PUT 上传
   const logInterval = totalParts > 100 ? 5 : 10; // 大文件每 5% 报告进度
-  log(`  共 ${totalParts} 个分片，开始上传...`);
+  log(`  共 ${totalParts} 个分片，每片 ${(sliceSize / 1024 / 1024).toFixed(1)}MB，开始上传...`);
+  const uploadStartTime = Date.now();
 
   for (let i = 1; i <= totalParts; i++) {
     if (uploadedParts.has(i)) continue;
@@ -307,7 +310,10 @@ async function uploadFile(filePath, fileName, parentFileId) {
     let lastErr = null;
 
     for (let retry = 0; retry < 3 && !sliceOk; retry++) {
-      if (retry > 0) await sleep(3000 * retry);
+      if (retry > 0) {
+        warn(`  分片 ${i}/${totalParts} 重试 ${retry}/3...`);
+        await sleep(2000);
+      }
 
       try {
         // 获取预签名上传 URL
@@ -317,7 +323,7 @@ async function uploadFile(filePath, fileName, parentFileId) {
         });
 
         const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 300_000); // 每个分片 5 分钟超时
+        const timer = setTimeout(() => ctrl.abort(), 120_000); // 每个分片 2 分钟超时
 
         const putRes = await fetch(urlData.presignedURL, {
           method: "PUT",
@@ -335,7 +341,9 @@ async function uploadFile(filePath, fileName, parentFileId) {
       } catch (err) {
         lastErr = err;
         if (err.name === "AbortError") {
-          warn(`  分片 ${i} PUT 超时`);
+          warn(`  分片 ${i}/${totalParts} PUT 超时 (2分钟)`);
+        } else {
+          warn(`  分片 ${i}/${totalParts} 失败: ${err.message}`);
         }
       }
     }
@@ -344,10 +352,13 @@ async function uploadFile(filePath, fileName, parentFileId) {
       throw new Error(`分片 ${i}/${totalParts} 上传失败: ${lastErr?.message}`);
     }
 
-    // 每 logInterval% 打印进度
+    // 每 logInterval% 打印进度（含预估剩余时间）
     const pct = Math.round((i / totalParts) * 100);
     if (pct >= lastLogPercent + logInterval || i === totalParts) {
-      log(`  上传进度: ${pct}% (${i}/${totalParts})`);
+      const elapsed = (Date.now() - uploadStartTime) / 1000;
+      const eta = i > 0 ? (elapsed / i) * (totalParts - i) : 0;
+      const etaStr = eta > 60 ? `${Math.round(eta / 60)}分钟` : `${Math.round(eta)}秒`;
+      log(`  上传进度: ${pct}% (${i}/${totalParts})，预计剩余 ${etaStr}`);
       lastLogPercent = Math.floor(pct / logInterval) * logInterval;
     }
   }

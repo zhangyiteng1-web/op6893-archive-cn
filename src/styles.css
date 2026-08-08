@@ -15,6 +15,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -35,7 +36,7 @@ body {
     auto,
     auto,
     auto;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body::before {
@@ -69,6 +70,7 @@ a:hover {
 main {
   width: min(1220px, calc(100% - 32px));
   margin: 0 auto;
+  overflow-x: hidden;
 }
 
 /* Toast */
@@ -98,6 +100,7 @@ main {
 .hero {
   position: relative;
   padding: 26px 0 38px;
+  overflow: hidden;
 }
 
 .hero::after {

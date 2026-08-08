@@ -334,7 +334,7 @@ function flattenIndexEntries(indexData) {
 }
 
 async function main() {
-  log("=== 123pan 离线下载 Mirror Script ===");
+  log("=== 123pan 离线下载 Mirror Script (批量模式) ===");
   log(`代理前缀: ${PROXY_PREFIX}`);
   log(`轮询超时: ${POLL_TIMEOUT_MIN} 分钟`);
 
@@ -366,64 +366,147 @@ async function main() {
     return;
   }
 
-  log(`待处理: ${pending.length} 个文件\n`);
+  log(`待处理: ${pending.length} 个文件`);
+  log("");
 
-  let success = 0;
-  let failed = 0;
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Phase 1: 批量提交所有离线下载任务
+  // ═══════════════════════════════════════════════════════════════════════════
+  log("━━━ Phase 1: 批量提交离线下载 ━━━");
+
+  const tasks = []; // { taskID, filename, entry, category, index, proxyUrl }
 
   for (let i = 0; i < pending.length; i++) {
-    const { entry, category, index, filename } = pending[i];
-
-    log(`[${i + 1}/${pending.length}] ${entry.name || filename}`);
-
-    // 构建代理 URL
-    const proxyUrl = `${PROXY_PREFIX}/${entry.url}`;
-
-    let fileId = null;
+    const item = pending[i];
+    const proxyUrl = `${PROXY_PREFIX}/${item.entry.url}`;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        if (attempt > 1) {
-          log(`  重试 ${attempt}/${MAX_RETRIES}...`);
-          await sleep(5000);
-        }
+        if (attempt > 1) await sleep(3000);
 
-        // 先检查文件是否已存在
-        fileId = await findFileInFolder(filename, folderId);
-        if (fileId) {
-          log(`  文件已存在云端, id=${fileId}`);
+        // 先检查是否已存在
+        const existingId = await findFileInFolder(item.filename, folderId);
+        if (existingId) {
+          log(`[${i + 1}/${pending.length}] ${item.entry.name || item.filename} — 已存在云端, id=${existingId}`);
+          tasks.push({ taskID: null, filename: item.filename, entry: item.entry, category: item.category, index: item.index, proxyUrl, fileId: existingId });
           break;
         }
 
-        // Step 1: 提交离线下载
-        const taskID = await submitOfflineDownload(proxyUrl, filename, folderId);
-
-        // Step 2: 轮询等待完成
-        await waitForOfflineDownload(taskID, filename);
-
-        // Step 3: 查找文件
-        fileId = await waitForFileToAppear(filename, folderId);
-        if (fileId) {
-          log(`  找到文件, id=${fileId}`);
-          break;
-        }
-
-        throw new Error("离线下载完成但找不到文件");
+        const taskID = await submitOfflineDownload(proxyUrl, item.filename, folderId);
+        log(`[${i + 1}/${pending.length}] ${item.entry.name || item.filename} → taskID=${taskID}`);
+        tasks.push({ taskID, filename: item.filename, entry: item.entry, category: item.category, index: item.index, proxyUrl });
+        break;
       } catch (err) {
-        if (attempt < MAX_RETRIES) {
-          warn(`  重试 ${attempt}/${MAX_RETRIES}: ${err.message}`);
-        } else {
-          error_(`  ✗ 失败: ${err.message}`);
+        if (attempt === MAX_RETRIES) {
+          error_(`[${i + 1}/${pending.length}] ✗ 提交失败: ${err.message}`);
+          tasks.push({ taskID: null, filename: item.filename, entry: item.entry, category: item.category, index: item.index, proxyUrl, error: err.message });
         }
       }
     }
+    await sleep(500); // 避免请求太快
+  }
 
-    if (!fileId) {
+  log(`\n已提交 ${tasks.filter(t => t.taskID || t.fileId).length}/${tasks.length} 个任务\n`);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Phase 2: 等待全部下载完成
+  // ═══════════════════════════════════════════════════════════════════════════
+  log("━━━ Phase 2: 等待全部下载完成 ━━━");
+
+  const activeTasks = tasks.filter(t => t.taskID && !t.fileId); // 只等真正需要下载的
+  const startTime = Date.now();
+  const timeoutMs = POLL_TIMEOUT_MIN * 60 * 1000;
+  let lastSummaryPct = -1;
+
+  while (activeTasks.length > 0) {
+    const elapsed = (Date.now() - startTime) / 1000;
+    if (elapsed * 1000 > timeoutMs) {
+      warn(`轮询超时 (${POLL_TIMEOUT_MIN}分钟)，剩余 ${activeTasks.length} 个任务未完成`);
+      break;
+    }
+
+    let completed = 0;
+    let downloading = 0;
+    let waiting = 0;
+    let activeFailed = 0;
+
+    const stillActive = [];
+
+    for (const task of activeTasks) {
+      try {
+        const progress = await getOfflineProgress(task.taskID);
+        const pct = Math.round(progress.process || 0);
+
+        if (progress.status === 2) {
+          completed++;
+          // 查找文件
+          const fileId = await waitForFileToAppear(task.filename, folderId);
+          if (fileId) {
+            task.fileId = fileId;
+            log(`  ✓ ${task.filename} — 下载完成, fileId=${fileId}`);
+          } else {
+            task.error = "下载完成但找不到文件";
+            log(`  ✗ ${task.filename} — ${task.error}`);
+          }
+        } else if (progress.status === 3) {
+          activeFailed++;
+          task.error = "离线下载失败";
+          log(`  ✗ ${task.filename} — ${task.error}`);
+        } else if (progress.status === 4) {
+          activeFailed++;
+          task.error = "离线下载已取消";
+          log(`  ✗ ${task.filename} — ${task.error}`);
+        } else {
+          // 状态 0(等待中) 或 1(下载中)
+          if (progress.status === 0) waiting++;
+          if (progress.status === 1) downloading++;
+          stillActive.push(task);
+        }
+      } catch (err) {
+        // 查询失败，保留在 active 中重试
+        stillActive.push(task);
+      }
+      await sleep(200); // 避免请求太快
+    }
+
+    activeTasks.length = 0;
+    activeTasks.push(...stillActive);
+
+    // 汇总进度
+    const totalDone = tasks.filter(t => t.fileId || t.error).length;
+    const totalPct = Math.round((totalDone / tasks.length) * 100);
+    if (totalPct !== lastSummaryPct) {
+      const elapsedMin = Math.floor(elapsed / 60);
+      const elapsedSec = Math.floor(elapsed % 60);
+      log(`\n  总进度: ${totalDone}/${tasks.length} (${totalPct}%), 等待中:${waiting} 下载中:${downloading} 剩余:${activeTasks.length}, 已过 ${elapsedMin}分${elapsedSec}秒\n`);
+      lastSummaryPct = totalPct;
+    }
+
+    if (activeTasks.length > 0) {
+      await sleep(10000);
+    }
+  }
+
+  log("\n━━━ Phase 3: 分享并更新资源站 ━━━\n");
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Phase 3: 分享所有成功下载的文件
+  // ═══════════════════════════════════════════════════════════════════════════
+  let success = 0;
+  let failed = 0;
+
+  for (let i = 0; i < tasks.length; i++) {
+    const task = tasks[i];
+
+    if (!task.fileId) {
+      if (task.error) {
+        error_(`[${i + 1}/${tasks.length}] ✗ ${task.entry.name || task.filename}: ${task.error}`);
+      }
       failed++;
       continue;
     }
 
-    // ── 分享 ──
+    // 分享
     let shareDone = false;
     let shareUrl = null;
 
@@ -431,16 +514,14 @@ async function main() {
       try {
         if (attempt > 1) await sleep(3000);
 
-        const result = await createShare(fileId, filename);
+        const result = await createShare(task.fileId, task.filename);
         shareUrl = result.shareUrl;
-        log(`  分享链接: ${shareUrl}`);
+        log(`[${i + 1}/${tasks.length}] ✓ ${task.entry.name || task.filename} → ${shareUrl}`);
         shareDone = true;
         break;
       } catch (err) {
-        if (attempt < MAX_RETRIES) {
-          warn(`  分享重试 ${attempt}/${MAX_RETRIES}: ${err.message}`);
-        } else {
-          error_(`  ✗ 分享失败: ${err.message}`);
+        if (attempt === MAX_RETRIES) {
+          error_(`[${i + 1}/${tasks.length}] ✗ 分享失败: ${err.message}`);
         }
       }
     }
@@ -450,27 +531,20 @@ async function main() {
       continue;
     }
 
-    // Update index
-    indexData[category][index].url_123pan = shareUrl;
-    shares[String(fileId)] = { shareUrl, fileName: filename, sharedAt: new Date().toISOString() };
-
+    // 更新 index
+    indexData[task.category][task.index].url_123pan = shareUrl;
+    shares[String(task.fileId)] = { shareUrl, fileName: task.filename, sharedAt: new Date().toISOString() };
     success++;
 
-    // Save progress every 3 files
-    if ((i + 1) % 3 === 0) {
-      await saveShares(shares);
-      await saveIndex(indexData);
-      log("  [已保存进度]\n");
-    }
-
-    await sleep(2000);
+    await sleep(500);
   }
 
   // Final save
   await saveShares(shares);
   await saveIndex(indexData);
+  log("  [index.json 已更新]\n");
 
-  log(`\n=== 完成: ${success} 成功, ${failed} 失败 ===`);
+  log(`=== 完成: ${success} 成功, ${failed} 失败 ===`);
 
   if (failed > 0) process.exit(1);
 }

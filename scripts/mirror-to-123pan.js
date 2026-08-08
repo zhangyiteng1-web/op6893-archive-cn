@@ -1,52 +1,55 @@
 /**
- * 123pan mirror script
- * - Authenticates via pre-obtained Bearer token (PAN123_TOKEN) or phone+password login
- * - Reads public/index.json and compares with public/.mirrored.json
- * - Downloads new files from archive.org → uploads to 123pan → creates share link
- * - Replaces download URLs in index.json with 123pan share links
+ * 123pan OpenAPI mirror script (官方文档对齐版)
+ * - Uses official OpenAPI V2 (https://open-api.123pan.com)
+ * - Auth via CLIENT_ID + CLIENT_SECRET → access_token
+ * - Downloads from archive.org → uploads via OpenAPI V2 → creates share → updates index.json
  *
- * Required env vars (one of):
- *   PAN123_TOKEN    - 123pan Bearer token (preferred, avoids verification code)
+ * 官方文档: https://123yunpan.yuque.com/org-wiki-123yunpan-muaork/cr6ced
+ * 注册获取凭证: https://www.123pan.com/open/
  *
- * Fallback env vars (if no token):
- *   PAN123_PHONE    - 123pan account phone number
- *   PAN123_PASSWORD - 123pan account password
+ * Required env vars:
+ *   PAN123_CLIENT_ID     - 123pan OpenAPI client ID
+ *   PAN123_CLIENT_SECRET - 123pan OpenAPI client secret
  *
  * Optional env vars:
- *   PAN123_MAX_SIZE_MB - skip files larger than this (default: 0 = no limit)
- *   PAN123_DRY_RUN     - set to "1" to skip actual upload (test mode)
+ *   PAN123_DRY_RUN       - set to "1" to skip actual upload (test mode)
  */
 
 import { readFile, writeFile, stat, unlink, mkdir } from "node:fs/promises";
 import { createWriteStream, createReadStream } from "node:fs";
 import { createHash } from "node:crypto";
-import { basename, join } from "node:path";
+import { join } from "node:path";
 import { tmpdir } from "node:os";
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-const BASE_URL = "https://www.123pan.cn";
-const USER_API = "https://user.123pan.cn";
-const MAX_SIZE_MB = parseInt(process.env.PAN123_MAX_SIZE_MB || "0", 10); // 0 = no limit
+const API_BASE = "https://open-api.123pan.com";
 const DRY_RUN = process.env.PAN123_DRY_RUN === "1";
-const MIRRORED_FILE = "public/.mirrored.json";
+const SHARES_FILE = "public/.shares.json";
 const INDEX_FILE = "public/index.json";
-const CHUNK_SIZE = 8 * 1024 * 1024; // 8MB chunks for multipart upload
-const SMALL_FILE_THRESHOLD = 100 * 1024 * 1024; // 100MB, below this use direct upload (multipart is unreliable for small files)
 const TARGET_FOLDER_NAME = "rmx3031刷机包";
+const MAX_RETRIES = 3;
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 function log(msg) {
-  console.log(`[mirror] ${msg}`);
+  console.log(`[openapi] ${msg}`);
 }
 
 function warn(msg) {
-  console.warn(`[mirror:WARN] ${msg}`);
+  console.warn(`[openapi:WARN] ${msg}`);
 }
 
-function error(msg) {
-  console.error(`[mirror:ERROR] ${msg}`);
+function error_(msg) {
+  console.error(`[openapi:ERROR] ${msg}`);
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fileSize(path) {
+  return (await stat(path)).size;
 }
 
 function md5FromStream(stream) {
@@ -62,543 +65,253 @@ function md5FromFile(filePath) {
   return md5FromStream(createReadStream(filePath));
 }
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function md5FromBuffer(buf) {
+  return createHash("md5").update(buf).digest("hex");
 }
 
-async function fileSize(path) {
-  return (await stat(path)).size;
+/** Read a byte range from a file (streaming, no full-file memory load) */
+function readChunk(filePath, start, end) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    const stream = createReadStream(filePath, { start, end: end - 1 });
+    stream.on("data", (chunk) => chunks.push(chunk));
+    stream.on("end", () => resolve(Buffer.concat(chunks)));
+    stream.on("error", reject);
+  });
 }
 
-// ── 123pan API client ───────────────────────────────────────────────────────
+// ── OpenAPI client ──────────────────────────────────────────────────────────
 
-let authToken = null;
+let accessToken = null;
 
-function headers() {
+function authHeaders() {
   return {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${authToken}`,
-    Origin: "https://yun.123pan.cn",
-    Referer: "https://yun.123pan.cn/",
-    Platform: "web",
-    "App-Version": "3",
+    Authorization: `Bearer ${accessToken}`,
+    Platform: "open_platform",
   };
 }
 
-async function apiPost(url, body, extraHeaders = {}) {
+async function apiPost(path, body) {
+  const url = API_BASE + path;
   const res = await fetch(url, {
     method: "POST",
-    headers: { ...headers(), ...extraHeaders },
+    headers: authHeaders(),
     body: JSON.stringify(body),
   });
   const json = await res.json();
-  if (json.code !== 0 && json.code !== 200) {
-    throw new Error(`API error ${url}: code=${json.code} message=${json.message || ""}`);
+  if (json.code !== 0) {
+    throw new Error(`API error ${path}: code=${json.code} message=${json.message || ""}`);
   }
-  return json;
+  return json.data;
 }
 
-async function apiGet(url, params = {}) {
-  const u = new URL(url);
+async function apiGet(path, params = {}) {
+  const u = new URL(API_BASE + path);
   for (const [k, v] of Object.entries(params)) {
-    u.searchParams.set(k, String(v));
+    if (v !== undefined && v !== null) u.searchParams.set(k, String(v));
   }
-  const res = await fetch(u.toString(), { headers: headers() });
+  const res = await fetch(u.toString(), { headers: authHeaders() });
   const json = await res.json();
-  if (json.code !== 0 && json.code !== 200) {
-    throw new Error(`API error ${url}: code=${json.code} message=${json.message || ""}`);
+  if (json.code !== 0) {
+    throw new Error(`API error ${path}: code=${json.code} message=${json.message || ""}`);
   }
-  return json;
+  return json.data;
 }
 
-// ── Login ───────────────────────────────────────────────────────────────────
-
-/**
- * Validate that the current token is still usable.
- */
-async function validateToken() {
-  // Try multiple endpoints to validate the token, simplest first
-  const endpoints = [
-    { url: `${BASE_URL}/a/api/user/info`, method: "GET" },
-    { url: `https://www.123pan.cn/a/api/user/info`, method: "GET" },
-    { url: `${BASE_URL}/b/api/file/list/new?driveId=0&parentFileId=0&limit=1`, method: "GET" },
-  ];
-
-  log(`Validating token (${endpoints.length} endpoints)...`);
-
-  for (const { url, method } of endpoints) {
-    try {
-      const res = await fetch(url, { method, headers: headers() });
-      const json = await res.json();
-      if (json.code === 0 || json.code === 200) {
-        log(`Token is valid (${url.split("?")[0]})`);
-        return true;
-      }
-      log(`  ${url.split("?")[0]}: code=${json.code} ${json.message || ""}`);
-    } catch (err) {
-      log(`  ${url.split("?")[0]}: ${err.message}`);
-    }
-  }
-
-  return false;
-}
+// ── Auth ────────────────────────────────────────────────────────────────────
 
 async function login() {
-  // 1. Try token first (most reliable, avoids overseas IP block)
-  let token = process.env.PAN123_TOKEN;
+  const clientId = process.env.PAN123_CLIENT_ID;
+  const clientSecret = process.env.PAN123_CLIENT_SECRET;
 
-  if (token) {
-    // Strip "Bearer " prefix if user pasted the full header
-    token = token.replace(/^Bearer\s+/i, "").trim();
-    authToken = token;
-    log("Using PAN123_TOKEN...");
-
-    const valid = await validateToken();
-    if (valid) {
-      log("Token is valid, proceeding");
-      return;
-    }
-
-    warn("Token validation failed — check the log above for the API response code");
+  if (!clientId || !clientSecret) {
+    throw new Error(
+      "请设置 PAN123_CLIENT_ID 和 PAN123_CLIENT_SECRET 环境变量。\n" +
+      "在 https://www.123pan.com/open/ 注册开发者应用获取。"
+    );
   }
 
-  // 2. Fallback: phone + password (may be blocked for overseas IPs)
-  const phone = process.env.PAN123_PHONE;
-  const password = process.env.PAN123_PASSWORD;
+  log("获取 access_token...");
+  const res = await fetch(`${API_BASE}/api/v1/access_token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Platform: "open_platform",
+    },
+    body: JSON.stringify({
+      clientID: clientId,
+      clientSecret: clientSecret,
+    }),
+  });
 
-  if (phone && password) {
-    log(`Logging into 123pan as ${phone}...`);
-
-    const res = await fetch(`${USER_API}/api/user/sign_in`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Origin: "https://yun.123pan.cn",
-        Referer: "https://yun.123pan.cn/",
-        Platform: "web",
-        "App-Version": "3",
-      },
-      body: JSON.stringify({
-        remember: true,
-        passport: phone,
-        password: password,
-      }),
-    });
-
-    const json = await res.json();
-
-    if (json.code === 200) {
-      authToken = json.data.token;
-      log("Login successful");
-      log(`TOKEN_FOR_REUSE: ${authToken}`);
-      return;
-    }
-
-    warn(`Login failed: code=${json.code} message=${json.message || ""}`);
-    throw new Error(`Login blocked: ${json.message || JSON.stringify(json)}`);
+  const json = await res.json();
+  if (json.code !== 0) {
+    throw new Error(`获取token失败: code=${json.code} message=${json.message || ""}`);
   }
 
-  throw new Error(
-    "Token验证失败。请重新从 get-token.html 获取Token，确保完整复制。"
-  );
+  accessToken = json.data.accessToken;
+  log("access_token 获取成功");
 }
-
-// ── Upload ───────────────────────────────────────────────────────────────────
 
 // ── Folder management ───────────────────────────────────────────────────────
 
-/**
- * Standard params for the /b/api/file/list/new web API.
- */
-function listParams(parentFileId, opts = {}) {
-  return {
-    driveId: 0,
-    parentFileId: String(parentFileId),
-    limit: opts.limit || 100,
-    orderBy: "file_id",
-    orderDirection: "desc",
-    trashed: false,
-    Page: String(opts.page || 1),
-    SearchData: opts.searchData || "",
-    searchType: opts.searchType || 0,
-    OnlyLookAbnormalFile: 0,
-  };
-}
-
-/**
- * Extract items from a list API response. The web API returns data.InfoList.
- */
-function extractItems(res) {
-  return res.data?.InfoList || res.data?.fileList || res.data?.infoList || [];
-}
-
-/**
- * Normalize item field names (web API uses FileName, FileId, Type).
- */
-function itemName(item) {
-  return item.FileName || item.fileName || item.filename || "";
-}
-
-function itemId(item) {
-  return item.FileId || item.fileId || item.fileID || 0;
-}
-
-function itemType(item) {
-  return item.Type !== undefined ? item.Type : item.type;
-}
-
-/**
- * Find or create the target folder. Returns folderId.
- */
 async function findOrCreateFolder() {
-  // Strategy 1: Search by name
-  try {
-    const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, listParams(0, {
-      searchData: TARGET_FOLDER_NAME,
-      searchType: 1,
-    }));
-    const items = extractItems(res);
-    for (const item of items) {
-      if (itemName(item) === TARGET_FOLDER_NAME && itemType(item) === 1) {
-        const id = itemId(item);
-        log(`Found existing folder "${TARGET_FOLDER_NAME}", id=${id}`);
-        return id;
-      }
-    }
-  } catch (err) {
-    warn(`  Folder search failed: ${err.message}`);
-  }
-
-  // Strategy 2: Paginate through root
-  try {
-    for (let page = 1; page <= 10; page++) {
-      const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, listParams(0, { page }));
-      const items = extractItems(res);
-      if (!items.length) break;
-      for (const item of items) {
-        if (itemName(item) === TARGET_FOLDER_NAME && itemType(item) === 1) {
-          const id = itemId(item);
-          log(`Found existing folder "${TARGET_FOLDER_NAME}" via listing (page ${page}), id=${id}`);
-          return id;
-        }
-      }
-      if (items.length < 100) break;
-    }
-  } catch (err) {
-    warn(`  Folder listing failed: ${err.message}`);
-  }
-
-  // Strategy 3: Create the folder — try multiple endpoints
-  log(`Creating folder "${TARGET_FOLDER_NAME}"...`);
-  const mkdirEndpoints = [
-    { url: `${BASE_URL}/b/api/file/newFolder`, body: { driveId: 0, parentFileId: 0, folderName: TARGET_FOLDER_NAME } },
-    { url: `${BASE_URL}/b/api/file/mkdir`, body: { driveId: 0, name: TARGET_FOLDER_NAME, parentFileId: 0 } },
-    { url: `${BASE_URL}/upload/v1/file/mkdir`, body: { name: TARGET_FOLDER_NAME, parentID: 0 } },
-  ];
-
-  let lastErr = null;
-  for (const { url, body } of mkdirEndpoints) {
-    try {
-      const res = await apiPost(url, body);
-      const folderId = res.data?.fileId || res.data?.fileID || res.data?.FileId || res.data?.dirID;
-      if (folderId) {
-        log(`Folder created via ${url.split("/").pop()}, id=${folderId}`);
-        return folderId;
-      }
-      log(`  ${url}: created but no folderId in response: ${JSON.stringify(res.data).slice(0, 100)}`);
-    } catch (err) {
-      lastErr = err;
-      log(`  ${url.split("/").pop()}: ${err.message}`);
+  const res = await apiGet("/api/v2/file/list", { parentFileId: 0, limit: 100 });
+  const fileList = res.fileList || res.file_list || [];
+  for (const item of fileList) {
+    const name = item.filename || item.fileName || "";
+    if (name === TARGET_FOLDER_NAME && (item.type === 1 || item.fileType === 1)) {
+      log(`找到文件夹: "${TARGET_FOLDER_NAME}", id=${item.fileId || item.fileID}`);
+      return item.fileId || item.fileID;
     }
   }
 
-  throw new Error(`Failed to create folder after trying ${mkdirEndpoints.length} endpoints. Last error: ${lastErr?.message}`);
+  log(`创建文件夹 "${TARGET_FOLDER_NAME}"...`);
+  const data = await apiPost("/upload/v1/file/mkdir", {
+    name: TARGET_FOLDER_NAME,
+    parentID: 0,
+  });
+  log(`文件夹创建成功, id=${data.dirID}`);
+  return data.dirID;
 }
 
-/**
- * Search for a file by name in the target folder.
- * Returns fileId or null.
- */
 async function findFileInFolder(fileName, parentFileId) {
-  // Strategy 1: Use search API
-  try {
-    const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, listParams(parentFileId, {
-      searchData: fileName,
-      searchType: 1,
-    }));
-    const items = extractItems(res);
-    for (const item of items) {
-      if (itemName(item) === fileName) {
-        const id = itemId(item);
-        log(`  Found existing file via search: id=${id}`);
-        return id;
-      }
-    }
-  } catch (err) {
-    warn(`  Search API failed: ${err.message}, trying listing...`);
+  const res = await apiGet("/api/v2/file/list", { parentFileId, limit: 100, searchData: fileName, searchMode: 1 });
+  const fileList = res.fileList || res.file_list || [];
+  for (const item of fileList) {
+    const name = item.filename || item.fileName || "";
+    if (name === fileName) return item.fileId || item.fileID;
   }
-
-  // Strategy 2: Paginate through target folder
-  try {
-    for (let page = 1; page <= 10; page++) {
-      const res = await apiGet(`${BASE_URL}/b/api/file/list/new`, listParams(parentFileId, { page }));
-      const items = extractItems(res);
-      if (!items.length) break;
-      for (const item of items) {
-        if (itemName(item) === fileName) {
-          const id = itemId(item);
-          log(`  Found existing file via listing (page ${page}): id=${id}`);
-          return id;
-        }
-      }
-      if (items.length < 100) break;
-    }
-  } catch (err) {
-    warn(`  File listing failed: ${err.message}`);
-  }
-
   return null;
 }
 
-async function uploadRequest(fileName, etag, size, parentFileId) {
-  return apiPost(`${BASE_URL}/b/api/file/upload_request`, {
-    driveId: 0,
-    etag,
-    fileName,
-    parentFileId,
-    size,
-    type: 0,
-    duplicate: 0,
-  });
-}
-
-async function uploadComplete(fileId) {
-  return apiPost(`${BASE_URL}/b/api/file/upload_complete`, { fileId });
-}
-
-async function s3PrepareUploadParts(bucket, key, uploadId, storageNode, start, end) {
-  return apiPost(`${BASE_URL}/b/api/file/s3_repare_upload_parts_batch`, {
-    bucket,
-    key,
-    partNumberEnd: end,
-    partNumberStart: start,
-    uploadId,
-    storageNode,
-  });
-}
-
-async function s3CompleteMultipartUpload(bucket, key, uploadId, storageNode) {
-  return apiPost(`${BASE_URL}/b/api/file/s3_complete_multipart_upload`, {
-    bucket,
-    key,
-    uploadId,
-    storageNode,
-  });
-}
+// ── Upload (V2 API) ─────────────────────────────────────────────────────────
 
 /**
- * Upload a batch of chunks to S3 presigned URLs in parallel.
- */
-async function uploadBatch(batch, bucket, key, uploadId, storageNode) {
-  const start = batch[0].partNumber;
-  const end = batch[batch.length - 1].partNumber;
-
-  const partsRes = await s3PrepareUploadParts(bucket, key, uploadId, storageNode, start, end);
-  const presignedUrls = partsRes.data?.presignedUrls;
-
-  if (!presignedUrls) {
-    throw new Error(`No presigned URLs for parts ${start}-${end}`);
-  }
-
-  await Promise.all(
-    batch.map(async (chunk) => {
-      const url = presignedUrls[String(chunk.partNumber)] || presignedUrls[chunk.partNumber - 1];
-      if (!url) {
-        throw new Error(`No presigned URL for part ${chunk.partNumber}`);
-      }
-
-      const putRes = await fetch(url, {
-        method: "PUT",
-        body: chunk.data,
-        headers: { "Content-Type": "application/octet-stream" },
-      });
-
-      if (!putRes.ok) {
-        throw new Error(`PUT part ${chunk.partNumber} failed: ${putRes.status}`);
-      }
-    })
-  );
-}
-
-/**
- * Upload a local file to 123pan inside the target folder.
- * Returns { fileId, fileName }.
+ * Upload a file to 123pan via OpenAPI V2.
+ * Uses streaming reads to avoid loading entire file into memory.
+ * Returns fileID.
  */
 async function uploadFile(filePath, fileName, parentFileId) {
   const size = await fileSize(filePath);
   const etag = await md5FromFile(filePath);
 
-  log(`  Uploading ${fileName} (${(size / 1024 / 1024).toFixed(1)}MB)...`);
+  log(`  上传 ${fileName} (${(size / 1024 / 1024).toFixed(1)}MB)...`);
 
   if (DRY_RUN) {
-    log(`[DRY RUN] Would upload ${fileName} to folder ${parentFileId}`);
-    return { fileId: `dry_run_${Date.now()}`, fileName };
+    log("  [DRY RUN] 跳过上传");
+    return `dry_${Date.now()}`;
   }
 
-  // Step 1: upload_request
-  let reqRes = await uploadRequest(fileName, etag, size, parentFileId);
+  // Step 1: V2 Create upload
+  const data = await apiPost("/upload/v2/file/create", {
+    parentFileID: parentFileId,
+    filename: fileName,
+    etag: etag,
+    size: size,
+  });
 
-  if (reqRes.data.Reuse) {
-    let fileId = reqRes.data.FileId;
-    if (!fileId || fileId === 0) {
-      log(`  Reuse returned fileId=0, searching in folder...`);
-      fileId = await findFileInFolder(fileName, parentFileId);
-    }
-    if (fileId && fileId !== 0) {
-      log(`  File already exists on 123pan (reuse), fileId=${fileId}`);
-      return { fileId, fileName };
-    }
-    // Could not find fileId — force a fresh upload with duplicate=1
-    warn(`  Could not find existing fileId, forcing fresh upload...`);
-    reqRes = await apiPost(`${BASE_URL}/b/api/file/upload_request`, {
-      driveId: 0,
-      etag,
-      fileName,
-      parentFileId,
-      size,
-      type: 0,
-      duplicate: 1,
-    });
-    if (reqRes.data.Reuse) {
-      throw new Error(`Still got Reuse after forcing duplicate=1 for ${fileName}`);
-    }
-    log(`  Forced fresh upload for ${fileName}`);
+  // 秒传：文件已存在
+  if (data.reuse) {
+    log("  文件已存在，秒传成功");
+    if (data.fileID) return data.fileID;
+    const existingId = await findFileInFolder(fileName, parentFileId);
+    if (existingId) return existingId;
+    return data.fileID;
   }
 
-  const { Bucket: bucket, StorageNode: storageNode, Key: key, UploadId: uploadId, FileId: fileId } = reqRes.data;
+  const preuploadID = data.preuploadID;
+  const sliceSize = data.sliceSize;
+  const servers = data.servers || [];
+  const uploadServer = (servers.length > 0 ? servers[0] : API_BASE).replace(/\/$/, "");
 
-  if (size === 0) {
-    // 0-byte file: skip PUT, just complete upload
-    log(`  0-byte file, completing upload directly...`);
-    await uploadComplete(fileId);
-    return { fileId, fileName };
-  }
+  // Step 2: Upload each slice via multipart form
+  const totalParts = Math.ceil(size / sliceSize);
 
-  if (size <= SMALL_FILE_THRESHOLD) {
-    // Small file: get presigned URL for single-part upload
-    const partsRes = await s3PrepareUploadParts(bucket, key, uploadId, storageNode, 1, 1);
-    const presignedUrl = partsRes.data?.presignedUrls?.["1"] || partsRes.data?.presignedUrls?.[0];
+  for (let i = 1; i <= totalParts; i++) {
+    const start = (i - 1) * sliceSize;
+    const end = Math.min(start + sliceSize, size);
 
-    if (!presignedUrl) {
-      throw new Error("No presigned URL returned for small file upload");
-    }
+    // Read chunk and compute its MD5 (streaming, no full-file load)
+    const chunk = await readChunk(filePath, start, end);
+    const sliceMD5 = md5FromBuffer(chunk);
 
-    const fileBuffer = await readFile(filePath);
-    const putRes = await fetch(presignedUrl, {
-      method: "PUT",
-      body: fileBuffer,
-      headers: { "Content-Type": "application/octet-stream" },
+    // Build multipart form
+    const form = new FormData();
+    form.append("preuploadID", preuploadID);
+    form.append("sliceNo", String(i));
+    form.append("sliceMD5", sliceMD5);
+    form.append("filename", fileName);
+    form.append("slice", new Blob([chunk]), fileName);
+
+    const sliceUrl = `${uploadServer}/upload/v2/file/slice`;
+    const sliceRes = await fetch(sliceUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Platform: "open_platform",
+      },
+      body: form,
     });
 
-    if (!putRes.ok) {
-      throw new Error(`PUT to presigned URL failed: ${putRes.status} ${putRes.statusText}`);
+    const sliceJson = await sliceRes.json();
+    if (sliceJson.code !== 0) {
+      throw new Error(`分片 ${i}/${totalParts} 上传失败: code=${sliceJson.code} message=${sliceJson.message || ""}`);
     }
-  } else {
-    // Large file: multipart upload — stream in batches to avoid memory blowup
-
-    const stream = createReadStream(filePath, { highWaterMark: CHUNK_SIZE });
-
-    let partNumber = 0;
-    const BATCH_SIZE = 10;
-    let batch = [];
-
-    for await (const chunk of stream) {
-      partNumber++;
-      batch.push({ data: chunk, partNumber, size: chunk.length });
-
-      if (batch.length >= BATCH_SIZE) {
-        await uploadBatch(batch, bucket, key, uploadId, storageNode);
-        batch = [];
-      }
-    }
-
-    // Upload remaining
-    if (batch.length > 0) {
-      await uploadBatch(batch, bucket, key, uploadId, storageNode);
-    }
-
-    // Complete multipart upload
-    await s3CompleteMultipartUpload(bucket, key, uploadId, storageNode);
-    // Wait for server-side assembly
-    await sleep(3000);
   }
 
-  // Complete upload with retry (server may need time to finalize)
-  for (let retry = 1; retry <= 3; retry++) {
+  // Step 3: Complete upload (poll until done)
+  log(`  所有分片上传完成，等待服务器合并...`);
+  for (let attempt = 1; attempt <= 60; attempt++) {
+    await sleep(2000);
     try {
-      await uploadComplete(fileId);
-      break;
-    } catch (err) {
-      if (retry < 3 && err.message.includes("5053")) {
-        await sleep(3000);
-      } else {
-        throw err;
+      const completeData = await apiPost("/upload/v2/file/upload_complete", { preuploadID });
+      if (completeData.completed && completeData.fileID) {
+        log(`  上传完成 fileId=${completeData.fileID}`);
+        return completeData.fileID;
       }
+    } catch (err) {
+      // Keep polling — server may still be processing
+    }
+    if (attempt % 10 === 0) {
+      log(`  等待合并中... (${attempt}/60)`);
     }
   }
 
-  return { fileId, fileName };
+  throw new Error("上传超时：60次轮询后仍未完成");
 }
 
 // ── Share ────────────────────────────────────────────────────────────────────
 
-/**
- * Create a share link for a file.
- * Returns { shareUrl, shareKey }.
- */
-async function createShare(fileId, fileName, shareName) {
+async function createShare(fileId, fileName) {
   if (DRY_RUN) {
     return { shareUrl: `https://www.123pan.com/s/dry_run`, shareKey: "dry_run" };
   }
 
-  const res = await apiPost(`${BASE_URL}/a/api/share/create`, {
-    driveId: 0,
-    expiration: "2099-12-31T23:59:59+08:00", // Far future = permanent
-    fileIdList: String(fileId),
-    shareName: shareName || fileName,
+  const data = await apiPost("/api/v1/share/create", {
+    shareName: fileName,
+    shareExpire: 0, // 0 = 永久有效
+    fileIDList: [fileId],
     sharePwd: "",
   });
 
-  const shareKey = res.data?.ShareKey;
-  if (!shareKey) {
-    throw new Error(`Share creation returned no ShareKey: ${JSON.stringify(res)}`);
-  }
-
-  const shareUrl = `https://www.123pan.com/s/${shareKey}`;
+  const shareUrl = data.shareUrl || data.share_url || `https://www.123pan.com/s/${data.shareKey || data.share_key}`;
+  const shareKey = data.shareKey || data.share_key || "";
   return { shareUrl, shareKey };
 }
 
-// ── Download file from archive.org ──────────────────────────────────────────
+// ── Download ─────────────────────────────────────────────────────────────────
 
-/**
- * Download a file using fetch() stream.
- */
 async function downloadFile(url, destPath) {
   if (DRY_RUN) {
     await writeFile(destPath, "dummy");
     return;
   }
 
-  await downloadWithFetch(url, destPath);
-}
-
-/**
- * Download a file using fetch() stream.
- */
-async function downloadWithFetch(url, destPath) {
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error(`Download failed: ${res.status} ${res.statusText}`);
+    throw new Error(`下载失败: ${res.status} ${res.statusText}`);
   }
 
   const fileStream = createWriteStream(destPath);
@@ -614,206 +327,153 @@ async function downloadWithFetch(url, destPath) {
   await new Promise((resolve) => fileStream.on("finish", resolve));
 }
 
-// ── Main mirror logic ───────────────────────────────────────────────────────
+// ── State ────────────────────────────────────────────────────────────────────
 
-async function loadMirrored() {
-  try {
-    const raw = await readFile(MIRRORED_FILE, "utf8");
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
+async function loadShares() {
+  try { return JSON.parse(await readFile(SHARES_FILE, "utf8")); } catch { return {}; }
 }
 
-async function saveMirrored(data) {
+async function saveShares(data) {
   await mkdir("public", { recursive: true });
-  await writeFile(MIRRORED_FILE, JSON.stringify(data, null, 2), "utf8");
+  await writeFile(SHARES_FILE, JSON.stringify(data, null, 2), "utf8");
 }
 
 async function loadIndex() {
-  const raw = await readFile(INDEX_FILE, "utf8");
-  return JSON.parse(raw);
+  return JSON.parse(await readFile(INDEX_FILE, "utf8"));
 }
 
 async function saveIndex(data) {
   await writeFile(INDEX_FILE, JSON.stringify(data, null, 2), "utf8");
 }
 
-function flattenFiles(indexData) {
+// ── Main ─────────────────────────────────────────────────────────────────────
+
+function extractFilenameFromUrl(url) {
+  try {
+    return decodeURIComponent(new URL(url).pathname.split("/").pop());
+  } catch {
+    return null;
+  }
+}
+
+function flattenIndexEntries(indexData) {
   const result = [];
   for (const [category, value] of Object.entries(indexData)) {
     if (category.startsWith("_") || !Array.isArray(value)) continue;
     for (let i = 0; i < value.length; i++) {
-      const file = value[i];
-      if (file && file.url) {
-        result.push({ file, category, index: i });
+      if (value[i] && value[i].url) {
+        result.push({ entry: value[i], category, index: i });
       }
     }
   }
   return result;
 }
 
-function isCategoryKey(key) {
-  return !key.startsWith("_");
-}
-
 async function main() {
-  log("=== 123pan Mirror Script ===");
+  log("=== 123pan OpenAPI V2 Mirror Script ===");
 
-  // 1. Login
+  // 1. Auth
   await login();
 
-  // 2. Find or create target folder
+  // 2. Find/create folder
   const folderId = await findOrCreateFolder();
 
   // 3. Load state
   const indexData = await loadIndex();
-  const mirrored = await loadMirrored();
-  const allFiles = flattenFiles(indexData);
+  const shares = await loadShares();
+  const entries = flattenIndexEntries(indexData);
 
-  log(`Loaded index: ${allFiles.length} files across ${Object.keys(indexData).filter(isCategoryKey).length} categories`);
-  log(`Previously mirrored: ${Object.keys(mirrored).length} files`);
+  log(`index.json: ${entries.length} files`);
+  log(`已分享: ${Object.keys(shares).length} files`);
 
-  // 4. Find new files
-  const newFiles = allFiles.filter((f) => !mirrored[f.file.url]);
+  // 4. Find pending files
+  const pending = [];
+  for (const { entry, category, index } of entries) {
+    const filename = extractFilenameFromUrl(entry.url);
+    if (!filename) continue;
+    if (entry.url_123pan) continue; // Already has share link
+    pending.push({ entry, category, index, filename });
+  }
 
-  if (newFiles.length === 0) {
-    log("No new files to mirror. Done.");
+  if (pending.length === 0) {
+    log("所有文件都已处理完毕！");
     return;
   }
 
-  log(`Found ${newFiles.length} new files to mirror`);
+  log(`待处理: ${pending.length} 个文件\n`);
 
-  // 5. Size check
-  let skipped = 0;
-  const toProcess = [];
-  for (const f of newFiles) {
-    if (MAX_SIZE_MB > 0 && f.file.size) {
-      const sizeMB = parseSizeMB(f.file.size);
-      if (sizeMB > MAX_SIZE_MB) {
-        warn(`Skipping ${f.file.name} (${f.file.size} > ${MAX_SIZE_MB}MB limit)`);
-        skipped++;
-        continue;
-      }
-    }
-    toProcess.push(f);
-  }
-
-  if (skipped > 0) {
-    log(`${skipped} files skipped due to size limit`);
-  }
-
-  if (toProcess.length === 0) {
-    log("No files to process after size filter. Done.");
-    return;
-  }
-
-  // 6. Process each file
-  const tmpDir = join(tmpdir(), "123pan-mirror");
+  const tmpDir = join(tmpdir(), "123pan-openapi-v2");
   await mkdir(tmpDir, { recursive: true });
 
   let success = 0;
   let failed = 0;
-  const failedFiles = [];
-  const MAX_RETRIES = 3;
 
-  for (const { file, category, index } of toProcess) {
-    const fileName = basename(new URL(file.url).pathname) || file.name || "unknown";
-    const tmpPath = join(tmpDir, fileName);
+  for (let i = 0; i < pending.length; i++) {
+    const { entry, category, index, filename } = pending[i];
+    const tmpPath = join(tmpDir, filename);
 
-    let lastErr = null;
-    let mirroredEntry = null;
+    log(`[${i + 1}/${pending.length}] ${entry.name}`);
+    let done = false;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        if (attempt > 1) {
-          const delay = Math.min(attempt * 5, 20);
-          await sleep(delay * 1000);
-        }
+        if (attempt > 1) await sleep(attempt * 5000);
 
-        log(`\n  [${file.name}] (${file.size || "unknown"})${attempt > 1 ? ` [重试 ${attempt}/${MAX_RETRIES}]` : ""}`);
+        // Download via archive.org
+        await downloadFile(entry.url, tmpPath);
 
-        // Download
-        await downloadFile(file.url, tmpPath);
+        const actualSize = await fileSize(tmpPath);
+        if (actualSize === 0) throw new Error("下载文件大小为0");
+        log(`  下载完成: ${(actualSize / 1024 / 1024).toFixed(1)}MB`);
 
-        if (!DRY_RUN) {
-          const actualSize = await fileSize(tmpPath);
-          if (actualSize === 0) {
-            throw new Error("Downloaded file is 0 bytes");
-          }
-        }
+        // Upload via OpenAPI V2
+        const fileId = await uploadFile(tmpPath, filename, folderId);
 
-        // Upload to 123pan (inside target folder)
-        const { fileId } = await uploadFile(tmpPath, fileName, folderId);
+        // Share
+        const { shareUrl, shareKey } = await createShare(fileId, filename);
+        log(`  分享链接: ${shareUrl}`);
 
-        // Create share
-        const shareName = file.name || fileName;
-        const { shareUrl } = await createShare(fileId, fileName, shareName);
-
-        // Update index.json
+        // Update index
         indexData[category][index].url_123pan = shareUrl;
-        indexData[category][index].url_original = file.url;
-
-        mirroredEntry = {
-          shareUrl,
-          fileId,
-          mirroredAt: new Date().toISOString(),
-        };
+        indexData[category][index].url_original = entry.url;
+        shares[String(fileId)] = { shareUrl, shareKey, fileName: filename, sharedAt: new Date().toISOString() };
 
         success++;
-        log(`  ✓ 完成: ${shareUrl}`);
-        break; // success, exit retry loop
+        done = true;
+        break;
       } catch (err) {
-        lastErr = err;
         if (attempt < MAX_RETRIES) {
-          warn(`  Attempt ${attempt} failed: ${err.message}`);
+          warn(`  重试 ${attempt}/${MAX_RETRIES}: ${err.message}`);
         } else {
-          error(`  ✗ Failed to mirror ${file.name} after ${MAX_RETRIES} attempts: ${err.message}`);
+          error_(`  ✗ 失败: ${err.message}`);
         }
       } finally {
-        // Clean up temp file between retries
         try { await unlink(tmpPath); } catch { /* ignore */ }
       }
     }
 
-    if (mirroredEntry) {
-      // Record in mirrored state (whether success or skipped)
-      mirrored[file.url] = mirroredEntry;
-    } else {
-      failed++;
-      failedFiles.push(`${file.name}: ${lastErr?.message || "unknown"}`);
+    if (!done) failed++;
+
+    // Save progress every 3 files
+    if ((i + 1) % 3 === 0) {
+      await saveShares(shares);
+      await saveIndex(indexData);
+      log("  [已保存进度]\n");
     }
+
+    await sleep(1000);
   }
 
-  // 7. Save state
+  // Final save
+  await saveShares(shares);
   await saveIndex(indexData);
-  await saveMirrored(mirrored);
 
-  log(`\n=== Done: ${success} succeeded, ${failed} failed, ${skipped} skipped ===`);
+  log(`\n=== 完成: ${success} 成功, ${failed} 失败 ===`);
 
-  if (failedFiles.length > 0) {
-    log(`\nFailed files:`);
-    for (const f of failedFiles) {
-      error(`  ${f}`);
-    }
-  }
-
-  if (failed > 0) {
-    process.exit(1);
-  }
-}
-
-function parseSizeMB(sizeStr) {
-  if (!sizeStr) return 0;
-  const match = String(sizeStr).trim().match(/^([\d.]+)\s*(GB|MB|KB|B)$/i);
-  if (!match) return 0;
-  const num = parseFloat(match[1]);
-  const unit = match[2].toUpperCase();
-  const multipliers = { B: 1 / 1024 / 1024, KB: 1 / 1024, MB: 1, GB: 1024 };
-  return num * (multipliers[unit] || 1);
+  if (failed > 0) process.exit(1);
 }
 
 main().catch((err) => {
-  error(`Fatal: ${err.message}`);
+  error_(`致命错误: ${err.message}`);
   process.exit(1);
 });

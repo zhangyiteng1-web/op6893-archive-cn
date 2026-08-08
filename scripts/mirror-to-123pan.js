@@ -280,11 +280,11 @@ async function uploadFile(filePath, fileName, parentFileId) {
 
   const preuploadID = data.preuploadID;
   const sliceSize = data.sliceSize;
-  const servers = data.servers || [];
-  const uploadServer = (servers.length > 0 ? servers[0] : API_BASE).replace(/\/$/, "");
+  const servers = data.servers && data.servers.length > 0 ? data.servers : [API_BASE.replace("https://", "")];
 
-  // Step 2: Upload each slice via multipart form
+  // Step 2: Upload each slice via multipart form (with retry)
   const totalParts = Math.ceil(size / sliceSize);
+  let lastLogPercent = 0;
 
   for (let i = 1; i <= totalParts; i++) {
     const start = (i - 1) * sliceSize;
@@ -293,26 +293,64 @@ async function uploadFile(filePath, fileName, parentFileId) {
     const chunk = await readChunk(filePath, start, end);
     const sliceMD5 = md5FromBuffer(chunk);
 
-    const form = new FormData();
-    form.append("preuploadID", preuploadID);
-    form.append("sliceNo", String(i));
-    form.append("sliceMD5", sliceMD5);
-    form.append("filename", fileName);
-    form.append("slice", new Blob([chunk]), fileName);
+    // 分片级重试（最多3次，轮换 upload server）
+    let sliceOk = false;
+    let lastErr = null;
 
-    const sliceUrl = `${uploadServer}/upload/v2/file/slice`;
-    const sliceRes = await fetch(sliceUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Platform: "open_platform",
-      },
-      body: form,
-    });
+    for (let retry = 0; retry < 3 && !sliceOk; retry++) {
+      if (retry > 0) await sleep(3000 * retry);
 
-    const sliceJson = await sliceRes.json();
-    if (sliceJson.code !== 0) {
-      throw new Error(`分片 ${i}/${totalParts} 上传失败: code=${sliceJson.code} message=${sliceJson.message || ""}`);
+      // 轮换使用不同的 upload server
+      const svr = servers[retry % servers.length] || servers[0];
+      const sliceUrl = `https://${svr}/upload/v2/file/slice`;
+
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 300_000); // 5 分钟超时
+
+        const form = new FormData();
+        form.append("preuploadID", preuploadID);
+        form.append("sliceNo", String(i));
+        form.append("sliceMD5", sliceMD5);
+        form.append("filename", fileName);
+        form.append("slice", new Blob([chunk]), fileName);
+
+        const sliceRes = await fetch(sliceUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Platform: "open_platform",
+          },
+          body: form,
+          signal: ctrl.signal,
+        });
+
+        clearTimeout(timer);
+
+        const sliceJson = await sliceRes.json();
+        if (sliceJson.code !== 0) {
+          throw new Error(`code=${sliceJson.code} message=${sliceJson.message || ""}`);
+        }
+        sliceOk = true;
+      } catch (err) {
+        lastErr = err;
+        if (err.name === "AbortError") {
+          warn(`  分片 ${i}/${totalParts} 超时，重试 ${retry + 1}/3...`);
+        } else {
+          warn(`  分片 ${i}/${totalParts} 失败: ${err.message}，重试 ${retry + 1}/3...`);
+        }
+      }
+    }
+
+    if (!sliceOk) {
+      throw new Error(`分片 ${i}/${totalParts} 上传失败（3次重试后）: ${lastErr?.message}`);
+    }
+
+    // 每 10% 打印进度
+    const pct = Math.round((i / totalParts) * 100);
+    if (pct >= lastLogPercent + 10 || i === totalParts) {
+      log(`  上传进度: ${pct}% (${i}/${totalParts})`);
+      lastLogPercent = Math.floor(pct / 10) * 10;
     }
   }
 

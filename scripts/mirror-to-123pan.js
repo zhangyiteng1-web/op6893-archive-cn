@@ -660,10 +660,11 @@ async function main() {
         } else {
           error_(`  ✗ 下载/上传失败: ${err.message}`);
         }
-      } finally {
-        try { await unlink(tmpPath); } catch { /* ignore */ }
       }
     }
+
+    // 清理临时文件
+    try { await unlink(tmpPath); } catch { /* ignore */ }
 
     if (!fileId) {
       failed++;

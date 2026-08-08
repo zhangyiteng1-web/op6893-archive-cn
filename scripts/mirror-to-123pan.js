@@ -345,10 +345,12 @@ async function createShare(fileId, fileName) {
     return { shareUrl: `https://www.123pan.com/s/dry_run`, shareKey: "dry_run" };
   }
 
+  // fileIDList 必须是逗号分隔的字符串，不是数组！
+  log(`  创建分享: fileId=${fileId}, fileIDList="${String(fileId)}"`);
   const data = await apiPost("/api/v1/share/create", {
     shareName: fileName,
     shareExpire: 0,
-    fileIDList: [fileId],
+    fileIDList: String(fileId),
     sharePwd: "",
   });
 

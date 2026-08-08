@@ -438,7 +438,7 @@ async function uploadFile(filePath, fileName, parentFileId) {
   const size = await fileSize(filePath);
   const etag = await md5FromFile(filePath);
 
-  log(`Uploading ${fileName} (${(size / 1024 / 1024).toFixed(1)}MB, etag=${etag})...`);
+  log(`  Uploading ${fileName} (${(size / 1024 / 1024).toFixed(1)}MB)...`);
 
   if (DRY_RUN) {
     log(`[DRY RUN] Would upload ${fileName} to folder ${parentFileId}`);
@@ -505,13 +505,10 @@ async function uploadFile(filePath, fileName, parentFileId) {
     }
   } else {
     // Large file: multipart upload — stream in batches to avoid memory blowup
-    const totalParts = Math.ceil(size / CHUNK_SIZE);
-    log(`  Multipart upload: ${totalParts} parts of ${(CHUNK_SIZE / 1024 / 1024).toFixed(0)}MB each`);
 
     const stream = createReadStream(filePath, { highWaterMark: CHUNK_SIZE });
 
     let partNumber = 0;
-    let bytesRead = 0;
     const BATCH_SIZE = 10;
     let batch = [];
 
@@ -521,17 +518,13 @@ async function uploadFile(filePath, fileName, parentFileId) {
 
       if (batch.length >= BATCH_SIZE) {
         await uploadBatch(batch, bucket, key, uploadId, storageNode);
-        bytesRead += batch.reduce((s, c) => s + c.size, 0);
-        log(`  Uploaded parts ${batch[0].partNumber}-${batch[batch.length - 1].partNumber} (${(bytesRead / size * 100).toFixed(0)}%)`);
-        batch = []; // free memory
+        batch = [];
       }
     }
 
     // Upload remaining
     if (batch.length > 0) {
       await uploadBatch(batch, bucket, key, uploadId, storageNode);
-      bytesRead += batch.reduce((s, c) => s + c.size, 0);
-      log(`  Uploaded parts ${batch[0].partNumber}-${batch[batch.length - 1].partNumber} (${(bytesRead / size * 100).toFixed(0)}%)`);
     }
 
     // Complete multipart upload
@@ -547,7 +540,6 @@ async function uploadFile(filePath, fileName, parentFileId) {
       break;
     } catch (err) {
       if (retry < 3 && err.message.includes("5053")) {
-        warn(`  upload_complete failed (retry ${retry}/3), waiting before retry...`);
         await sleep(3000);
       } else {
         throw err;
@@ -555,7 +547,6 @@ async function uploadFile(filePath, fileName, parentFileId) {
     }
   }
 
-  log(`  Upload complete, fileId=${fileId}`);
   return { fileId, fileName };
 }
 
@@ -566,8 +557,6 @@ async function uploadFile(filePath, fileName, parentFileId) {
  * Returns { shareUrl, shareKey }.
  */
 async function createShare(fileId, fileName, shareName) {
-  log(`  Creating share for ${fileName}...`);
-
   if (DRY_RUN) {
     return { shareUrl: `https://www.123pan.com/s/dry_run`, shareKey: "dry_run" };
   }
@@ -586,7 +575,6 @@ async function createShare(fileId, fileName, shareName) {
   }
 
   const shareUrl = `https://www.123pan.com/s/${shareKey}`;
-  log(`  Share created: ${shareUrl}`);
   return { shareUrl, shareKey };
 }
 
@@ -596,10 +584,7 @@ async function createShare(fileId, fileName, shareName) {
  * Download a file using fetch() stream.
  */
 async function downloadFile(url, destPath) {
-  log(`  Downloading ${url}...`);
-
   if (DRY_RUN) {
-    log(`  [DRY RUN] Would download to ${destPath}`);
     await writeFile(destPath, "dummy");
     return;
   }
@@ -608,7 +593,7 @@ async function downloadFile(url, destPath) {
 }
 
 /**
- * Single-threaded fallback using fetch() stream.
+ * Download a file using fetch() stream.
  */
 async function downloadWithFetch(url, destPath) {
   const res = await fetch(url);
@@ -616,33 +601,17 @@ async function downloadWithFetch(url, destPath) {
     throw new Error(`Download failed: ${res.status} ${res.statusText}`);
   }
 
-  const contentLength = res.headers.get("content-length");
-  const total = contentLength ? parseInt(contentLength, 10) : 0;
-
   const fileStream = createWriteStream(destPath);
-  let downloaded = 0;
-  let lastLog = 0;
-
   const reader = res.body.getReader();
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-
-    downloaded += value.length;
     fileStream.write(value);
-
-    if (downloaded - lastLog >= 10 * 1024 * 1024) {
-      lastLog = downloaded;
-      const pct = total ? ` ${(downloaded / total * 100).toFixed(0)}%` : "";
-      log(`    Downloaded ${(downloaded / 1024 / 1024).toFixed(0)}MB${pct}`);
-    }
   }
 
   fileStream.end();
   await new Promise((resolve) => fileStream.on("finish", resolve));
-
-  log(`    Download complete: ${(downloaded / 1024 / 1024).toFixed(1)}MB`);
 }
 
 // ── Main mirror logic ───────────────────────────────────────────────────────
@@ -759,18 +728,16 @@ async function main() {
       try {
         if (attempt > 1) {
           const delay = Math.min(attempt * 5, 20);
-          log(`  Retry ${attempt}/${MAX_RETRIES} after ${delay}s...`);
           await sleep(delay * 1000);
         }
 
-        log(`\n--- Processing: ${file.name} (${file.size || "unknown"})${attempt > 1 ? ` [attempt ${attempt}]` : ""} ---`);
+        log(`\n  [${file.name}] (${file.size || "unknown"})${attempt > 1 ? ` [重试 ${attempt}/${MAX_RETRIES}]` : ""}`);
 
         // Download
         await downloadFile(file.url, tmpPath);
 
         if (!DRY_RUN) {
           const actualSize = await fileSize(tmpPath);
-          log(`  File size on disk: ${(actualSize / 1024 / 1024).toFixed(1)}MB`);
           if (actualSize === 0) {
             throw new Error("Downloaded file is 0 bytes");
           }
@@ -794,7 +761,7 @@ async function main() {
         };
 
         success++;
-        log(`  ✓ Mirrored: ${shareUrl}`);
+        log(`  ✓ 完成: ${shareUrl}`);
         break; // success, exit retry loop
       } catch (err) {
         lastErr = err;

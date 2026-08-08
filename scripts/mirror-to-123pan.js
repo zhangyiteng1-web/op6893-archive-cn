@@ -92,14 +92,19 @@ function authHeaders() {
   };
 }
 
-async function apiPost(path, body) {
+/** Make a POST request with error handling. Returns { code, data, message } */
+async function apiPostRaw(path, body) {
   const url = API_BASE + path;
   const res = await fetch(url, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(body),
   });
-  const json = await res.json();
+  return await res.json();
+}
+
+async function apiPost(path, body) {
+  const json = await apiPostRaw(path, body);
   if (json.code !== 0) {
     throw new Error(`API error ${path}: code=${json.code} message=${json.message || ""}`);
   }
@@ -176,13 +181,37 @@ async function findOrCreateFolder() {
   return data.dirID;
 }
 
+/**
+ * 在文件夹中查找文件，先尝试精准搜索，搜索不到则遍历列表
+ */
 async function findFileInFolder(fileName, parentFileId) {
-  const res = await apiGet("/api/v2/file/list", { parentFileId, limit: 100, searchData: fileName, searchMode: 1 });
+  // 先尝试精准搜索
+  const res = await apiGet("/api/v2/file/list", {
+    parentFileId,
+    limit: 100,
+    searchData: fileName,
+    searchMode: 1,
+  });
   const fileList = res.fileList || res.file_list || [];
   for (const item of fileList) {
     const name = item.filename || item.fileName || "";
-    if (name === fileName) return item.fileId || item.fileID;
+    if (name === fileName) {
+      const id = item.fileId || item.fileID;
+      if (id) return id;
+    }
   }
+
+  // 搜索不到就遍历列表
+  const allRes = await apiGet("/api/v2/file/list", { parentFileId, limit: 100 });
+  const allFiles = allRes.fileList || allRes.file_list || [];
+  for (const item of allFiles) {
+    const name = item.filename || item.fileName || "";
+    if (name === fileName) {
+      const id = item.fileId || item.fileID;
+      if (id) return id;
+    }
+  }
+
   return null;
 }
 
@@ -205,20 +234,42 @@ async function uploadFile(filePath, fileName, parentFileId) {
   }
 
   // Step 1: V2 Create upload
-  const data = await apiPost("/upload/v2/file/create", {
+  const createJson = await apiPostRaw("/upload/v2/file/create", {
     parentFileID: parentFileId,
     filename: fileName,
     etag: etag,
     size: size,
   });
 
-  // 秒传：文件已存在
+  // 文件名重复 → 文件已存在，直接查找
+  if (createJson.code === 1) {
+    log("  文件已存在（文件名重复），查找已有文件...");
+    const existingId = await findFileInFolder(fileName, parentFileId);
+    if (existingId) {
+      log(`  找到已有文件, id=${existingId}`);
+      return existingId;
+    }
+    throw new Error("文件已存在但无法找到其ID");
+  }
+
+  if (createJson.code !== 0) {
+    throw new Error(`创建上传失败: code=${createJson.code} message=${createJson.message || ""}`);
+  }
+
+  const data = createJson.data;
+
+  // 秒传：文件已存在（MD5 匹配）
   if (data.reuse) {
     log("  文件已存在，秒传成功");
-    if (data.fileID) return data.fileID;
+    const reuseId = data.fileID || data.fileId;
+    if (reuseId) return reuseId;
+
     const existingId = await findFileInFolder(fileName, parentFileId);
-    if (existingId) return existingId;
-    return data.fileID;
+    if (existingId) {
+      log(`  找到已有文件, id=${existingId}`);
+      return existingId;
+    }
+    throw new Error("秒传成功但无法获取 fileID");
   }
 
   const preuploadID = data.preuploadID;
@@ -233,11 +284,9 @@ async function uploadFile(filePath, fileName, parentFileId) {
     const start = (i - 1) * sliceSize;
     const end = Math.min(start + sliceSize, size);
 
-    // Read chunk and compute its MD5 (streaming, no full-file load)
     const chunk = await readChunk(filePath, start, end);
     const sliceMD5 = md5FromBuffer(chunk);
 
-    // Build multipart form
     const form = new FormData();
     form.append("preuploadID", preuploadID);
     form.append("sliceNo", String(i));
@@ -267,12 +316,13 @@ async function uploadFile(filePath, fileName, parentFileId) {
     await sleep(2000);
     try {
       const completeData = await apiPost("/upload/v2/file/upload_complete", { preuploadID });
-      if (completeData.completed && completeData.fileID) {
-        log(`  上传完成 fileId=${completeData.fileID}`);
-        return completeData.fileID;
+      if (completeData.completed && (completeData.fileID || completeData.fileId)) {
+        const fileId = completeData.fileID || completeData.fileId;
+        log(`  上传完成 fileId=${fileId}`);
+        return fileId;
       }
     } catch (err) {
-      // Keep polling — server may still be processing
+      // Keep polling
     }
     if (attempt % 10 === 0) {
       log(`  等待合并中... (${attempt}/60)`);
@@ -291,7 +341,7 @@ async function createShare(fileId, fileName) {
 
   const data = await apiPost("/api/v1/share/create", {
     shareName: fileName,
-    shareExpire: 0, // 0 = 永久有效
+    shareExpire: 0,
     fileIDList: [fileId],
     sharePwd: "",
   });
@@ -391,7 +441,7 @@ async function main() {
   for (const { entry, category, index } of entries) {
     const filename = extractFilenameFromUrl(entry.url);
     if (!filename) continue;
-    if (entry.url_123pan) continue; // Already has share link
+    if (entry.url_123pan) continue;
     pending.push({ entry, category, index, filename });
   }
 
@@ -413,46 +463,84 @@ async function main() {
     const tmpPath = join(tmpDir, filename);
 
     log(`[${i + 1}/${pending.length}] ${entry.name}`);
-    let done = false;
+
+    // ── Phase 1: 下载 + 上传 ──
+    let fileId = null;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         if (attempt > 1) await sleep(attempt * 5000);
 
-        // Download via archive.org
         await downloadFile(entry.url, tmpPath);
 
         const actualSize = await fileSize(tmpPath);
         if (actualSize === 0) throw new Error("下载文件大小为0");
         log(`  下载完成: ${(actualSize / 1024 / 1024).toFixed(1)}MB`);
 
-        // Upload via OpenAPI V2
-        const fileId = await uploadFile(tmpPath, filename, folderId);
-
-        // Share
-        const { shareUrl, shareKey } = await createShare(fileId, filename);
-        log(`  分享链接: ${shareUrl}`);
-
-        // Update index
-        indexData[category][index].url_123pan = shareUrl;
-        indexData[category][index].url_original = entry.url;
-        shares[String(fileId)] = { shareUrl, shareKey, fileName: filename, sharedAt: new Date().toISOString() };
-
-        success++;
-        done = true;
+        fileId = await uploadFile(tmpPath, filename, folderId);
         break;
       } catch (err) {
+        // 文件名重复 → 重试时直接查找已有文件
+        if (err.message.includes("文件名重复")) {
+          try {
+            fileId = await findFileInFolder(filename, folderId);
+            if (fileId) {
+              log(`  文件已存在, id=${fileId}`);
+              break;
+            }
+          } catch { /* fall through */ }
+        }
+
         if (attempt < MAX_RETRIES) {
-          warn(`  重试 ${attempt}/${MAX_RETRIES}: ${err.message}`);
+          warn(`  下载/上传重试 ${attempt}/${MAX_RETRIES}: ${err.message}`);
         } else {
-          error_(`  ✗ 失败: ${err.message}`);
+          error_(`  ✗ 下载/上传失败: ${err.message}`);
         }
       } finally {
         try { await unlink(tmpPath); } catch { /* ignore */ }
       }
     }
 
-    if (!done) failed++;
+    if (!fileId) {
+      failed++;
+      continue;
+    }
+
+    // ── Phase 2: 分享 ──
+    let shareDone = false;
+    let shareUrl = null;
+    let shareKey = null;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        if (attempt > 1) await sleep(attempt * 3000);
+
+        const result = await createShare(fileId, filename);
+        shareUrl = result.shareUrl;
+        shareKey = result.shareKey;
+        log(`  分享链接: ${shareUrl}`);
+        shareDone = true;
+        break;
+      } catch (err) {
+        if (attempt < MAX_RETRIES) {
+          warn(`  分享重试 ${attempt}/${MAX_RETRIES}: ${err.message}`);
+        } else {
+          error_(`  ✗ 分享失败: ${err.message}`);
+        }
+      }
+    }
+
+    if (!shareDone) {
+      failed++;
+      continue;
+    }
+
+    // Update index
+    indexData[category][index].url_123pan = shareUrl;
+    indexData[category][index].url_original = entry.url;
+    shares[String(fileId)] = { shareUrl, shareKey, fileName: filename, sharedAt: new Date().toISOString() };
+
+    success++;
 
     // Save progress every 3 files
     if ((i + 1) % 3 === 0) {

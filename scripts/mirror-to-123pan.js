@@ -15,7 +15,7 @@
  *   PAN123_DRY_RUN       - set to "1" to skip actual upload (test mode)
  */
 
-import { readFile, writeFile, stat, unlink, mkdir } from "node:fs/promises";
+import { readFile, writeFile, stat, unlink, mkdir, open } from "node:fs/promises";
 import { createWriteStream, createReadStream } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
@@ -361,16 +361,56 @@ async function createShare(fileId, fileName) {
 
 // ── Download ─────────────────────────────────────────────────────────────────
 
+const DOWNLOAD_THREADS = 4;          // 并发连接数
+const MULTI_THREAD_MIN_SIZE = 50 * 1024 * 1024; // 小于 50MB 用单线程
+
+/**
+ * 多线程下载，用 HTTP Range 将文件分成 N 段并行下载
+ * 每个线程写入文件对应偏移量，无需额外合并
+ */
 async function downloadFile(url, destPath) {
   if (DRY_RUN) {
     await writeFile(destPath, "dummy");
     return;
   }
 
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`下载失败: ${res.status} ${res.statusText}`);
+  // 1. HEAD 请求获取文件大小
+  const headRes = await fetch(url, { method: "HEAD" });
+  const totalSize = parseInt(headRes.headers.get("content-length") || "0", 10);
+  const acceptRanges = headRes.headers.get("accept-ranges");
+
+  // 小文件或服务器不支持 Range → 单线程
+  if (totalSize === 0 || totalSize < MULTI_THREAD_MIN_SIZE || acceptRanges !== "bytes") {
+    return downloadSingleThread(url, destPath);
   }
+
+  // 2. 预分配文件空间
+  const fd = await open(destPath, "w");
+  await fd.truncate(totalSize);
+  await fd.close();
+
+  // 3. 计算分片并并行下载
+  const chunkSize = Math.ceil(totalSize / DOWNLOAD_THREADS);
+  const tasks = [];
+  const startTime = Date.now();
+
+  for (let i = 0; i < DOWNLOAD_THREADS; i++) {
+    const start = i * chunkSize;
+    const end = i === DOWNLOAD_THREADS - 1 ? totalSize - 1 : start + chunkSize - 1;
+    if (start >= totalSize) break;
+    tasks.push(downloadChunk(url, destPath, start, end, i));
+  }
+
+  await Promise.all(tasks);
+
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  const speed = totalSize > 0 ? ((totalSize / 1024 / 1024) / (elapsed || 0.1)).toFixed(1) : "?";
+  log(`  下载完成: ${(totalSize / 1024 / 1024).toFixed(1)}MB (${DOWNLOAD_THREADS}线程, ${elapsed}s, ${speed}MB/s)`);
+}
+
+async function downloadSingleThread(url, destPath) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`下载失败: ${res.status} ${res.statusText}`);
 
   const fileStream = createWriteStream(destPath);
   const reader = res.body.getReader();
@@ -383,6 +423,32 @@ async function downloadFile(url, destPath) {
 
   fileStream.end();
   await new Promise((resolve) => fileStream.on("finish", resolve));
+}
+
+async function downloadChunk(url, destPath, start, end, index) {
+  for (let retry = 0; retry < 3; retry++) {
+    try {
+      const res = await fetch(url, {
+        headers: { Range: `bytes=${start}-${end}` },
+      });
+
+      if (!res.ok && res.status !== 206) {
+        throw new Error(`Range 请求失败: ${res.status}`);
+      }
+
+      const buf = Buffer.from(await res.arrayBuffer());
+
+      // 写入文件对应偏移量
+      const fd = await open(destPath, "r+");
+      await fd.write(buf, 0, buf.length, start);
+      await fd.close();
+
+      return;
+    } catch (err) {
+      if (retry === 2) throw err;
+      await sleep(2000 * (retry + 1));
+    }
+  }
 }
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -483,7 +549,6 @@ async function main() {
 
         const actualSize = await fileSize(tmpPath);
         if (actualSize === 0) throw new Error("下载文件大小为0");
-        log(`  下载完成: ${(actualSize / 1024 / 1024).toFixed(1)}MB`);
 
         fileId = await uploadFile(tmpPath, filename, folderId);
         break;

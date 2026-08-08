@@ -676,26 +676,8 @@ td a.mirrorLink:hover {
   color: #ffd166;
 }
 
-td .actionsCell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-
 tr:last-child td {
   border-bottom: 0;
-}
-
-/* Sortable headers */
-th.sortable {
-  color: #a0c4dd;
-  cursor: pointer;
-  transition: color 0.14s ease;
-}
-
-th.sortable:hover {
-  color: #62f7ff;
 }
 
 /* Changelog expansion */

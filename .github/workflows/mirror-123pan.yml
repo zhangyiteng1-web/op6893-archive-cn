@@ -23,9 +23,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install aria2
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq aria2
-
       - name: Mirror new files to 123pan
         run: node scripts/mirror-to-123pan.js
         continue-on-error: true

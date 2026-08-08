@@ -20,9 +20,8 @@
 import { readFile, writeFile, stat, unlink, mkdir } from "node:fs/promises";
 import { createWriteStream, createReadStream } from "node:fs";
 import { createHash } from "node:crypto";
-import { basename, dirname, join } from "node:path";
+import { basename, join } from "node:path";
 import { tmpdir } from "node:os";
-import { spawn } from "node:child_process";
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -33,7 +32,7 @@ const DRY_RUN = process.env.PAN123_DRY_RUN === "1";
 const MIRRORED_FILE = "public/.mirrored.json";
 const INDEX_FILE = "public/index.json";
 const CHUNK_SIZE = 8 * 1024 * 1024; // 8MB chunks for multipart upload
-const SMALL_FILE_THRESHOLD = 10 * 1024 * 1024; // 10MB, below this use direct upload
+const SMALL_FILE_THRESHOLD = 100 * 1024 * 1024; // 100MB, below this use direct upload (multipart is unreliable for small files)
 const TARGET_FOLDER_NAME = "rmx3031刷机包";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -398,6 +397,40 @@ async function s3CompleteMultipartUpload(bucket, key, uploadId, storageNode) {
 }
 
 /**
+ * Upload a batch of chunks to S3 presigned URLs in parallel.
+ */
+async function uploadBatch(batch, bucket, key, uploadId, storageNode) {
+  const start = batch[0].partNumber;
+  const end = batch[batch.length - 1].partNumber;
+
+  const partsRes = await s3PrepareUploadParts(bucket, key, uploadId, storageNode, start, end);
+  const presignedUrls = partsRes.data?.presignedUrls;
+
+  if (!presignedUrls) {
+    throw new Error(`No presigned URLs for parts ${start}-${end}`);
+  }
+
+  await Promise.all(
+    batch.map(async (chunk) => {
+      const url = presignedUrls[String(chunk.partNumber)] || presignedUrls[chunk.partNumber - 1];
+      if (!url) {
+        throw new Error(`No presigned URL for part ${chunk.partNumber}`);
+      }
+
+      const putRes = await fetch(url, {
+        method: "PUT",
+        body: chunk.data,
+        headers: { "Content-Type": "application/octet-stream" },
+      });
+
+      if (!putRes.ok) {
+        throw new Error(`PUT part ${chunk.partNumber} failed: ${putRes.status}`);
+      }
+    })
+  );
+}
+
+/**
  * Upload a local file to 123pan inside the target folder.
  * Returns { fileId, fileName }.
  */
@@ -471,7 +504,7 @@ async function uploadFile(filePath, fileName, parentFileId) {
       throw new Error(`PUT to presigned URL failed: ${putRes.status} ${putRes.statusText}`);
     }
   } else {
-    // Large file: multipart upload
+    // Large file: multipart upload — stream in batches to avoid memory blowup
     const totalParts = Math.ceil(size / CHUNK_SIZE);
     log(`  Multipart upload: ${totalParts} parts of ${(CHUNK_SIZE / 1024 / 1024).toFixed(0)}MB each`);
 
@@ -479,58 +512,48 @@ async function uploadFile(filePath, fileName, parentFileId) {
 
     let partNumber = 0;
     let bytesRead = 0;
-    const chunks = [];
+    const BATCH_SIZE = 10;
+    let batch = [];
 
     for await (const chunk of stream) {
       partNumber++;
-      chunks.push({ data: chunk, partNumber, size: chunk.length });
+      batch.push({ data: chunk, partNumber, size: chunk.length });
+
+      if (batch.length >= BATCH_SIZE) {
+        await uploadBatch(batch, bucket, key, uploadId, storageNode);
+        bytesRead += batch.reduce((s, c) => s + c.size, 0);
+        log(`  Uploaded parts ${batch[0].partNumber}-${batch[batch.length - 1].partNumber} (${(bytesRead / size * 100).toFixed(0)}%)`);
+        batch = []; // free memory
+      }
     }
 
-    // Upload parts in batches of 10
-    const BATCH_SIZE = 10;
-    for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
-      const batch = chunks.slice(i, i + BATCH_SIZE);
-      const start = batch[0].partNumber;
-      const end = batch[batch.length - 1].partNumber;
-
-      const partsRes = await s3PrepareUploadParts(bucket, key, uploadId, storageNode, start, end);
-      const presignedUrls = partsRes.data?.presignedUrls;
-
-      if (!presignedUrls) {
-        throw new Error(`No presigned URLs for parts ${start}-${end}`);
-      }
-
-      // Upload each part in parallel
-      await Promise.all(
-        batch.map(async (chunk) => {
-          const url = presignedUrls[String(chunk.partNumber)] || presignedUrls[chunk.partNumber - 1];
-          if (!url) {
-            throw new Error(`No presigned URL for part ${chunk.partNumber}`);
-          }
-
-          const putRes = await fetch(url, {
-            method: "PUT",
-            body: chunk.data,
-            headers: { "Content-Type": "application/octet-stream" },
-          });
-
-          if (!putRes.ok) {
-            throw new Error(`PUT part ${chunk.partNumber} failed: ${putRes.status}`);
-          }
-
-          bytesRead += chunk.size;
-        })
-      );
-
-      log(`  Uploaded parts ${start}-${end} (${(bytesRead / size * 100).toFixed(0)}%)`);
+    // Upload remaining
+    if (batch.length > 0) {
+      await uploadBatch(batch, bucket, key, uploadId, storageNode);
+      bytesRead += batch.reduce((s, c) => s + c.size, 0);
+      log(`  Uploaded parts ${batch[0].partNumber}-${batch[batch.length - 1].partNumber} (${(bytesRead / size * 100).toFixed(0)}%)`);
     }
 
     // Complete multipart upload
     await s3CompleteMultipartUpload(bucket, key, uploadId, storageNode);
+    // Wait for server-side assembly
+    await sleep(3000);
   }
 
-  // Complete upload
-  await uploadComplete(fileId);
+  // Complete upload with retry (server may need time to finalize)
+  for (let retry = 1; retry <= 3; retry++) {
+    try {
+      await uploadComplete(fileId);
+      break;
+    } catch (err) {
+      if (retry < 3 && err.message.includes("5053")) {
+        warn(`  upload_complete failed (retry ${retry}/3), waiting before retry...`);
+        await sleep(3000);
+      } else {
+        throw err;
+      }
+    }
+  }
 
   log(`  Upload complete, fileId=${fileId}`);
   return { fileId, fileName };
@@ -570,19 +593,7 @@ async function createShare(fileId, fileName, shareName) {
 // ── Download file from archive.org ──────────────────────────────────────────
 
 /**
- * Check if aria2c is available on the system.
- */
-function checkAria2() {
-  return new Promise((resolve) => {
-    const proc = spawn("aria2c", ["--version"], { stdio: "pipe" });
-    proc.on("close", (code) => resolve(code === 0));
-    proc.on("error", () => resolve(false));
-  });
-}
-
-/**
- * Download a file using aria2c for multi-threaded acceleration.
- * Falls back to fetch() if aria2c is not installed.
+ * Download a file using fetch() stream.
  */
 async function downloadFile(url, destPath) {
   log(`  Downloading ${url}...`);
@@ -593,87 +604,7 @@ async function downloadFile(url, destPath) {
     return;
   }
 
-  const aria2Available = await checkAria2();
-
-  if (aria2Available) {
-    await downloadWithAria2(url, destPath);
-  } else {
-    warn("  aria2c not found, falling back to single-threaded fetch()...");
-    await downloadWithFetch(url, destPath);
-  }
-}
-
-/**
- * Multi-threaded download via aria2c.
- * -x 16: 16 connections per server
- * -s 16: split into 16 chunks
- * -k 1M: minimum chunk size 1MB
- * --file-allocation=none: skip preallocation (faster start on ext4/xfs)
- * --allow-overwrite=true: overwrite partial downloads
- */
-async function downloadWithAria2(url, destPath) {
-  const dir = dirname(destPath);
-  const out = basename(destPath);
-
-  const args = [
-    url,
-    "-x", "16",            // max connections per server
-    "-s", "16",            // split into 16 chunks
-    "-k", "1M",            // min split size
-    "-d", dir,             // output directory
-    "-o", out,             // output filename
-    "--file-allocation=none",
-    "--allow-overwrite=true",
-    "--console-log-level=notice",
-    "--summary-interval=10",
-    "--max-tries=5",
-    "--retry-wait=5",
-    "--connect-timeout=10",
-    "--timeout=30",
-    "--max-connection-per-server=16",
-    "--min-split-size=1M",
-    "--check-certificate=false",
-  ];
-
-  log(`  aria2c: ${args.slice(0, 1).join(" ")} -x 16 -s 16 -o ${out}`);
-
-  await new Promise((resolve, reject) => {
-    const proc = spawn("aria2c", args, { stdio: ["ignore", "pipe", "pipe"] });
-
-    let lastLog = 0;
-
-    proc.stdout.on("data", (data) => {
-      const text = data.toString();
-      // Parse aria2c progress lines like:
-      // [#1 256MiB/3.6GiB(6%) CN:16 DL:48MiB/s ETA:1m12s]
-      const match = text.match(/\[#\w+\s+([^\]]+)\]/);
-      if (match) {
-        const now = Date.now();
-        if (now - lastLog >= 5000) { // Log every 5s max
-          lastLog = now;
-          log(`    ${match[1].trim()}`);
-        }
-      }
-    });
-
-    proc.stderr.on("data", (data) => {
-      const text = data.toString().trim();
-      if (text && !text.includes("WARNING")) {
-        warn(`  aria2c: ${text}`);
-      }
-    });
-
-    proc.on("close", (code) => {
-      if (code === 0) {
-        log(`    aria2c download complete`);
-        resolve();
-      } else {
-        reject(new Error(`aria2c exited with code ${code}`));
-      }
-    });
-
-    proc.on("error", reject);
-  });
+  await downloadWithFetch(url, destPath);
 }
 
 /**

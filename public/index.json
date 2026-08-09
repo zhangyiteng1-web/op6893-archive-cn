@@ -221,7 +221,8 @@
       "date": "2026-04-18",
       "size": "19MB",
       "url": "https://archive.org/download/rmx3031-kernels/RESUKISU-CUPIDA-DENNIZ.zip",
-      "changelog": "Resukisu . SuSFS v2.1.0 For AOSP ROMs . By Soulspark"
+      "changelog": "Resukisu . SuSFS v2.1.0 For AOSP ROMs . By Soulspark",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-deYzv"
     },
     {
       "name": "ReSukiSU Cupida Denniz (COS16/OOS16)",
@@ -229,7 +230,8 @@
       "date": "2026-04-18",
       "size": "19MB",
       "url": "https://archive.org/download/rmx3031-kernels/COS16-RESUKISU-CUPIDA-DENNIZ.zip",
-      "changelog": "Resukisu . SUSFS v2.1.0 for ColorOS 16 and OxygenOS 16 ROMs . By Soulspark"
+      "changelog": "Resukisu . SUSFS v2.1.0 for ColorOS 16 and OxygenOS 16 ROMs . By Soulspark",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-24czv"
     },
     {
       "name": "KSU Next Cupida Denniz (COS/OOS)",
@@ -272,7 +274,8 @@
       "date": "2026-03-08",
       "size": "22MB",
       "url": "https://archive.org/download/rmx3031-sukisu-ultra/SukiSU_Ultra_RMX3031.zip",
-      "changelog": "Working: Root via SukiSU Ultra, SuSFS v2.0.0, Zygisk Next, Tricky Store / Play Integrity, Droidspaces / Linux container, KPM modules. Not working: ReZygisk (version check blocks non-submodule KSU), LSPosed (incompatible with Android 16 QPR2 ART)."
+      "changelog": "Working: Root via SukiSU Ultra, SuSFS v2.0.0, Zygisk Next, Tricky Store / Play Integrity, Droidspaces / Linux container, KPM modules. Not working: ReZygisk (version check blocks non-submodule KSU), LSPosed (incompatible with Android 16 QPR2 ART).",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-HgYiv"
     },
     {
       "name": "COS 16 Kernel (No Root)(Unstable)",
@@ -280,7 +283,8 @@
       "date": "2026-03-08",
       "size": "20MB",
       "url": "https://archive.org/download/rmx3031-kernels/COS_16_kernel_no_root.zip",
-      "changelog": "COS 16 kernel without root for RMX3031"
+      "changelog": "COS 16 kernel without root for RMX3031",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-Gd6zv"
     },
     {
       "name": "Stock KSU Kernel",
@@ -297,7 +301,8 @@
       "date": "2026-03-08",
       "size": "26MB",
       "url": "https://archive.org/download/rmx3031-kernels/SukiSU-Ultra_3.2.0.zip",
-      "changelog": "SukiSU Ultra 3.2.0 kernel for RMX3031"
+      "changelog": "SukiSU Ultra 3.2.0 kernel for RMX3031",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-lYKzv"
     },
     {
       "name": "Kernel v4.19.325 KSUN SuSFS v1.5.5",
@@ -305,7 +310,8 @@
       "date": "2026-03-08",
       "size": "35MB",
       "url": "https://archive.org/download/rmx3031-kernels/v4.19.325-ksun-v12602-susfs-v1.5.5.zip",
-      "changelog": "Linux 4.19.325 with KernelSU Next and SuSFS v1.5.5 and Nethunter"
+      "changelog": "Linux 4.19.325 with KernelSU Next and SuSFS v1.5.5 and Nethunter",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-7YKzv"
     },
     {
       "name": "KSU Next OP6893 (COS16/OOS16)",
@@ -387,7 +393,8 @@
       "date": "2026-03-08",
       "size": "1.2MB",
       "url": "https://archive.org/download/permissiver-v-5/Permissiver_v5.zip",
-      "changelog": "Permissiver V5 for RMX3031. Flashable via Magisk or TWRP."
+      "changelog": "Permissiver V5 for RMX3031. Flashable via Magisk or TWRP.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-bYKzv"
     }
   ],
   "ota": [
@@ -548,7 +555,8 @@
       "date": "2026-03-30",
       "size": "7.29GB",
       "url": "https://archive.org/download/rmx3031-ota-cn-f24/RMX3031-F24-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-s4czv"
     },
     {
       "name": "F25 Toolbox",
@@ -662,7 +670,8 @@
       "date": "2026-03-08",
       "size": "57MB",
       "url": "https://archive.org/download/rmx3031-firmware/RMX3031_RUI4_F.13_FW_ONLY.zip",
-      "changelog": "RUI4 F.13 firmware only package for RMX3031"
+      "changelog": "RUI4 F.13 firmware only package for RMX3031",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-W4czv"
     },
     {
       "name": "OOS 13 F.57 Restore Brom Firmware (Denniz)",
@@ -734,7 +743,8 @@
       "date": "2026-03-09",
       "size": "46MB",
       "url": "https://archive.org/download/rmx3031-twrp-rui4/TWRP-3.7.0-12.1-RUI4-RMX3031-20220417.zip",
-      "changelog": "RMX3031-twrp-RUI4"
+      "changelog": "RMX3031-twrp-RUI4",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-3eYzv"
     },
     {
       "name": "RMX3031 TWRP RUI3",
@@ -742,7 +752,8 @@
       "date": "2026-03-09",
       "size": "45MB",
       "url": "https://archive.org/download/rmx3031-twrp-rui3/TWRP-3.7.0-12-RMX3031-20221024.zip",
-      "changelog": "RMX3031-twrp-RUI3"
+      "changelog": "RMX3031-twrp-RUI3",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-ZYKzv"
     },
     {
       "name": "RMX3031 TWRP RUI2",

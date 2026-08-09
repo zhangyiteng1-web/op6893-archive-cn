@@ -145,35 +145,61 @@ async function findOrCreateFolder() {
   return data.dirID;
 }
 
-/** 在文件夹中查找文件 */
+/** 在文件夹中查找文件（优先用 V2，失败回退 V1） */
 async function findFileInFolder(fileName, parentFileId) {
-  const res = await apiGet("/api/v2/file/list", {
-    parentFileId,
-    limit: 100,
-    searchData: fileName,
-    searchMode: 1,
-  });
-  const fileList = res.fileList || res.file_list || [];
-  for (const item of fileList) {
-    const name = item.filename || item.fileName || "";
-    if (name === fileName) {
-      const id = item.fileId || item.fileID;
-      if (id) return id;
+  // 先尝试 V2 搜索
+  try {
+    const res = await apiGet("/api/v2/file/list", {
+      parentFileId,
+      limit: 100,
+      searchData: fileName,
+      searchMode: 1,
+    });
+    const fileList = res.fileList || res.file_list || [];
+    for (const item of fileList) {
+      const name = item.filename || item.fileName || "";
+      if (name === fileName) {
+        const id = item.fileId || item.fileID;
+        if (id) return id;
+      }
     }
+  } catch (e) {
+    // V2 失败，回退到 V1
   }
 
-  // fallback: 遍历列表
-  const allRes = await apiGet("/api/v2/file/list", { parentFileId, limit: 100 });
-  const allFiles = allRes.fileList || allRes.file_list || [];
-  for (const item of allFiles) {
-    const name = item.filename || item.fileName || "";
-    if (name === fileName) {
-      const id = item.fileId || item.fileID;
-      if (id) return id;
+  // 回退: V1 列表遍历
+  try {
+    const v1Res = await apiGet("/api/v1/file/list", {
+      parentFileId,
+      page: 1,
+      limit: 100,
+      orderBy: "file_id",
+      orderDirection: "desc",
+      searchData: fileName,
+    });
+    const v1List = v1Res.fileList || v1Res.file_list || [];
+    for (const item of v1List) {
+      const name = item.filename || item.fileName || "";
+      if (name === fileName) {
+        const id = item.fileId || item.fileID;
+        if (id) return id;
+      }
     }
+  } catch (e) {
+    // 忽略
   }
 
   return null;
+}
+
+/** 用 V1 API 验证文件是否可操作（file/detail 成功说明文件已就绪） */
+async function verifyFileV1(fileId) {
+  try {
+    await apiGet("/api/v1/file/detail", { fileID: fileId });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // ── Offline Download ────────────────────────────────────────────────────────
@@ -510,17 +536,18 @@ async function main() {
       continue;
     }
 
-    // 分享（最多重试 6 次，每次间隔递增）
+    // 分享（最多重试 10 次，每次间隔递增，并用 V1 detail 验证文件就绪）
     let shareDone = false;
     let shareUrl = null;
 
-    for (let attempt = 1; attempt <= 6; attempt++) {
+    for (let attempt = 1; attempt <= 10; attempt++) {
       try {
         if (attempt > 1) {
-          const waitSec = attempt * 5;
+          const waitSec = Math.min(attempt * 10, 60); // 10s, 20s, ..., 60s
           log(`  等待 ${waitSec}s 后重试...`);
           await sleep(waitSec * 1000);
-          // 重新查找最新的 fileId
+
+          // 用 V1 API 重新查找文件（确保 V1 层面能看到）
           const freshId = await findFileInFolder(task.filename, folderId);
           if (freshId) {
             if (freshId !== task.fileId) {
@@ -528,7 +555,23 @@ async function main() {
             }
             task.fileId = freshId;
           } else {
-            warn(`  未找到文件 ${task.filename}，继续使用旧 ID`);
+            warn(`  V1 未找到文件 ${task.filename}，继续等待...`);
+            continue;
+          }
+
+          // 用 V1 detail API 验证文件是否真正就绪
+          const v1Ready = await verifyFileV1(task.fileId);
+          if (!v1Ready) {
+            warn(`  V1 detail 验证失败，文件尚未就绪，${attempt}/10`);
+            continue;
+          }
+          log(`  V1 验证通过，文件已就绪`);
+        } else {
+          // 首次尝试前也验证一下
+          const v1Ready = await verifyFileV1(task.fileId);
+          if (!v1Ready) {
+            warn(`  V1 detail 验证失败，文件尚未就绪，等待后重试...`);
+            continue;
           }
         }
 
@@ -540,12 +583,12 @@ async function main() {
       } catch (err) {
         const msg = err.message || "";
         if (msg.includes("文件已被删除或移动") || msg.includes("分享ID非法")) {
-          warn(`  文件尚未就绪 (${msg})，${attempt}/6`);
+          warn(`  文件尚未就绪 (${msg})，${attempt}/10`);
         } else {
           warn(`  分享失败: ${msg}`);
         }
-        if (attempt === 6) {
-          error_(`[${i + 1}/${tasks.length}] ✗ 分享失败 (已重试6次): ${msg}`);
+        if (attempt === 10) {
+          error_(`[${i + 1}/${tasks.length}] ✗ 分享失败 (已重试10次): ${msg}`);
         }
       }
     }

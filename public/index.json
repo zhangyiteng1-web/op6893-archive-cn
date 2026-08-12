@@ -404,7 +404,8 @@
       "date": "2026-03-11",
       "size": "4.66GB",
       "url": "https://archive.org/download/rmx3031-ota-a15/X7-MAX-A15-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-QeYzv"
     },
     {
       "name": "X7-MAX A22 Toolbox",
@@ -475,7 +476,8 @@
       "date": "2026-03-11",
       "size": "6.58GB",
       "url": "https://archive.org/download/rmx3031-ota-f25/X7-MAX-F25-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-EeYzv"
     },
     {
       "name": "X7-MAX A21 (Rollback)",
@@ -530,7 +532,8 @@
       "date": "2026-03-17",
       "size": "6.28GB",
       "url": "https://archive.org/download/rmx3031-ota-in-c26/RMX3031-C26-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-dt3Lv"
     },
     {
       "name": "F01 Toolbox",
@@ -547,7 +550,8 @@
       "date": "2026-03-30",
       "size": "6.80GB",
       "url": "https://archive.org/download/rmx3031-ota-cn-f12/RMX3031-F12-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3031 Indian variant. Sequential upgrade path: A27 > C18 > C26 > F01 > F12 > F24 > F25 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-M1ozv"
     },
     {
       "name": "F24 Toolbox",
@@ -573,7 +577,8 @@
       "date": "2026-03-30",
       "size": "4.59GB",
       "url": "https://archive.org/download/rmx3031-rollback-cn-a29/RMX3031_11_A.29.zip",
-      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install."
+      "changelog": "Rollback package. Enable Developer Mode > Settings > About Phone > Software Update > Local Installation > select and install. Rename to ota_downgrade.zip and install.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-3t3Lv"
     },
     {
       "name": "C25 (Rollback)",
@@ -601,7 +606,8 @@
       "date": "2026-03-31",
       "size": "5.31GB",
       "url": "https://archive.org/download/rmx3350-flash-a07/RMX3350-A07-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-w1ozv"
     },
     {
       "name": "A16 (Compact) Toolbox",
@@ -618,7 +624,8 @@
       "date": "2026-03-31",
       "size": "5.45GB",
       "url": "https://archive.org/download/rmx3350-flash-a16/RMX3350-A16-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-RF3zv"
     },
     {
       "name": "C15 Toolbox",
@@ -626,7 +633,8 @@
       "date": "2026-03-31",
       "size": "6.07GB",
       "url": "https://archive.org/download/rmx3350-flash-c15/RMX3350-C15-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-g1ozv"
     },
     {
       "name": "C20 Toolbox",
@@ -643,7 +651,8 @@
       "date": "2026-03-31",
       "size": "6.59GB",
       "url": "https://archive.org/download/rmx3350-flash-f01/RMX3350-F01-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-ht3Lv"
     },
     {
       "name": "F12 Toolbox",
@@ -651,7 +660,8 @@
       "date": "2026-05-06",
       "size": "6.80GB",
       "url": "https://archive.org/download/rmx3350-flash-f12/RMX3350-F12-Toolbox.zip",
-      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format."
+      "changelog": "Three-in-one package includes TWRP, Fastboot and SP Flash Tool. RMX3350 GT Neo Flash Edition. Sequential upgrade path: A22 > C12 > F13 > F24 (no data wipe needed). Cross-version upgrades/downgrades require data format.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-TrCzv"
     }
   ],
   "firmware": [
@@ -699,7 +709,8 @@
       "date": "2026-03-12",
       "size": "3.2GB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/A.15.7z",
-      "changelog": "SP Flash Tool firmware package for RMX3031."
+      "changelog": "SP Flash Tool firmware package for RMX3031.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-kOaiv"
     },
     {
       "name": "A.22",
@@ -707,7 +718,8 @@
       "date": "2026-03-12",
       "size": "3.0GB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/A.22.7z",
-      "changelog": "SP Flash Tool firmware package for RMX3031."
+      "changelog": "SP Flash Tool firmware package for RMX3031.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-kgYiv"
     },
     {
       "name": "C.12saxx",
@@ -715,7 +727,8 @@
       "date": "2026-03-12",
       "size": "4.3GB",
       "url": "https://archive.org/download/rmx3031-sptool-firmware/C.12saxx.7z",
-      "changelog": "SP Flash Tool firmware package for RMX3031."
+      "changelog": "SP Flash Tool firmware package for RMX3031.",
+      "url_123pan": "https://www.123pan.com/s/MsA8vd-vrCzv"
     },
     {
       "name": "C.15",

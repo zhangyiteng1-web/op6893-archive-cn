@@ -212,6 +212,24 @@
       "changelog": "- Initial release\n- Gapps | userbuild\n- SELinux: Enforcing\n- Signed with release keys\n- Sony Dolby Atmos (OnePlus UI)\n- Credits: liwhy1 & ManshuTyagi for trees\n- Build By Rakhshan",
       "android": "16",
       "url_123pan": "https://www.123pan.com/s/MsA8vd-dgYiv"
+    },
+    {
+      "name": "LineageOS 23.2 Unofficial V (Vanilla)",
+      "version": "v23.2",
+      "date": "2026-08-14",
+      "size": "1.1GB",
+      "url": "https://archive.org/download/lineageos-23.2-20260814-unofficial-op6893/lineage-23.2-20260814-UNOFFICIAL-op6893.zip",
+      "changelog": "August Security Patch . Misc Improvements. Vanilla build . By ManshuTyagi.",
+      "android": "16"
+    },
+    {
+      "name": "LineageOS 23.2 Unofficial V (GMS)",
+      "version": "v23.2",
+      "date": "2026-08-14",
+      "size": "1.4GB",
+      "url": "https://archive.org/download/lineageos-23.2-20260814-unofficial-op6893/lineage-23.2-20260814-UNOFFICIAL-gms-op6893.zip",
+      "changelog": "August Security Patch . Misc Improvements . GMS build (includes Google Apps). By ManshuTyagi.",
+      "android": "16"
     }
   ],
   "kernels": [
@@ -375,6 +393,46 @@
       "url": "https://archive.org/download/rmx3031-susfs-2.2.0-inline-Hook/ReSukiSU_OP6893.zip",
       "changelog": "ResukiSU . SUSFS v.2.2.0 . Inline Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By soulspark666",
       "url_123pan": "https://www.123pan.com/s/MsA8vd-hgYiv"
+    },
+    {
+      "name": "KSU Next Performance (AOSP)",
+      "version": "3.4.1",
+      "date": "2026-10-05",
+      "size": "22MB",
+      "url": "https://archive.org/download/rmx3031-kernels-20261011/KSU-NEXT-PERF.zip",
+      "changelog": "Performance Boosted Kernel . version:4 . KernelSU Next . SUSFS v.2.2.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
+    },
+    {
+      "name": "KSU Next (RUI)",
+      "version": "3.4.1",
+      "date": "2026-10-06",
+      "size": "22MB",
+      "url": "https://archive.org/download/rmx3031-kernels-20261011/KSU-NEXT-RUI-v4.zip",
+      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . COS/OOS/RUI kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
+    },
+    {
+      "name": "KSU Next (AOSP)",
+      "version": "3.4.1",
+      "date": "2026-10-07",
+      "size": "22MB",
+      "url": "https://archive.org/download/rmx3031-kernels-20261011/KSU-NEXT-AOSP-v4.zip",
+      "changelog": "KernelSU Next . SUSFS v.2.2.0 . Manual Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By xCaptaiN09"
+    },
+    {
+      "name": "BakaSU OP6893",
+      "version": "4.2.0",
+      "date": "2026-10-09",
+      "size": "20MB",
+      "url": "https://archive.org/download/rmx3031-kernels-20261011/BakaSU-OP6893.zip",
+      "changelog": "BakaSU . SUSFS v.2.2.0 . Inline Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By soulspark666"
+    },
+    {
+      "name": "BakaSU MGLRU OP6893",
+      "version": "4.2.0",
+      "date": "2026-10-10",
+      "size": "20MB",
+      "url": "https://archive.org/download/rmx3031-kernels-20261011/BakaSU-MGLRU-OP6893.zip",
+      "changelog": "ResukiSU . MGLRU Memory management . SUSFS v.2.2.0 . Inline Hook . AOSP kernel . LSPosed working . SELinux: Enforcing . By soulspark666"
     }
   ],
   "modules": [
@@ -807,6 +865,6 @@
       "url_123pan": "https://www.123pan.com/s/MsA8vd-SYKzv"
     }
   ],
-  "_synced_at": "2026-10-10",
+  "_synced_at": "2026-10-11",
   "_sync_source": "https://rmx3031-archive.pages.dev/index.json"
 }

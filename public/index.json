@@ -230,6 +230,15 @@
       "url": "https://archive.org/download/lineageos-23.2-20260814-unofficial-op6893/lineage-23.2-20260814-UNOFFICIAL-gms-op6893.zip",
       "changelog": "August Security Patch . Misc Improvements . GMS build (includes Google Apps). By ManshuTyagi.",
       "android": "16"
+    },
+    {
+      "name": "ColorOS 17 (RMX3031)",
+      "version": "17",
+      "date": "2026-10-15",
+      "size": "6.6GB",
+      "url": "https://archive.org/download/coloros-17-beta-rmx3031/Cos_17_RMX3031.zip",
+      "changelog": "Fastboot package. Extract, boot to fastboot, run flash.bat (Win) or ./flash.sh (Linux). Phone auto-reboots to TWRP. Sideload COS16/OOS16 kernel via ADB, format data, reboot.",
+      "android": "17"
     }
   ],
   "kernels": [
@@ -865,6 +874,6 @@
       "url_123pan": "https://www.123pan.com/s/MsA8vd-SYKzv"
     }
   ],
-  "_synced_at": "2026-10-14",
+  "_synced_at": "2026-10-15",
   "_sync_source": "https://rmx3031-archive.pages.dev/index.json"
 }

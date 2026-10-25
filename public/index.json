@@ -239,6 +239,42 @@
       "url": "https://archive.org/download/coloros-17-beta-rmx3031/Cos_17_RMX3031.zip",
       "changelog": "Fastboot package. Extract, boot to fastboot, run flash.bat (Win) or ./flash.sh (Linux). Phone auto-reboots to TWRP. Sideload COS16/OOS16 kernel via ADB, format data, reboot.",
       "android": "17"
+    },
+    {
+      "name": "LineageOS 24.0 UNOFFICIAL",
+      "version": "24.0",
+      "date": "2026-10-21",
+      "size": "1.2GB",
+      "url": "https://archive.org/download/lineage-24.0-20261023-unofficial-op6893/lineage-24.0-20261023-UNOFFICIAL-op6893.zip",
+      "changelog": "Changelog:\n• Updated to latest LineageOS source\n• Latest security patches merged\n• Fixed Bluetooth audio routing\n• Author: liwhy1",
+      "android": "17"
+    },
+    {
+      "name": "Evolution X 17.0 UNOFFICIAL",
+      "version": "17.0",
+      "date": "2026-10-22",
+      "size": "4.0GB",
+      "url": "https://archive.org/download/evolutionx-17.0-20261024-op6893-12.3-unofficial/EvolutionX-17.0-20261024-op6893-12.3-Unofficial.zip",
+      "changelog": "Changelog:\n• Updated to latest Evolution X source\n• October 2026 security patches merged\n• Fixed Bluetooth audio routing\n• Signed Oplus camera\n• Author: liwhy1",
+      "android": "17"
+    },
+    {
+      "name": "OxygenOS 16 STABLE (RMX3031)",
+      "version": "16",
+      "date": "2026-10-24",
+      "size": "4.6GB",
+      "url": "https://archive.org/download/oos16-rmx3031-stable/OOS_16.7z",
+      "changelog": "Changelog:\n• Initial stable release\n• Extreme system debloating\n• OxygenOS 16 interface\n• Device-specific integration\n• Pre-rooted with KernelSU Next\n• Known bugs: none reported\n• Author: x1_osz\n• Credits: @liwhy1, @Atrick11, @xCaptain_09, @CYBER6756, @ManshuTyagi",
+      "android": "16"
+    },
+    {
+      "name": "ColorOS 17 - Refined (RMX3031)",
+      "version": "17",
+      "date": "2026-10-25",
+      "size": "7.7GB",
+      "url": "https://archive.org/download/coloros-17-refined-rmx3031/Cos_17_RMX3031_Refined.zip",
+      "changelog": "Changelog:\n• Fixed USB-C earphone and external USB DAC audio\n• Added Spatial Audio support for wired and USB headphones\n• Forced \"Disable HW overlays\" ON, persists across reboots with Developer Options OFF\n• Preinstalled full Google Play Store\n• Debloated unnecessary Chinese system apps\n\nAuthor: <HANDLE> (Refined Build)\n\nCredits:\n• Original ROM Developer: Frxncyyy\n• RMX3031 Port Fixes & Adaptation: Atrick11\n• Bug fixes: xCaptaiN09\n• Porting Guide: L0gan07\n• Francesco for the original Nord 2 ROM\n\nFastboot package. Extract, boot to fastboot, run flash.bat (Win) or ./flash.sh (Linux). Phone auto-reboots to TWRP. Sideload COS16/OOS16 kernel via ADB, format data, reboot.",
+      "android": "17"
     }
   ],
   "kernels": [
@@ -874,6 +910,6 @@
       "url_123pan": "https://www.123pan.com/s/MsA8vd-SYKzv"
     }
   ],
-  "_synced_at": "2026-10-24",
+  "_synced_at": "2026-10-25",
   "_sync_source": "https://rmx3031-archive.pages.dev/index.json"
 }

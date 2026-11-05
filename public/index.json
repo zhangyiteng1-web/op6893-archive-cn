@@ -250,8 +250,8 @@
       "android": "17"
     },
     {
-      "name": "Evolution X 17.0 UNOFFICIAL",
-      "version": "17.0",
+      "name": "Evolution X 12.3 UNOFFICIAL",
+      "version": "12.3",
       "date": "2026-10-22",
       "size": "4.0GB",
       "url": "https://archive.org/download/evolutionx-17.0-20261024-op6893-12.3-unofficial/EvolutionX-17.0-20261024-op6893-12.3-Unofficial.zip",
@@ -942,6 +942,6 @@
       "url_123pan": "https://www.123pan.com/s/MsA8vd-SYKzv"
     }
   ],
-  "_synced_at": "2026-11-04",
+  "_synced_at": "2026-11-05",
   "_sync_source": "https://rmx3031-archive.pages.dev/index.json"
 }
